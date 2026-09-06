@@ -75,8 +75,13 @@ citations in `docs/rules/{de,en,ro}.md`.
 ## CLI
 
 ```sh
-cargo install --path verbalize-cli   # installs the `verbalize` binary
+cargo install verbalize-cli          # from crates.io; installs the `verbalize` binary
+cargo install --path verbalize-cli   # from a checkout
 ```
+
+Prebuilt binaries for Linux (x86_64, aarch64), macOS (x86_64, aarch64) and
+Windows (x86_64) ship with every [GitHub release](https://github.com/relu/verbalize/releases),
+with shell/PowerShell installers.
 
 ```sh
 # Normalize whole input once (not per line), stdin or a file
@@ -154,6 +159,25 @@ cargo xtask check-data          # CI guard: fails if generated data is stale
   ICU4C via PyICU: spells 0–1,000,000 (strided), powers of ten to 10¹⁸, and
   10,000 random values for every vendored locale and public ruleset. Any
   mismatch is a failure; see `tools/icu-diff/README.md`.
+
+## Releasing
+
+Releases are cut by [cargo-dist](https://opensource.axo.dev/cargo-dist/)
+from `.github/workflows/release.yml` (generated; edit
+`dist-workspace.toml` and re-run `dist generate`, never the YAML). Both
+crates share one version and one tag.
+
+1. Bump `version` in `verbalize/Cargo.toml` and `verbalize-cli/Cargo.toml`
+   (and the `verbalize` dependency in the latter); move the `[Unreleased]`
+   notes in `CHANGELOG.md` under a dated `## [x.y.z]` heading.
+2. `dist plan` shows what the tag will produce; commit.
+3. `git tag vx.y.z && git push --tags`.
+
+The tag triggers the workflow: it builds the CLI for every target, runs
+`.github/workflows/publish-crates.yml` (`cargo publish` for `verbalize`
+then `verbalize-cli`, needs the `CARGO_REGISTRY_TOKEN` repository secret),
+then creates the GitHub release with the archives, installers, checksums
+and the changelog section for that version as release notes.
 
 ## Licence
 
