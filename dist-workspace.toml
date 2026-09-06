@@ -17,5 +17,9 @@ install-path = "CARGO_HOME"
 hosting = "github"
 # Custom workflow_call jobs run after all artifacts build, before announce
 publish-jobs = ["./publish-crates"]
+# The generated job otherwise only grants id-token/packages, leaving
+# publish-crates.yml's own `contents: read` (needed for actions/checkout)
+# capped at "none" per GitHub's reusable-workflow permission ceiling.
+github-custom-job-permissions = { "publish-crates" = { id-token = "write", packages = "write", contents = "read" } }
 # Whether to install an updater program
 install-updater = false
