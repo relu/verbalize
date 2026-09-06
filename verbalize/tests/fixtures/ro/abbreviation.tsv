@@ -1,0 +1,24 @@
+# §7.5 Abbreviation — DOOM3 list; months and weekdays from CLDR ro.
+etc.	etcetera
+de ex.	de exemplu
+nr. 5	numărul cinci
+dr. Popescu	doctor Popescu
+str. Aviatorilor	strada Aviatorilor
+bd. Unirii	bulevardul Unirii
+aprox. 5 km	aproximativ cinci kilometri
+d.Hr.	după Hristos
+î.Hr.	înainte de Hristos
+pag. 5	pagina cinci
+art. 3	articolul trei
+ș.a.m.d.	și așa mai departe
+dl. Ionescu	domnul Ionescu
+ian.	ianuarie
+feb.	februarie
+sept.	septembrie
+dec.	decembrie
+lun.	luni
+vin.	vineri
+# ambiguous: "mar." is both martie and marți; the month wins
+mar.	martie
+# negative: not in the table
+SRL	SRL

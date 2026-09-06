@@ -1,0 +1,10 @@
+# §7.5 Decimal — comma, fraction digits one by one.
+3,5	trei virgulă cinci
+0,75	zero virgulă șapte cinci
+12,34	doisprezece virgulă trei patru
+-3,5	minus trei virgulă cinci
+7,0	șapte virgulă zero
+1.000,50	o mie virgulă cinci zero
+# agreement on the integer part when the noun's gender is known
+2,5 ore	două virgulă cinci ore
+1,5 litri	unu virgulă cinci litri

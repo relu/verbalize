@@ -1,0 +1,27 @@
+# §7.5 Ordinal — written `al N-lea`/`a N-a` (also Roman `al II-lea`); words derived from the cardinal.
+al 3-lea	al treilea
+a 5-a	a cincea
+al II-lea	al doilea
+a II-a	a doua
+al 2-lea	al doilea
+a 2-a	a doua
+1-a	prima
+al 1-lea	primul
+al 4-lea	al patrulea
+a 4-a	a patra
+al 8-lea	al optulea
+a 8-a	a opta
+al 9-lea	al nouălea
+a 9-a	a noua
+al 10-lea	al zecelea
+a 12-a	a douăsprezecea
+al 20-lea	al douăzecilea
+a 20-a	a douăzecea
+al 21-lea	al douăzeci și unulea
+a 21-a	a douăzeci și una
+al 100-lea	al o sutălea
+al XX-lea	al douăzecilea
+al 3-lea etaj	al treilea etaj
+a 3-a clasă	a treia clasă
+# negative: a bare number with a period is a Cardinal
+Capitolul 3.	Capitolul trei.

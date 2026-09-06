@@ -1,0 +1,27 @@
+# §7.5 Money — lei/bani; "de" from 20 on; "și" between major and minor.
+1 leu	un leu
+2 lei	doi lei
+19 lei	nouăsprezece lei
+20 lei	douăzeci de lei
+20 de lei	douăzeci de lei
+100 de lei	o sută de lei
+1,50 lei	un leu și cincizeci de bani
+2,05 lei	doi lei și cinci bani
+0,50 lei	cincizeci de bani
+0,01 lei	un ban
+10,00 lei	zece lei
+1.200,50 lei	o mie două sute de lei și cincizeci de bani
+12,5 lei	doisprezece lei și cincizeci de bani
+100 RON	o sută de lei
+1 euro	un euro
+20 de euro	douăzeci de euro
+1,50 €	un euro și cincizeci de cenți
+5 $	cinci dolari
+10 dolari	zece dolari
+£5	cinci lire
+1,234 lei	unu virgulă doi trei patru lei
+# scale words between amount and currency: "de" after the scale noun, plural currency noun
+2,5 mld. lei	două virgulă cinci miliarde de lei
+3 mil. lei	trei milioane de lei
+3 mil. de lei	trei milioane de lei
+1 mil. euro	un milion de euro

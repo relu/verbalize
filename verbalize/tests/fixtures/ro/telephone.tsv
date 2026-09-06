@@ -1,0 +1,10 @@
+# §7.5 Telephone — digit by digit, groups paused by a comma.
++40 21 123 4567	plus patru zero, doi unu, unu doi trei, patru cinci șase șapte
+0721 123 456	zero șapte doi unu, unu doi trei, patru cinci șase
+0721-123-456	zero șapte doi unu, unu doi trei, patru cinci șase
+021/1234567	zero doi unu, unu doi trei patru cinci șase șapte
+tel. 0721 123 456	telefon zero șapte doi unu, unu doi trei, patru cinci șase
+# negative: a date is not a phone number
+01.11.2026	întâi noiembrie două mii douăzeci și șase
+# extrapolated: parenthesised area code
+(021) 123 4567	zero doi unu, unu doi trei, patru cinci șase șapte

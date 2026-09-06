@@ -1,0 +1,13 @@
+# §7.5 Date — day as a cardinal ("întâi" for the first), month from CLDR ro, year via Year.
+1 noiembrie 2026	întâi noiembrie două mii douăzeci și șase
+01.11.2026	întâi noiembrie două mii douăzeci și șase
+1.11.2026	întâi noiembrie două mii douăzeci și șase
+2026-11-01	întâi noiembrie două mii douăzeci și șase
+24.12.2026	douăzeci și patru decembrie două mii douăzeci și șase
+2 noiembrie	doi noiembrie
+21 martie 2024	douăzeci și unu martie două mii douăzeci și patru
+15.03.	cincisprezece martie
+pe 3 mai	pe trei mai
+ian. 2026	ianuarie două mii douăzeci și șase
+# ISO year-month: month and year, no day (was misread as a range)
+2003-03	martie două mii trei

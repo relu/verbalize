@@ -1,0 +1,35 @@
+# §7.5 Cardinal — "." grouping; gender from the following noun; "de" from 20 on.
+12	doisprezece
+1.000	o mie
+22 000	douăzeci și două de mii
+1.200.000	un milion două sute de mii
+21	douăzeci și unu
+Răspunsul este 1.	Răspunsul este unu.
+-12	minus doisprezece
+1 leu	un leu
+1 oră	o oră
+2 ore	două ore
+2 ani	doi ani
+12 ore	douăsprezece ore
+19 euro	nouăsprezece euro
+20 de euro	douăzeci de euro
+20 euro	douăzeci de euro
+21 de ani	douăzeci și unu de ani
+22 de ore	douăzeci și două de ore
+100 de lei	o sută de lei
+# CLDR ro: 101 is "few" (n % 100 = 1..19), so no "de"
+101 lei	o sută unu lei
+102 lei	o sută doi lei
+1.000 de metri	o mie de metri
+20 de persoane	douăzeci de persoane
+2 milioane	două milioane
+# no noun follows: no "de"
+Sunt 20 și 30.	Sunt douăzeci și treizeci.
+# CLDR variant spellings replaced by DOOM3's standard forms
+14	paisprezece
+16	șaisprezece
+60	șaizeci
+# a scale word with no currency: "de" before a following noun, a written "de" kept
+20 mii de locuitori	douăzeci de mii de locuitori
+3 milioane locuitori	trei milioane de locuitori
+3 milioane km	trei milioane de kilometri

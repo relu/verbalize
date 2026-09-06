@@ -1,0 +1,11 @@
+# §7.2 Roman numeral I–IV in grading contexts.
+NYHA II-III	NYHA doi până la trei
+NYHA IV	NYHA patru
+Stadiul II	Stadiul doi
+Gradul III	Gradul trei
+Tipul II	Tipul doi
+Clasa I	Clasa unu
+# negative: V and above are never expanded
+Carol V	Carol V
+# negative: an ordinal with the article and suffix is the Ordinal class
+sec. al XX-lea	secolul al douăzecilea

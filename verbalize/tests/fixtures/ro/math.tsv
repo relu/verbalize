@@ -1,0 +1,19 @@
+# §7.6 Math expression — operator words in docs/rules/ro.md.
+3 + 4 = 7	trei plus patru egal șapte
+p < 0,05	p mai mic decât zero virgulă zero cinci
+n = 12	n egal doisprezece
+±2 %	plus minus doi la sută
+√2	radical din doi
+x ≈ 3,14	x aproximativ trei virgulă unu patru
+≥65 ani	mai mare sau egal cu șaizeci și cinci de ani
+> 37 pmol/l	mai mare decât treizeci și șapte de picomoli pe litru
+x ≠ 0	x diferit de zero
+∞	infinit
+2 × 3	doi ori trei
+8 ÷ 2	opt împărțit la doi
+3 - 5	trei minus cinci
+≤10 mg	mai mic sau egal cu zece miligrame
+# negative: no numeric operand
+a = b	a = b
+# negative: unspaced hyphen is a Range
+3-5	trei până la cinci

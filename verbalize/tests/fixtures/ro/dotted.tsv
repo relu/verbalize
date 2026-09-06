@@ -1,0 +1,8 @@
+# Dotted number — section, version or clause numbers: groups as cardinals joined by "punct"; a leading-zero group digit by digit.
+2.3	doi punct trei
+3.10	trei punct zece
+versiunea 1.2.7	versiunea unu punct doi punct șapte
+capitolul 4.02	capitolul patru punct zero doi
+# negative: a grouped cardinal and a date keep their own classes
+1.000	o mie
+1.11.2026	întâi noiembrie două mii douăzeci și șase

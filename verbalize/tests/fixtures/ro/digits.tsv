@@ -1,0 +1,7 @@
+# §7.5 Long digit run — leading zeros and IBAN shapes, digit by digit.
+007	zero zero șapte
+01234	zero unu doi trei patru
+RO49 AAAA 1B31 0075 9384 0000	RO patru nouă A A A A unu B trei unu zero zero șapte cinci nouă trei opt patru zero zero zero zero
+0000	zero zero zero zero
+# a 16-digit card number: digit by digit with a pause between groups
+4111 1111 1111 1111	patru unu unu unu, unu unu unu unu, unu unu unu unu, unu unu unu unu

@@ -1,0 +1,20 @@
+# Electronic — emails, URLs, domains, IPv4, @handles: letters as written, digits one by one, symbols by name (at, punct, bară, două puncte, semnul întrebării, egal, liniuță, linie jos).
+ion.popescu@example.ro	ion punct popescu at example punct ro
+info@firma.ro	info at firma punct ro
+asdf123@abc.com	asdf unu doi trei at abc punct com
+a1b2@abc.com	a unu b doi at abc punct com
+enterprise-services@example.com	enterprise liniuță services at example punct com
+https://www.example.ro/cale?x=1	https două puncte bară bară www punct example punct ro bară cale semnul întrebării x egal unu
+http://www.example.com	http două puncte bară bară www punct example punct com
+https://developer.example.com/drive-sim/early-access	https două puncte bară bară developer punct example punct com bară drive liniuță sim bară early liniuță access
+www.example.ro	www punct example punct ro
+example.com	example punct com
+ftp://host/cale_1-2	ftp două puncte bară bară host bară cale linie jos unu liniuță doi
+192.168.0.1	unu nouă doi punct unu șase opt punct zero punct unu
+@jensen	at jensen
+@wezyr1986	at wezyr unu nouă opt șase
+Scrie la info@firma.ro.	Scrie la info at firma punct ro.
+# negative: abbreviations, grouped cardinals, dates and version numbers are not electronic
+etc. 1.000 pe 1.11.2026	etcetera o mie pe întâi noiembrie două mii douăzeci și șase
+dr. Popescu	doctor Popescu
+versiunea 1.2.7	versiunea unu punct doi punct șapte

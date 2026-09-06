@@ -1,0 +1,27 @@
+# §7.5 Measure — CLDR ro long names with one/few/other ("de" inside CLDR's other form).
+10 km	zece kilometri
+20 km	douăzeci de kilometri
+1 km	un kilometru
+2 km	doi kilometri
+120 km/h	o sută douăzeci de kilometri pe oră
+5 kg	cinci kilograme
+1 kg	un kilogram
+2 m	doi metri
+1,5 l	unu virgulă cinci litri
+500 ml	cinci sute de mililitri
+50 mp	cincizeci de metri pătrați
+80 m²	optzeci de metri pătrați
+30 min	treizeci de minute
+2 h	două ore
+500mg	cinci sute de miligrame
+# negative: "/" elsewhere is untouched
+și/sau	și/sau
+# digital units (CLDR digital-*): bit/byte with SI prefixes, data rates with /s or the bps spelling
+2 GB	doi gigabyți
+512 MB	cinci sute doisprezece megabyți
+1 TB	un terabyte
+64 kB	șaizeci și patru de kilobyți
+100 Mbit/s	o sută de megabiți pe secundă
+1 Gbit/s	un gigabit pe secundă
+100 Mbps	o sută de megabiți pe secundă
+1 Gbps	un gigabit pe secundă

@@ -1,0 +1,16 @@
+# §7.5 Time — "ora paisprezece", "paisprezece și treizeci".
+14:30	paisprezece și treizeci
+9:00	ora nouă
+14:00	ora paisprezece
+9:05	nouă și cinci
+ora 9	ora nouă
+ora 2	ora două
+ora 12	ora douăsprezece
+ora 21	ora douăzeci și unu
+22:15	douăzeci și două și cincisprezece
+00:30	zero și treizeci
+la ora 9:30	la nouă și treizeci
+# time zones stay as written after the spoken time; a UTC/GMT offset reads as an expression
+14:30 EET	paisprezece și treizeci EET
+09:00 UTC	ora nouă UTC
+12:00 UTC+2	ora douăsprezece UTC plus doi

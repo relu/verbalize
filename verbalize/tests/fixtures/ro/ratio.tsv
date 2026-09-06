@@ -1,0 +1,12 @@
+# §7.6 Ratio, titer and blood pressure — "cu" for blood pressure, "la" otherwise.
+120/80 mmHg	o sută douăzeci cu optzeci de milimetri coloană de mercur
+TA 120/80	TA o sută douăzeci cu optzeci
+TA 90/50 mmHg	TA nouăzeci cu cincizeci de milimetri coloană de mercur
+100-110/min	o sută până la o sută zece pe minut
+raport 1:3	raport unu la trei
+1 : 3	unu la trei
+ANA 1:640	ANA unu la șase sute patruzeci
+titru 1:80	titru unu la optzeci
+scara 1:25.000	scara unu la douăzeci și cinci de mii
+# negative: "/" after a unit is "pe"
+120 km/h	o sută douăzeci de kilometri pe oră
