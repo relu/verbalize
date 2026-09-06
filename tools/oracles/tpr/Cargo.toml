@@ -1,0 +1,13 @@
+# Driver for the text-processing-rs oracle (design §11.4). Standalone
+# package on purpose: it is not a member of the verbalize workspace and
+# the oracle crate is never linked into verbalize.
+[package]
+name = "tpr-oracle"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+text-processing-rs = { git = "https://github.com/FluidInference/text-processing-rs", rev = "d54aa1f4f7b20587867f5bf8cb053d5bd30f331b" }
