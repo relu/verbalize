@@ -1,0 +1,10 @@
+# §7.4 Time range — both ends read alike; am/pm read once when shared.
+9:00–11:00	nine o'clock to eleven o'clock
+2–4 pm	two to four p m
+2:30–4:00 pm	two thirty to four p m
+from 9:00 to 5:00 pm	from nine to five p m
+9 am–5 pm	nine a m to five p m
+10-11 am	ten to eleven a m
+13:15–14:45	thirteen fifteen to fourteen forty-five
+# negative: bare hours without am/pm are a plain Range
+9-17	nine to seventeen

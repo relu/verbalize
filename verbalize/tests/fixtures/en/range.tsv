@@ -1,0 +1,8 @@
+# §7.4 Range — unspaced dash reads "to".
+5–10 minutes	five to ten minutes
+5-10	five to ten
+2010–2012	twenty ten to twenty twelve
+100–200	one hundred to two hundred
+1–5	one to five
+# negative: spaced dash is left alone; the numbers still read
+5 – 10	five – ten

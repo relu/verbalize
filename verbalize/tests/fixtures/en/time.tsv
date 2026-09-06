@@ -1,0 +1,31 @@
+# §7.4 Time — 12-hour with am/pm, 24-hour without; readings in docs/rules/en.md.
+9:00	nine o'clock
+9:05	nine oh five
+9:30	nine thirty
+14:30	fourteen thirty
+14:00	fourteen hundred
+2:30 pm	two thirty p m
+2:30 PM	two thirty p m
+2:30 p.m.	two thirty p m
+9:00 am	nine a m
+2 pm	two p m
+12:00 pm	twelve p m
+11:45 a.m.	eleven forty-five a m
+00:15	zero fifteen
+23:59	twenty-three fifty-nine
+at 5 pm sharp	at five p m sharp
+# negative: "pm" glued to a letter is not a meridiem
+10 pmol	ten picomoles
+# time zones stay as written after the spoken time; a UTC/GMT offset reads as an expression
+2:30 PM EST	two thirty p m EST
+09:00 UTC	nine o'clock UTC
+14:30 CET	fourteen thirty CET
+10:00 GMT+1	ten o'clock GMT plus one
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/en, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: hh:mm:ss as counted hours, minutes and seconds
+1:01:01	one hour one minute and one second
+14:10:30	fourteen hours ten minutes and thirty seconds
+# a meridiem or a recognised time zone after hh:mm:ss makes it a clock instead
+10:00:00 p.m. EST	ten p m EST
+2:30:15 pm	two thirty and fifteen seconds p m
+14:10:30 EST	fourteen ten and thirty seconds EST

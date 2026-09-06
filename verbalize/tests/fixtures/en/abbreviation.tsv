@@ -1,0 +1,23 @@
+# §7.4 Abbreviation — common English abbreviations; months/weekdays from CLDR en.
+e.g.	for example
+i.e.	that is
+etc.	et cetera
+Dr. Smith	Doctor Smith
+Mr. Jones	Mister Jones
+Mrs. Jones	Missus Jones
+Prof. Brown	Professor Brown
+St. John	Saint John
+Main St.	Main Street
+No. 5	Number five
+approx. 5 km	approximately five kilometers
+vs.	versus
+Inc.	Incorporated
+Mon.	Monday
+Fri.	Friday
+Jan. 5	January fifth
+Sept. 5	September fifth
+Dec.	December
+# negative: "No." without a number is left alone
+No.	No.
+# negative: not in the table
+GmbH	GmbH

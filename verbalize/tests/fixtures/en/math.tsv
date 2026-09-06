@@ -1,0 +1,19 @@
+# §7.6 Math expression — operator words in docs/rules/en.md.
+3 + 4 = 7	three plus four equals seven
+p < 0.05	p is less than zero point zero five
+n = 12	n equals twelve
+±2 %	plus or minus two percent
+√2	the square root of two
+x ≈ 3.14	x is approximately three point one four
+≥65 years	greater than or equal to sixty-five years
+> 37 pmol/L	greater than thirty-seven picomoles per liter
+x ≠ 0	x is not equal to zero
+∞	infinity
+2 × 3	two times three
+8 ÷ 2	eight divided by two
+3 - 5	three minus five
+≤10 mg	less than or equal to ten milligrams
+# negative: no numeric operand
+a = b	a = b
+# negative: unspaced hyphen is a Range
+3-5	three to five

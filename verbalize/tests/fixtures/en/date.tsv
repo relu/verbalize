@@ -1,0 +1,27 @@
+# §7.4 Date — numeric month-day-year in en-US (default), day-month-year in en-GB;
+# month-name forms keep their written order in both regions.
+11/01/2026	November first twenty twenty-six
+1/11/2026	January eleventh twenty twenty-six
+2026-11-01	November first twenty twenty-six
+2025-01-01	January first twenty twenty-five
+November 1, 2026	November first, twenty twenty-six
+Nov 1st	November first
+Nov. 5	November fifth
+1 November 2026	the first of November twenty twenty-six
+1st of November	the first of November
+24 December 2026	the twenty-fourth of December twenty twenty-six
+on March 15, 2024	on March fifteenth, twenty twenty-four
+# ISO year-month: month and year, no day (was misread as a range)
+2003-03	March two thousand three
+# region: EnGb
+11/01/2026	the eleventh of January twenty twenty-six
+1/11/2026	the first of November twenty twenty-six
+2026-11-01	the first of November twenty twenty-six
+November 1, 2026	November first, twenty twenty-six
+1 November 2026	the first of November twenty twenty-six
+# region: EnUs
+# negative: month or day out of range is not a date
+13/13/2026	thirteen/thirteen/twenty twenty-six
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/en, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: year first with slashes is unambiguous in either region
+2016/07/03	July third twenty sixteen

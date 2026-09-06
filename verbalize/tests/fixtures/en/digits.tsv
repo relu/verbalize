@@ -1,0 +1,11 @@
+# §7.4 Long digit run — leading zeros, IBAN shapes, overflow; digit by digit.
+007	zero zero seven
+01234	zero one two three four
+# bank-code letters inside the groups are read one by one as well
+GB29 NWBK 6016 1331 9268 19	GB two nine N W B K six zero one six one three three one nine two six eight one nine
+123456789012345678901234567890123456789	one two three four five six seven eight nine zero one two three four five six seven eight nine zero one two three four five six seven eight nine zero one two three four five six seven eight nine
+0000	zero zero zero zero
+# fixed digit-group shapes: a US SSN and a 16-digit card number, digit by digit with a pause between groups
+123-45-6789	one two three, four five, six seven eight nine
+4111 1111 1111 1111	four one one one, one one one one, one one one one, one one one one
+4111-1111-1111-1111	four one one one, one one one one, one one one one, one one one one

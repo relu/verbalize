@@ -1,0 +1,17 @@
+# §7.4 Cardinal — comma grouping, CLDR en RBNF %spellout-numbering.
+12	twelve
+1,000	one thousand
+22 000	twenty-two thousand
+1,000,000	one million
+100	one hundred
+21	twenty-one
+1,200,000	one million two hundred thousand
+The answer is 1.	The answer is one.
+-12	minus twelve
+1 dollar	one dollar
+2 dollars	two dollars
+B1	B one
+2-hour workshop	two-hour workshop
+# a scale word with no currency
+5 thousand people	five thousand people
+5 million km	five million kilometers

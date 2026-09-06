@@ -1,0 +1,12 @@
+# §7.4 Telephone — digit by digit, groups paused by a comma, "zero" for 0.
++1 (555) 123-4567	plus one, five five five, one two three, four five six seven
+555-123-4567	five five five, one two three, four five six seven
+(555) 123-4567	five five five, one two three, four five six seven
+555.123.4567	five five five, one two three, four five six seven
++44 20 7946 0958	plus four four, two zero, seven nine four six, zero nine five eight
+020 7946 0958	zero two zero, seven nine four six, zero nine five eight
+# a seven-digit local number
+555-1234	five five five, one two three four
+# negative: fewer than seven digits is a Range
+555-123	five hundred fifty-five to one hundred twenty-three
+Tel. 555-123-4567	Tel. five five five, one two three, four five six seven

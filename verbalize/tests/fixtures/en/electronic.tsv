@@ -1,0 +1,23 @@
+# Electronic — emails, URLs, domains, IPv4, @handles: letters as written, digits one by one, symbols by name (at, dot, slash, colon, question mark, equals, dash, underscore).
+a.bc@gmail.com	a dot bc at gmail dot com
+cdf@abc.edu	cdf at abc dot edu
+asdf123@abc.com	asdf one two three at abc dot com
+a1b2@abc.com	a one b two at abc dot com
+enterprise-services@example.com	enterprise dash services at example dot com
+email is abc1@gmail.com	email is abc one at gmail dot com
+http://www.ourdailynews.com	http colon slash slash www dot ourdailynews dot com
+https://www.example.com/path?x=1	https colon slash slash www dot example dot com slash path question mark x equals one
+https://developer.example.com/drive-sim/early-access	https colon slash slash developer dot example dot com slash drive dash sim slash early dash access
+www.ourdailynews.com/123-sm	www dot ourdailynews dot com slash one two three dash sm
+example.com	example dot com
+test.abc@example.org	test dot abc at example dot org
+192.168.0.1	one nine two dot one six eight dot zero dot one
+@jensen	at jensen
+file:///photos/image.jpg	file colon slash slash slash photos slash image dot jpg
+Visit example.com.	Visit example dot com.
+# negative: abbreviations, grouped cardinals and decimals are not electronic
+e.g. 1,000 or 5.4	for example one thousand or five point four
+Dr. Smith	Doctor Smith
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/en, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: an address with a path
+sdf@gmail.com/123-sm	sdf at gmail dot com slash one two three dash sm

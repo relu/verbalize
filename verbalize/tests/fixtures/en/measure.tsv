@@ -1,0 +1,32 @@
+# §7.4 Measure — CLDR en long unit names with plural category; "/" → "per".
+10 km	ten kilometers
+1 km	one kilometer
+80 m²	eighty square meters
+5 cm³	five cubic centimeters
+120 km/h	one hundred twenty kilometers per hour
+60 mph	sixty miles per hour
+5 kg	five kilograms
+2 m	two meters
+1.5 L	one point five liters
+500 mL	five hundred milliliters
+6 ft	six feet
+1 ft	one foot
+3 lb	three pounds
+12 oz	twelve ounces
+5 mi	five miles
+30 min	thirty minutes
+2 hrs	two hours
+500mg	five hundred milligrams
+# negative: "in" is a word, never an inch after a bare number
+5 in the morning	five in the morning
+# negative: "/" elsewhere is untouched
+and/or	and/or
+# digital units (CLDR digital-*): bit/byte with SI prefixes, data rates with /s or the bps spelling
+2 GB	two gigabytes
+512 MB	five hundred twelve megabytes
+1 TB	one terabyte
+64 KB	sixty-four kilobytes
+100 Mbit/s	one hundred megabits per second
+1 Gbit/s	one gigabit per second
+100 Mbps	one hundred megabits per second
+1 Gbps	one gigabit per second

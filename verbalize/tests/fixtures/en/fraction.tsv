@@ -1,0 +1,27 @@
+# §7.4 / §7.6 Fractions — Unicode and slash forms.
+½	one half
+¼	one quarter
+¾	three quarters
+1/2	one half
+3/4	three quarters
+2/3	two thirds
+1/8	one eighth
+5/12	five twelfths
+1/100	one hundredth
+1/1000	one thousandth
+1 ½	one and a half
+2 ¾	two and three quarters
+½ cup	one half cup
+# negative: numerator not smaller than the denominator
+2/2	two/two
+# negative: date-like shape is a Date (month/day/year in en-US)
+1/2/2026	January second twenty twenty-six
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/en, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: denominators 13–99 derive the noun from the ordinal
+31/32	thirty-one thirty-seconds
+1/13	one thirteenth
+# text-processing-rs: an ordinal suffix on the denominator joins the span
+1/4th	one quarter
+2/4th	two quarters
+# negative: a denominator above 99 that the table does not name falls through
+1/250	one/two hundred fifty

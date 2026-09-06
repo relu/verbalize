@@ -1,0 +1,10 @@
+# §7.4 Decimal — point as the separator, fraction digits read one by one.
+3.5	three point five
+0.75	zero point seven five
+12.34	twelve point three four
+0.05	zero point zero five
+100.1	one hundred point one
+-3.5	minus three point five
+7.0	seven point zero
+1,000.50	one thousand point five zero
+99.99	ninety-nine point nine nine

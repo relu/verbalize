@@ -1,0 +1,34 @@
+# §7.4 Money — symbol before the amount; "dollars and cents".
+$8.80	eight dollars and eighty cents
+$12	twelve dollars
+$1	one dollar
+$0.15	fifteen cents
+$0.01	one cent
+$1.01	one dollar and one cent
+$1,200.50	one thousand two hundred dollars and fifty cents
+$12.5	twelve dollars and fifty cents
+$10.00	ten dollars
+$8.808	eight point eight zero eight dollars
+€8.80	eight euros and eighty cents
+€1	one euro
+£5	five pounds
+£0.50	fifty pence
+£1.01	one pound and one penny
+10 CHF	ten francs
+8.80 USD	eight dollars and eighty cents
+$5/month	five dollars per month
+$30/hr	thirty dollars per hour
+US$ 100	one hundred dollars
+# scale words between amount and currency: one Money span, plural currency noun, never cents
+$2.5 billion	two point five billion dollars
+3 million euros	three million euros
+$1 million	one million dollars
+$5k	five thousand dollars
+£2bn	two billion pounds
+$5M	five million dollars
+# negative: a one-letter scale is only a scale when glued
+$5 M	five dollars M
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/en, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: an amount that starts at the point
+$.01	one cent
+$.506	zero point five zero six dollars

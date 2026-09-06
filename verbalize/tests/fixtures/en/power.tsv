@@ -1,0 +1,14 @@
+# §7.6 Power — "squared", "cubed", "to the power of".
+2⁵	two to the power of five
+10³	ten cubed
+2^10	two to the power of ten
+x²	x squared
+x³	x cubed
+x^-2	x to the power of minus two
+5²	five squared
+π²	pi squared
+n^-1	n to the power of minus one
+# negative: unit symbols are Measure
+80 m²	eighty square meters
+# negative: bare superscript is untouched
+²	²

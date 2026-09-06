@@ -1,0 +1,6 @@
+# Dotted number — version or clause numbers with two or more periods: groups as cardinals joined by "point"; a leading-zero group digit by digit.
+version 1.2.7	version one point two point seven
+section 4.02.1	section four point zero two point one
+# negative: one period is a decimal
+2.3	two point three
+3.10	three point one zero

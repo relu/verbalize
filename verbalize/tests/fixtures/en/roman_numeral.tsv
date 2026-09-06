@@ -1,0 +1,14 @@
+# §7.2 Roman numeral I–IV in grading contexts.
+NYHA II-III	NYHA two to three
+NYHA IV	NYHA four
+Stage II	Stage two
+Grade III	Grade three
+Type II diabetes	Type two diabetes
+Class I recommendation	Class one recommendation
+World War II	World War two
+lead II	lead two
+# negative: V and above are never expanded
+Henry V	Henry V
+factor V Leiden	factor V Leiden
+# negative: a lone I outside a grading context
+I am here	I am here

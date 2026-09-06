@@ -1,0 +1,12 @@
+# §7.6 Angle / coordinate — degrees, minutes, seconds, compass word.
+30°15′	thirty degrees fifteen minutes
+30° 15′ 20″	thirty degrees fifteen minutes twenty seconds
+52.52° N	fifty-two point five two degrees north
+48°51′29″ N	forty-eight degrees fifty-one minutes twenty-nine seconds north
+2.35° E	two point three five degrees east
+30°15'	thirty degrees fifteen minutes
+13.4° S	thirteen point four degrees south
+# negative: plain Degrees
+20 °C	twenty degrees Celsius
+# negative: a compass letter with no degree value
+N	N

@@ -1,0 +1,11 @@
+# §7.6 Scientific notation — "times ten to the power of".
+1.5 × 10⁻⁶	one point five times ten to the power of minus six
+1.5 · 10⁻⁶	one point five times ten to the power of minus six
+1.5×10^-6	one point five times ten to the power of minus six
+1.5e-6	one point five times ten to the power of minus six
+1.5E+08	one point five times ten to the power of eight
+2.0e10	two point zero times ten to the power of ten
+6.022 × 10²³ mol⁻¹	six point zero two two times ten to the power of twenty-three per mole
+3 × 10⁸ m/s	three times ten to the power of eight meters per second
+# negative: no decimal point and no signed exponent
+1e10	oneeten

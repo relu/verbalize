@@ -1,0 +1,13 @@
+# §7.4 Ordinal — digit + suffix, %spellout-ordinal; no context needed.
+1st	first
+2nd	second
+3rd	third
+4th	fourth
+22nd	twenty-second
+101st	one hundred first
+the 5th floor	the fifth floor
+1st–3rd	first to third
+# negative: a bare period is not an ordinal marker in English
+Chapter 3.	Chapter three.
+# negative: the suffix must be word-bounded
+1stx	onestx

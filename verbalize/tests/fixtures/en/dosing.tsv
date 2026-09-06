@@ -1,0 +1,15 @@
+# §7.6 Dose scheme and Repetition — "once", "twice", "N times".
+1-0-1	one, zero, one
+20-5-0 mg/d	twenty, five, zero milligrams per day
+1-1-1-1	one, one, one, one
+2x daily	twice daily
+3x daily	three times daily
+1x	once
+2×/day	twice per day
+4x 500 mg	four times five hundred milligrams
+1.5 x 2 cm	one point five times two centimeters
+Metformin 1000 mg 2x/day	Metformin one thousand milligrams twice per day
+# negative: two groups are a Range
+1-2 glasses	one to two glasses
+# negative: hex literal
+0x1F	zerox one F
