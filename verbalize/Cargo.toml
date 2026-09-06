@@ -1,6 +1,6 @@
 [package]
 name = "verbalize"
-version = "0.1.1"
+version = "0.1.2"
 description = "Text normalisation for speech synthesis: numbers, dates, prices and abbreviations as spoken words, driven by CLDR data"
 edition.workspace = true
 license.workspace = true

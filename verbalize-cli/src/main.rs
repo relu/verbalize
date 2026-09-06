@@ -30,7 +30,7 @@ enum Command {
 #[derive(Args)]
 struct CommonArgs {
     /// BCP-47 language tag: de, en, ro.
-    #[arg(long, default_value = "de")]
+    #[arg(long, default_value = "en")]
     lang: String,
     /// Regional variant, e.g. de-CH, en-US, en-GB.
     #[arg(long)]

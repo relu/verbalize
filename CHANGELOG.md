@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-06
+
+### Fixed
+
+- Range: a unit right after a range (`5-10 Min.`, `1-2 kg`) is now
+  claimed as part of the range instead of Measure claiming only the
+  second number and stranding the first as a bare cardinal with the
+  dash left unread (`5-10 Min.` was "fünf-zehn Minuten", now "fünf bis
+  zehn Minuten"). `de`/`en`/`ro`.
+
+### Changed
+
+- CLI: the default `--lang` is now `en` (was `de`).
+
 ## [0.1.1] - 2026-09-06
 
 ### Fixed

@@ -6,3 +6,7 @@
 1–5	one to five
 # negative: spaced dash is left alone; the numbers still read
 5 – 10	five – ten
+# regression: a unit right after the range is claimed with it, above
+# Measure — not stranded as a bare cardinal plus a literal hyphen
+5-10 min	five to ten minutes
+The trip takes 5-10 min and costs $5.	The trip takes five to ten minutes and costs five dollars.

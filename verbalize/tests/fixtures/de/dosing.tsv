@@ -22,6 +22,11 @@ Metformin 1000 mg 2×/Tag	Metformin eintausend Milligramm zweimal pro Tag
 # negative: a two-number hyphen shape is a plain Range, not a dose scheme
 # (needs three or four groups)
 1-2 Gläser Wein	eins bis zwei Gläser Wein
+# regression: Repetition outranks Range, so a hyphenated "Nx" still fuses
+# into "mal" even when a range-shaped number sits in front of it; the
+# leading number falls back to a bare Cardinal with the hyphen unread
+# (§9), same as before Range gained its own trailing-unit reading
+1-2x täglich	eins-zweimal täglich
 # negative: a two-group hyphen-digit shape with a rate is Ratio's
 # range-rate reading (§7.6 "Ratio, titer and blood pressure"), not this
 # class either

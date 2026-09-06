@@ -547,21 +547,37 @@ pub(super) fn verbalize(r: &Romanian, token: &Token, agreement: Agreement) -> Ve
             format!("{} până la {}", r.clock_words(*from), r.clock_words(*to))
         }
         Token::Date { day, month, year } => r.date_words(*day, *month, *year),
-        Token::Range { from, to } => {
-            // The noun after the range governs both ends' gender ("două
-            // până la trei ore"); only the end next to it takes the "de"
-            // ("douăzeci până la treizeci de minute"), and the far
-            // end keeps the pronoun form of one ("una", not the article "o").
-            let gender = agreement.gender;
-            let near = agreement.noun == NounPosition::After;
-            let end = |end: &RangeEnd, near: bool| match end {
-                RangeEnd::Cardinal(n) if near => r.count_words(n, gender),
-                RangeEnd::Cardinal(n) if n.integer == 1 => ruleset_words(1, gender),
-                RangeEnd::Cardinal(n) => words(n, gender),
-                RangeEnd::Ordinal(n) => ordinal_words(*n, Gender::Masculine),
-                RangeEnd::Year(y) => year_words(*y),
-            };
-            format!("{} până la {}", end(from, false), end(to, near))
+        Token::Range { from, to, unit } => {
+            if let (Some(unit), RangeEnd::Cardinal(n)) = (unit, to) {
+                let gender = r.unit_gender(unit);
+                let end = |end: &RangeEnd| match end {
+                    RangeEnd::Cardinal(n) if n.integer == 1 => ruleset_words(1, gender),
+                    RangeEnd::Cardinal(n) => words(n, gender),
+                    RangeEnd::Ordinal(n) => ordinal_words(*n, Gender::Masculine),
+                    RangeEnd::Year(y) => year_words(*y),
+                };
+                format!(
+                    "{} până la {} {}",
+                    end(from),
+                    end(to),
+                    r.unit_or_percent(unit, n)
+                )
+            } else {
+                // The noun after the range governs both ends' gender ("două
+                // până la trei ore"); only the end next to it takes the "de"
+                // ("douăzeci până la treizeci de minute"), and the far
+                // end keeps the pronoun form of one ("una", not the article "o").
+                let gender = agreement.gender;
+                let near = agreement.noun == NounPosition::After;
+                let end = |end: &RangeEnd, near: bool| match end {
+                    RangeEnd::Cardinal(n) if near => r.count_words(n, gender),
+                    RangeEnd::Cardinal(n) if n.integer == 1 => ruleset_words(1, gender),
+                    RangeEnd::Cardinal(n) => words(n, gender),
+                    RangeEnd::Ordinal(n) => ordinal_words(*n, Gender::Masculine),
+                    RangeEnd::Year(y) => year_words(*y),
+                };
+                format!("{} până la {}", end(from, false), end(to, near))
+            }
         }
         Token::Score { left, right } => format!(
             "{} la {}",

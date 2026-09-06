@@ -85,11 +85,11 @@ with shell/PowerShell installers.
 
 ```sh
 # Normalize whole input once (not per line), stdin or a file
-echo "Am 1. November um 19.30 Uhr kostet es 8,80 €." | verbalize normalize
+echo "Am 1. November um 19.30 Uhr kostet es 8,80 €." | verbalize normalize --lang de
 # Am ersten November um neunzehn Uhr dreißig kostet es acht Euro achtzig.
 
 # One classified span per line: byte_start-byte_end, class, original, spoken, fallback
-echo "Am 1. November um 19.30 Uhr kostet es 8,80 €." | verbalize annotate
+echo "Am 1. November um 19.30 Uhr kostet es 8,80 €." | verbalize annotate --lang de
 # 3-14	Date	1. November	ersten November	false
 # 18-27	Time	19.30 Uhr	neunzehn Uhr dreißig	false
 # 38-46	Money	8,80 €	acht Euro achtzig	false
@@ -103,7 +103,7 @@ verbalize survey corpus/ --threshold 5   # non-zero exit if an unhandled
 verbalize survey sqlite:app.db           # every TEXT column, every table
 ```
 
-Flags shared by `normalize`/`annotate`: `--lang de|en|ro` (default `de`),
+Flags shared by `normalize`/`annotate`: `--lang de|en|ro` (default `en`),
 `--region <tag>` (e.g. `de-CH`, `en-US`), `--no-abbreviations`, `--lexicon
 FILE` (see below), and a positional `FILE` or `-`/omitted for stdin.
 

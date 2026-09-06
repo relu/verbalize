@@ -10,3 +10,7 @@
 5–10 minute, apoi	cinci până la zece minute, apoi
 # negative: spaced dash is left alone; the numbers still read
 5 – 10	cinci – zece
+# regression: a unit right after the range is claimed with it, above
+# Measure — not stranded as a bare cardinal plus a literal hyphen
+5-10 min	cinci până la zece minute
+Drumul dureaza 5-10 min si costa 12,5 lei.	Drumul dureaza cinci până la zece minute si costa doisprezece lei și cincizeci de bani.

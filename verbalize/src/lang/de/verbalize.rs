@@ -359,12 +359,17 @@ pub(super) fn verbalize(g: &German, token: &Token, agreement: Agreement) -> Verb
             }
             out
         }
-        Token::Range { from, to } => {
-            format!(
+        Token::Range { from, to, unit } => {
+            let mut out = format!(
                 "{} bis {}",
                 g.range_end_words(from, agreement),
                 g.range_end_words(to, agreement)
-            )
+            );
+            if let (Some(unit), RangeEnd::Cardinal(n)) = (unit, to) {
+                out.push(' ');
+                out.push_str(&unit_words(g, unit, n));
+            }
+            out
         }
         Token::Score { left, right } => format!(
             "{} zu {}",

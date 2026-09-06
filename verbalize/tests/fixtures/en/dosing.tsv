@@ -11,5 +11,9 @@
 Metformin 1000 mg 2x/day	Metformin one thousand milligrams twice per day
 # negative: two groups are a Range
 1-2 glasses	one to two glasses
+# regression: Repetition outranks Range, so a hyphenated "Nx" still fuses
+# into "times" even when a range-shaped number sits in front of it; the
+# leading number falls back to a bare Cardinal with the hyphen unread
+2-3x daily	two-three times daily
 # negative: hex literal
 0x1F	zerox one F

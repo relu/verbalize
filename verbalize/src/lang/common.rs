@@ -130,7 +130,7 @@ impl Patterns {
             degrees: format!(r"(-?{num})\s*°\s?([CF])?"),
             measure: format!(r"(-?{num})(\s?)({unit})"),
             hyphenated_measure: r"([0-9]+)-(\p{L}{1,4})[-\s](\p{L})".into(),
-            range: format!(r"({int})[–-]({int})"),
+            range: format!(r"({int})[–-]({int})(?:(\s?)({unit}))?"),
             year: format!(r"([0-9]{{4}})({})?", regex::escape(tables.decade_suffix)),
             decimal: format!(r"(-?{int}){dec}([0-9]+)"),
             dotted: r"[0-9]+(?:\.[0-9]+)+".into(),
@@ -971,12 +971,25 @@ pub(crate) fn degrees<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<
     ))
 }
 
-pub(crate) fn measure<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Match> {
-    let (value, range) = numeral_at(c.numerals(), text, &group(caps, 1)?)?;
-    let glued = text_of(caps, 2).is_empty();
-    let symbol = group(caps, 3)?;
-    let mut end = group(caps, 0)?.end;
-    let mut written = &text[symbol.start..end];
+/// A unit symbol already captured by the caller's own regex group right
+/// after a number (`5 kg`, `5kg`, `10 Min.`), validated against the unit
+/// table; the trailing `.` of a short name is tried both kept and
+/// stripped. Unlike [`trailing_unit`], which scans forward from a bare
+/// offset and tolerates spaces and digits for compound multi-word units
+/// (`12,5 €`), this only ever looks at the single token the regex's
+/// `SYM`-bounded group matched, so prose after the unit can't be mistaken
+/// for part of it. `glued` is true when nothing separated the number from
+/// the symbol, which only a bare CLDR/extra symbol may do (`500mg`, not
+/// `3,5m` or `1,5Liter` — those keep the input's missing space instead of
+/// being misread as a two-letter unit).
+fn captured_unit<C: Context>(
+    c: &C,
+    text: &str,
+    symbol: Range<usize>,
+    glued: bool,
+) -> Option<(Unit, usize)> {
+    let mut end = symbol.end;
+    let mut written = &text[symbol.clone()];
     let mut unit = c.unit(written, !written.contains('/'));
     if unit.is_none() {
         if let Some(stripped) = written.strip_suffix('.') {
@@ -1008,6 +1021,14 @@ pub(crate) fn measure<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<
             return None;
         }
     }
+    Some((unit, end))
+}
+
+pub(crate) fn measure<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Match> {
+    let (value, range) = numeral_at(c.numerals(), text, &group(caps, 1)?)?;
+    let glued = text_of(caps, 2).is_empty();
+    let symbol = group(caps, 3)?;
+    let (unit, end) = captured_unit(c, text, symbol, glued)?;
     Some(Match::new(
         range.start..end,
         Token::Measure {
@@ -1076,17 +1097,20 @@ pub(crate) fn repetition<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Opti
     ))
 }
 
-/// `A–B` of cardinals or years (ordinal ranges are per language). The
-/// agreement is the noun after the range (`20–30 minute`), as for a
-/// cardinal.
+/// `A–B` of cardinals or years (ordinal ranges are per language), with an
+/// optional unit right after (`5-10 Min.`) claimed as part of the same
+/// match — above Measure in priority, so Measure never claims just the
+/// second number and strands the first as a bare cardinal. Without a
+/// claimable unit the agreement is the noun after the range
+/// (`20–30 minute`), as for a cardinal.
 pub(crate) fn range<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Match> {
-    let whole = group(caps, 0)?;
     let from = group(caps, 1)?;
     let to = group(caps, 2)?;
-    if !digit_bounded(text, &whole)
-        || char_before(text, whole.start).is_some_and(|ch| ch == '-' || ch == '–')
-        || (char_after(text, whole.end) == Some('-')
-            && char_after(text, whole.end + 1).is_some_and(|ch| ch.is_ascii_digit()))
+    let bare = from.start..to.end;
+    if !digit_bounded(text, &bare)
+        || char_before(text, bare.start).is_some_and(|ch| ch == '-' || ch == '–')
+        || (char_after(text, bare.end) == Some('-')
+            && char_after(text, bare.end + 1).is_some_and(|ch| ch.is_ascii_digit()))
     {
         return None;
     }
@@ -1097,12 +1121,30 @@ pub(crate) fn range<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
             _ => RangeEnd::Cardinal(Numeral::int(value)),
         })
     };
-    let agreement = counted(c, text, whole.end);
+    let from_end = end(&from)?;
+    let to_end = end(&to)?;
+    let mut whole = bare.clone();
+    let mut unit = None;
+    if matches!(to_end, RangeEnd::Cardinal(_)) {
+        if let Some(symbol) = caps.get(4) {
+            let glued = text_of(caps, 3).is_empty();
+            if let Some((u, end_pos)) = captured_unit(c, text, symbol, glued) {
+                whole = bare.start..end_pos;
+                unit = Some(u);
+            }
+        }
+    }
+    let agreement = if unit.is_none() {
+        counted(c, text, bare.end)
+    } else {
+        Agreement::default()
+    };
     let mut m = Match::new(
         whole,
         Token::Range {
-            from: end(&from)?,
-            to: end(&to)?,
+            from: from_end,
+            to: to_end,
+            unit,
         },
     );
     m.agreement = agreement;

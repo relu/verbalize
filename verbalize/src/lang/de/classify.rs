@@ -58,14 +58,14 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         ),
         recognizer(&p.percent, common::percent),
         recognizer(&p.degrees, common::degrees),
-        recognizer(&p.measure, common::measure),
-        recognizer(&p.hyphenated_measure, common::hyphenated_measure),
         recognizer(
             &format!(r"(-?{plain})\s*(?:[x×]|-mal)(/\p{{L}}+)?"),
             common::repetition,
         ),
         recognizer(r"([0-9]+)\.[–-]([0-9]+)\.", ordinal_range),
         recognizer(&p.range, common::range),
+        recognizer(&p.measure, common::measure),
+        recognizer(&p.hyphenated_measure, common::hyphenated_measure),
         recognizer(
             &format!(r"(?:((?i:{TRIGGERS}))\s+)?([0-9]+)\.(?:\s+(\p{{L}}+))?"),
             ordinal,
@@ -256,6 +256,7 @@ fn ordinal_range(g: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
         Token::Range {
             from: end(1)?,
             to: end(2)?,
+            unit: None,
         },
     );
     m.agreement = ordinal_agreement(previous_word(text, whole.start), Some(gender));

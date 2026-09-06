@@ -11,3 +11,7 @@
 1,5 x 2 cm	de unu virgulă cinci ori doi centimetri
 # negative: two groups are a Range (neuter plural takes the feminine "două")
 1-2 pahare	unu până la două pahare
+# regression: Repetition outranks Range, so a hyphenated "Nx" still fuses
+# into "ori" even when a range-shaped number sits in front of it; the
+# leading number falls back to a bare Cardinal with the hyphen unread
+2-3x pe zi	doi-de trei ori pe zi

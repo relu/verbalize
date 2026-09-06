@@ -285,9 +285,13 @@ pub enum Token {
         month: u8,
         year: Option<u64>,
     },
+    /// `unit` is `Some` only when a unit right after the range was
+    /// claimed with it (`5-10 Min.`), read from `to`'s value; `None`
+    /// leaves any trailing noun as plain unclaimed text.
     Range {
         from: RangeEnd,
         to: RangeEnd,
+        unit: Option<Unit>,
     },
     Score {
         left: u32,

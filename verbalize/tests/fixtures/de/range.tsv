@@ -16,3 +16,9 @@ vom 1.–3. November	vom ersten bis dritten November
 1–5	eins bis fünf
 # extrapolated
 100–200	einhundert bis zweihundert
+# regression: a unit right after the range is claimed with it, above
+# Measure — not stranded as a bare cardinal plus a literal hyphen
+5-10 Min.	fünf bis zehn Minuten
+5–10 Min.	fünf bis zehn Minuten
+5-10Min.	fünf bis zehn Minuten
+Die Fahrt dauert 5–10 Min. und kostet 12,5 €.	Die Fahrt dauert fünf bis zehn Minuten und kostet zwölf Euro fünfzig.

@@ -72,13 +72,13 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         ),
         recognizer(&p.percent, common::percent),
         recognizer(&p.degrees, common::degrees),
-        recognizer(&p.measure, common::measure),
-        recognizer(&p.hyphenated_measure, common::hyphenated_measure),
         recognizer(
             &format!(r"(-?{plain})\s*[x×](/\p{{L}}+)?"),
             common::repetition,
         ),
         recognizer(&p.range, common::range),
+        recognizer(&p.measure, common::measure),
+        recognizer(&p.hyphenated_measure, common::hyphenated_measure),
         // Above Decimal so `1.2.7` is not "one point two" plus a period.
         recognizer(&p.dotted, common::dotted),
         // Slash fraction before Year: `1/1000` is a thousandth, not a year.
@@ -282,6 +282,7 @@ fn ordinal_range(_: &English, text: &str, caps: &Caps<'_>) -> Option<Match> {
         Token::Range {
             from: end(1)?,
             to: end(2)?,
+            unit: None,
         },
     ))
 }

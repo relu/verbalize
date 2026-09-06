@@ -374,13 +374,18 @@ pub(super) fn verbalize(e: &English, token: &Token, agreement: Agreement) -> Ver
             )
         }
         Token::Date { day, month, year } => e.date_words(*day, *month, *year, agreement.noun),
-        Token::Range { from, to } => {
+        Token::Range { from, to, unit } => {
             let end = |end: &RangeEnd| match end {
                 RangeEnd::Cardinal(n) => words(n),
                 RangeEnd::Ordinal(n) => ordinal_words(*n),
                 RangeEnd::Year(y) => year_words(*y),
             };
-            format!("{} to {}", end(from), end(to))
+            let mut out = format!("{} to {}", end(from), end(to));
+            if let (Some(unit), RangeEnd::Cardinal(n)) = (unit, to) {
+                out.push(' ');
+                out.push_str(&unit_words(e, unit, n));
+            }
+            out
         }
         Token::Score { left, right } => {
             format!("{} to {}", words(&(*left).into()), words(&(*right).into()))
