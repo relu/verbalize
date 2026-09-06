@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: fmt check
+        run: cargo fmt --all -- --check
+      - name: clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: test
+        run: cargo test --workspace
+      - name: check-data
+        run: cargo xtask check-data
+
+  icu-diff:
+    name: icu-diff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: install libicu
+        run: sudo apt-get update && sudo apt-get install -y libicu-dev pkg-config
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: install PyICU
+        run: pip install -r tools/icu-diff/requirements.txt
+      - name: build rbnf_dump
+        run: cargo build --release -q -p verbalize --example rbnf_dump
+      - name: run icu-diff
+        # Default stride (997) and seed already keep the sweep well under
+        # 10 minutes (design §11.2, tools/icu-diff/README.md).
+        run: python3 tools/icu-diff/icu_diff.py
+
+  bench:
+    name: bench
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: bench --no-run
+        run: cargo bench --workspace --no-run
