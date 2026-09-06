@@ -1,0 +1,37 @@
+# §7.6 Measure — scientific and medical unit extension. CLDR de units.json
+# ids named in docs/rules/de.md; extra-symbol table for what CLDR lacks;
+# compound A/B[/C] lab tokens resolved compositionally. Case-sensitive
+# throughout: G/l vs g/l are different lab values.
+Kalium 5,8 mmol/l	Kalium fünf Komma acht Millimol pro Liter
+Glukose 210 mg/dl	Glukose zweihundertzehn Milligramm pro Deziliter
+CRP 84 mg/l	CRP vierundachtzig Milligramm pro Liter
+GPT 140 U/l	GPT einhundertvierzig Einheiten pro Liter
+Bilirubin 34 µmol/l	Bilirubin vierunddreißig Mikromol pro Liter
+12 IE Insulin	zwölf Internationale Einheiten Insulin
+BMI 31 kg/m²	BMI einunddreißig Kilogramm pro Quadratmeter
+GFR 42 ml/min/1,73 m²	GFR zweiundvierzig Milliliter pro Minute pro eins Komma sieben drei Quadratmeter
+Leukozyten 14 G/l	Leukozyten vierzehn Giga pro Liter
+# `G…` symbols other than the bare `G` are not gated: Gpt (10⁹/l), Tpt (10¹²/l)
+Thrombozyten 250 Gpt/l	Thrombozyten zweihundertfünfzig Gigapartikel pro Liter
+Erythrozyten 4,5 Tpt/l	Erythrozyten vier Komma fünf Terapartikel pro Liter
+# case-sensitive negative: lowercase g/l is grams, not Giga
+Hämoglobin 9,1 g/dl	Hämoglobin neun Komma eins Gramm pro Deziliter
+1 mg/kgKG	ein Milligramm pro Kilogramm Körpergewicht
+Natrium 138 mval/l	Natrium einhundertachtunddreißig Millival pro Liter
+Natrium 138 mEq/l	Natrium einhundertachtunddreißig Milliäquivalent pro Liter
+# extrapolated
+Kreatinin 0,9 mg/dl	Kreatinin null Komma neun Milligramm pro Deziliter
+# extrapolated
+273 K	zweihundertdreiundsiebzig Kelvin
+# extrapolated
+Widerstand 50 Ω	Widerstand fünfzig Ohm
+# extrapolated
+Frequenz 50 Hz	Frequenz fünfzig Hertz
+# extrapolated
+Druck 1013 hPa	Druck eintausenddreizehn Hektopascal
+# extrapolated: CLDR translates ppm, no letter-spelling needed
+50 ppm	fünfzig Millionstel
+# extrapolated
+im 75-g-oGTT	im fünfundsiebzig-Gramm-oGTT
+# negative: no rule needed, already correct via Decimal
+pH 7,4	pH sieben Komma vier

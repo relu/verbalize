@@ -1,0 +1,35 @@
+# §7.2 Money — two/one-digit fraction is cents; ",00" dropped; sub-unit only -> minor unit; "ein Euro"/"ein Cent" via masculine cardinal.
+8,80 €	acht Euro achtzig
+€ 8,80	acht Euro achtzig
+8,80 EUR	acht Euro achtzig
+8,80 Euro	acht Euro achtzig
+12 €	zwölf Euro
+1 €	ein Euro
+0,15 €	fünfzehn Cent
+1.200,50 €	eintausendzweihundert Euro fünfzig
+12,5 €	zwölf Euro fünfzig
+# extrapolated: ",00" is dropped
+10,00 €	zehn Euro
+# extrapolated: three or more fraction digits fall back to decimal reading + currency
+8,808 €	acht Komma acht null acht Euro
+# extrapolated: other currencies from CLDR names, minor-unit table
+8,80 $	acht Dollar achtzig
+# extrapolated
+5 £	fünf Pfund
+# extrapolated
+10 CHF	zehn Franken
+# extrapolated: sub-unit only -> minor unit via masculine cardinal
+1 Cent	ein Cent
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: currency symbol glued before the amount
+€2,20	zwei Euro zwanzig
+$2	zwei Dollar
+€0,20	zwanzig Cent
+£2,01	zwei Pfund eins
+# scale words between amount and currency: one Money span, plural currency noun, never cents
+2,5 Mrd. €	zwei Komma fünf Milliarden Euro
+€ 3 Mio.	drei Millionen Euro
+3 Mio. Euro	drei Millionen Euro
+1 Mio. €	eine Million Euro
+5 Tsd. €	fünf Tausend Euro
+2 Bio. €	zwei Billionen Euro

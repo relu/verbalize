@@ -1,0 +1,30 @@
+# §7.6 Ratio, titer and blood pressure — N/M reads "zu" when followed by
+# mmHg or preceded by RR; N-M/UNIT range-rate reads both ends via Range
+# wording plus the unit once; N:M reads "zu" with a trigger word or when M
+# is not a plausible clock minute. Priority above Measure, Range and Score.
+# Shapes reflect German laboratory/vital-sign documentation conventions.
+120/80 mmHg	einhundertzwanzig zu achtzig Millimeter Quecksilbersäule
+RR 120/80	RR einhundertzwanzig zu achtzig
+100-110/min	einhundert bis einhundertzehn pro Minute
+Verhältnis 1:3	Verhältnis eins zu drei
+1 : 3	eins zu drei
+ANA 1:640	ANA eins zu sechshundertvierzig
+Titer 1:80	Titer eins zu achtzig
+1:25.000	eins zu fünfundzwanzigtausend
+# extrapolated
+RR 90/50 mmHg	RR neunzig zu fünfzig Millimeter Quecksilbersäule
+# extrapolated
+Maßstab 1:50.000	Maßstab eins zu fünfzigtausend
+# extrapolated
+Verdünnung 1:100	Verdünnung eins zu einhundert
+# negative: bare N:M with no trigger word and a plausible score shape
+# stays Score, unchanged from design §7.2
+2:1	zwei zu eins
+# negative: a real clock time, not a ratio (has "Uhr")
+3:00 Uhr	drei Uhr
+# negative: "/" after a unit stays "pro" (Measure), not a ratio — no mmHg
+# and no RR trigger present
+120 km/h	einhundertzwanzig Kilometer pro Stunde
+# negative: bare N:M with M a valid minute and no trigger word is a
+# plausible clock time, not a ratio
+14:30	vierzehn Uhr dreißig

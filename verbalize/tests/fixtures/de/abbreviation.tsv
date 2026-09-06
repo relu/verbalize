@@ -1,0 +1,108 @@
+# §7.2 Abbreviation — Duden abbreviation list, expanded only when expand_abbreviations is on (default).
+# Weekdays Mo.–So. and months Jan.–Dez. from CLDR de abbreviated names. Full provenance: docs/rules/de.md.
+Abs.	Absatz
+Abt.	Abteilung
+allg.	allgemein
+bzgl.	bezüglich
+bzw.	beziehungsweise
+ca.	zirka
+d. h.	das heißt
+Dipl.	Diplom
+Dr.	Doktor
+evtl.	eventuell
+Fa.	Firma
+geb.	geboren
+gegr.	gegründet
+ggf.	gegebenenfalls
+Hr.	Herr
+i. d. R.	in der Regel
+inkl.	inklusive
+insb.	insbesondere
+Jh.	Jahrhundert
+Kap.	Kapitel
+m. E.	meines Erachtens
+Mio.	Million
+Min.	Minute
+Mrd.	Milliarde
+MwSt.	Mehrwertsteuer
+Nr.	Nummer
+o. Ä.	oder Ähnliches
+Pf.	Pfennig
+Prof.	Professor
+S.	Seite
+s. o.	siehe oben
+s. u.	siehe unten
+Sek.	Sekunde
+St.	Stück
+Std.	Stunde
+Str.	Straße
+Tel.	Telefon
+u. a.	unter anderem
+u. Ä.	und Ähnliches
+u. U.	unter Umständen
+usw.	und so weiter
+v. a.	vor allem
+v. Chr.	vor Christus
+n. Chr.	nach Christus
+vgl.	vergleiche
+z. B.	zum Beispiel
+z.B.	zum Beispiel
+z. T.	zum Teil
+zzgl.	zuzüglich
+Bhf.	Bahnhof
+Hbf.	Hauptbahnhof
+etc.	et cetera
+Abk.	Abkürzung
+Anm.	Anmerkung
+Aufl.	Auflage
+bspw.	beispielsweise
+dgl.	dergleichen
+ebd.	ebenda
+entspr.	entsprechend
+excl.	exklusive
+ff.	fortfolgende
+Hrsg.	Herausgeber
+i. A.	im Auftrag
+Kfm.	Kaufmann
+Kto.	Konto
+led.	ledig
+lfd.	laufend
+o. g.	oben genannt
+o. J.	ohne Jahr
+Pkt.	Punkt
+resp.	respektive
+sog.	sogenannte
+Tsd.	Tausend
+u. dgl.	und dergleichen
+u. v. a.	unter vielen anderen
+verh.	verheiratet
+Vers.	Versicherung
+Verf.	Verfasser
+Wdh.	Wiederholung
+z. Zt.	zur Zeit
+zit.	zitiert
+zzt.	zurzeit
+# ambiguous: "Fr." is "Frau" before a name, "Freitag" in a weekday context
+Fr. Müller	Frau Müller
+Mo.–Fr.	Montag–Freitag
+# weekdays, CLDR de abbreviated names
+Mo.	Montag
+Di.	Dienstag
+Mi.	Mittwoch
+Do.	Donnerstag
+Fr.	Freitag
+Sa.	Samstag
+So.	Sonntag
+# months, CLDR de abbreviated names
+Jan.	Januar
+Feb.	Februar
+Apr.	April
+Aug.	August
+Sep.	September
+Okt.	Oktober
+Nov.	November
+Dez.	Dezember
+# listing shorthand: "J." for "Jahren" after a cardinal
+12 J.	zwölf Jahren
+# negative: not in the Duden abbreviation list, left alone
+GmbH	GmbH

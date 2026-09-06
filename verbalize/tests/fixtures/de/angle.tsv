@@ -1,0 +1,26 @@
+# §7.6 Angle / coordinate — degree value plus prime/double-prime reads
+# "Minuten"/"Sekunden" (ISO 6709 sexagesimal chain, not the fuller CLDR
+# "Winkelminute" unit name); a compass letter directly after the value
+# expands to the cardinal-direction word. Priority above Degrees.
+30°15′	dreißig Grad fünfzehn Minuten
+30° 15′ 20″	dreißig Grad fünfzehn Minuten zwanzig Sekunden
+52,52° N	zweiundfünfzig Komma fünf zwei Grad Nord
+# extrapolated
+48°51′29″ N	achtundvierzig Grad einundfünfzig Minuten neunundzwanzig Sekunden Nord
+# extrapolated
+2,35° O	zwei Komma drei fünf Grad Ost
+# extrapolated: ASCII prime/double-prime characters read the same way
+30°15'	dreißig Grad fünfzehn Minuten
+30°15'20"	dreißig Grad fünfzehn Minuten zwanzig Sekunden
+# extrapolated
+13,4° S	dreizehn Komma vier Grad Süd
+# negative: a bare degree value with no prime/compass letter is plain
+# Degrees, unchanged from design §7.2
+20 °C	zwanzig Grad Celsius
+# negative: a compass-looking letter with no preceding degree value is
+# untouched — the gate requires immediate adjacency to a degree/prime/
+# second value
+N	N
+# negative: a letter after an unrelated number is not a coordinate — no
+# degree sign present, ordinary Cardinal reading
+5 N	fünf N

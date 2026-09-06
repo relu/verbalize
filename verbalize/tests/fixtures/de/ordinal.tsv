@@ -1,0 +1,55 @@
+# §7.2 Ordinal + §7.3 Agreement — CLDR de RBNF %spellout-ordinal(-n/-r/-s/-m); Duden Grammatik agreement.
+# Only in resolvable contexts: before a month name, before a lexicon noun, or in a numeric date.
+3. Klasse	dritte Klasse
+im 2. Stock	im zweiten Stock
+1. November	erster November
+am 1.11.	am ersten November
+am 1. November	am ersten November
+der 3. Platz	der dritte Platz
+die 3. Klasse	die dritte Klasse
+seit 1. November	seit erstem November
+# §7.3 row: am/vom/zum/beim/im + N. -> weak dative -en, %spellout-ordinal-n
+# extrapolated
+vom 1. Mai	vom ersten Mai
+# extrapolated
+zum 1. Mal	zum ersten Mal
+# extrapolated
+beim 2. Versuch	beim zweiten Versuch
+# §7.3 row: den/dem/des + N. -> weak -en
+# extrapolated
+des 3. Jahrhunderts	des dritten Jahrhunderts
+# extrapolated
+den 2. Platz	den zweiten Platz
+# §7.3 row: der + N. + feminine noun -> weak dative/genitive -en, -n
+# extrapolated
+der 3. Klasse	der dritten Klasse
+# §7.3 row: die/das + N. -> weak nominative -e
+# extrapolated
+das 2. Halbjahr	das zweite Halbjahr
+# §7.3 row: seit/ab/bis/nach/vor + N. + month -> strong dative -em
+# extrapolated
+ab 3. Oktober	ab drittem Oktober
+# extrapolated
+nach 3. Mai	nach drittem Mai
+# §7.3 row: bare N. + noun (no trigger) -> strong nominative by gender, -er/-e/-es
+# extrapolated: masculine
+1. Platz	erster Platz
+# extrapolated: feminine
+1. Klasse	erste Klasse
+# extrapolated: neuter
+1. Mal	erstes Mal
+# negative: bare N. with no resolvable context is not an ordinal; the number reads as a Cardinal and the period stays (§9: no digits in output)
+Platz 5.	Platz fünf.
+# negative: bare N. at sentence end with no month/lexicon noun following, same
+Er wurde 5.	Er wurde fünf.
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: a weak trigger (am/vom/zum/beim/im/dem/den/des/die/das) fixes the ending for every gender, so no lexicon noun is needed
+am 100. Geburtstag	am einhundertsten Geburtstag
+100. Geburtstag	einhundertster Geburtstag
+# extrapolated
+Wir treffen uns am 5.	Wir treffen uns am fünften
+bis zum 15.	bis zum fünfzehnten
+am 5. des Monats	am fünften des Monats
+im 3. Jahr	im dritten Jahr
+# negative: a strong trigger still needs a noun of known gender
+seit 5.	seit fünf.

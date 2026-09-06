@@ -1,0 +1,34 @@
+# §7.2 Cardinal — DIN 5008:2020 digit grouping; CLDR de RBNF %spellout-numbering.
+# "eins" standalone; "ein"/"eine" before a noun of known gender (§7.3).
+12	zwölf
+1.000	eintausend
+22 000	zweiundzwanzigtausend
+# NBSP (U+00A0) group separator
+22 000	zweiundzwanzigtausend
+# NNBSP (U+202F) group separator
+22 000	zweiundzwanzigtausend
+# thin space (U+2009) group separator
+22 000	zweiundzwanzigtausend
+# extrapolated
+1 000 000	eine Million
+# extrapolated
+100	einhundert
+# extrapolated
+21	einundzwanzig
+# extrapolated
+1.200.000	eine Million zweihunderttausend
+# eins standalone, no following noun
+Die Antwort ist 1.	Die Antwort ist eins.
+# extrapolated: "ein" before a masculine lexicon noun (§7.3 cardinal mechanism)
+1 Platz	ein Platz
+# extrapolated: "eine" before a feminine lexicon noun
+1 Runde	eine Runde
+# extrapolated: "ein" before a neuter lexicon noun
+1 Mal	ein Mal
+# extrapolated: negative cardinal via RBNF "-x" rule
+-12	minus zwölf
+# a scale word with no currency: the noun stays outside the span
+1,2 Mio. Einwohner	eins Komma zwei Millionen Einwohner
+20 Mio. Einwohner	zwanzig Millionen Einwohner
+# negative: a scale word glued into a compound is not a scale
+Millionenstadt	Millionenstadt

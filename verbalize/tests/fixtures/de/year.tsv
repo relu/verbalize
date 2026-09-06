@@ -1,0 +1,16 @@
+# §7.2 Year — bare 4-digit reads via CLDR de RBNF %spellout-numbering-year; grouped form is a Cardinal.
+1990	neunzehnhundertneunzig
+2024	zweitausendvierundzwanzig
+1990er	neunzehnhundertneunziger
+# negative: grouped form is a Cardinal, not a Year
+1.990	eintausendneunhundertneunzig
+# extrapolated
+2000	zweitausend
+# extrapolated
+1805	achtzehnhundertfünf
+# extrapolated
+2020er	zweitausendzwanziger
+# extrapolated
+1100	elfhundert
+# extrapolated
+1999	neunzehnhundertneunundneunzig

@@ -1,0 +1,21 @@
+# §7.2 Electronic — emails, URLs, domains, IPv4, @handles: letters as written, digits one by one, symbols by name (at, Punkt, Schrägstrich, Doppelpunkt, Fragezeichen, gleich, Bindestrich, Unterstrich).
+max.mustermann@example.de	max Punkt mustermann at example Punkt de
+info@firma.de	info at firma Punkt de
+asdf123@abc.com	asdf eins zwei drei at abc Punkt com
+a1b2@abc.com	a eins b zwei at abc Punkt com
+enterprise-services@example.com	enterprise Bindestrich services at example Punkt com
+https://www.example.com/pfad?x=1	https Doppelpunkt Schrägstrich Schrägstrich www Punkt example Punkt com Schrägstrich pfad Fragezeichen x gleich eins
+http://www.example.de	http Doppelpunkt Schrägstrich Schrägstrich www Punkt example Punkt de
+https://developer.example.com/drive-sim/early-access	https Doppelpunkt Schrägstrich Schrägstrich developer Punkt example Punkt com Schrägstrich drive Bindestrich sim Schrägstrich early Bindestrich access
+www.example.de	www Punkt example Punkt de
+example.com	example Punkt com
+brettspielversand.de.	brettspielversand Punkt de.
+ftp://host/pfad_1-2	ftp Doppelpunkt Schrägstrich Schrägstrich host Schrägstrich pfad Unterstrich eins Bindestrich zwei
+192.168.0.1	eins neun zwei Punkt eins sechs acht Punkt null Punkt eins
+@jensen	at jensen
+@wezyr1986	at wezyr eins neun acht sechs
+Schreib an info@firma.de.	Schreib an info at firma Punkt de.
+# negative: abbreviations, grouped cardinals, dates and version numbers are not electronic
+z.B. 1.000 am 3.10.	zum Beispiel eintausend am dritten Oktober
+Dr. Müller	Doktor Müller
+Version 1.2.7	Version eins Punkt zwei Punkt sieben

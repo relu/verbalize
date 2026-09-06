@@ -1,0 +1,31 @@
+# §7.2 Measure — CLDR long unit names with plural category; symbols via short-form reverse index, allow list;
+# "/" after a unit or currency -> "pro"; "/" elsewhere is untouched.
+10 km	zehn Kilometer
+80 m²	achtzig Quadratmeter
+1,5 Liter	eins Komma fünf Liter
+120 km/h	einhundertzwanzig Kilometer pro Stunde
+30 €/Monat	dreißig Euro pro Monat
+8 €/Std.	acht Euro pro Stunde
+# negative: "/" elsewhere (not after a unit or currency) is left alone
+Lehrer/Lehrerin	Lehrer/Lehrerin
+# extrapolated
+5 kg	fünf Kilogramm
+# extrapolated
+2 m	zwei Meter
+# extrapolated: singular unit via masculine cardinal agreement (der Kilometer)
+1 km	ein Kilometer
+# extrapolated
+3 Liter	drei Liter
+# digital units (CLDR digital-*): bit/byte with SI prefixes, data rates with /s or the bps spelling
+2 GB	zwei Gigabyte
+512 MB	fünfhundertzwölf Megabyte
+1 TB	ein Terabyte
+64 kB	vierundsechzig Kilobyte
+100 Mbit/s	einhundert Megabit pro Sekunde
+1 Gbit/s	ein Gigabit pro Sekunde
+100 Mbps	einhundert Megabit pro Sekunde
+1 Gbps	ein Gigabit pro Sekunde
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: a scale word before a unit, also lower-case in loose prose
+2 millionen km/h	zwei Millionen Kilometer pro Stunde
+2,2 Millionen km/h	zwei Komma zwei Millionen Kilometer pro Stunde

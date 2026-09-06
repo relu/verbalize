@@ -1,0 +1,19 @@
+# §7.2 Decimal — RBNF x.x rule; fraction digits read individually per Duden usage.
+3,5	drei Komma fünf
+0,75	null Komma sieben fünf
+# extrapolated
+12,34	zwölf Komma drei vier
+# extrapolated
+0,05	null Komma null fünf
+# extrapolated
+100,1	einhundert Komma eins
+# extrapolated: negative decimal via RBNF "-x" rule
+-3,5	minus drei Komma fünf
+# extrapolated
+7,0	sieben Komma null
+# extrapolated
+0,0	null Komma null
+# extrapolated
+2,25	zwei Komma zwei fünf
+# extrapolated
+99,99	neunundneunzig Komma neun neun

@@ -1,0 +1,20 @@
+# §9 Rendering rules and cross-class interactions
+# group separators consumed; spoken form followed by whatever followed the span, missing space stays visible
+1,5Liter	eins Komma fünfLiter
+# extrapolated: same rule with a different unit
+3,5m	drei Komma fünfm
+# a span may end where digits meet letters only for Year
+1990er	neunzehnhundertneunziger
+# digit run glued to letters: cardinal reading, letters stay attached
+B1	B eins
+2‑Stunden‑Workshop	zwei‑Stunden‑Workshop
+# abbreviation + money interaction
+z. B. kostet die Fahrkarte 8,80 €.	zum Beispiel kostet die Fahrkarte acht Euro achtzig.
+# ordinal (date) + money + time interaction
+Am 1. November zahlte ich 8,80 € um 14:30.	Am ersten November zahlte ich acht Euro achtzig um vierzehn Uhr dreißig.
+# measure + range interaction
+Die Fahrt dauert 5–10 Minuten und kostet 12,5 €.	Die Fahrt dauert fünf bis zehn Minuten und kostet zwölf Euro fünfzig.
+# percent + decimal interaction, punctuation outside the span preserved
+Der Anteil beträgt 3,5 % (gerundet).	Der Anteil beträgt drei Komma fünf Prozent (gerundet).
+# telephone + abbreviation interaction, casing outside spans preserved
+Tel. 030 12 34 56 78	Telefon null drei null, eins zwei, drei vier, fünf sechs, sieben acht

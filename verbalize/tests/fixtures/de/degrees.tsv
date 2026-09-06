@@ -1,0 +1,16 @@
+# §7.2 Degrees
+20 °C	zwanzig Grad Celsius
+20°	zwanzig Grad
+-5 °C	minus fünf Grad Celsius
+# extrapolated
+37 °C	siebenunddreißig Grad Celsius
+# extrapolated
+-10°	minus zehn Grad
+# extrapolated
+0 °C	null Grad Celsius
+# extrapolated
+100 °C	einhundert Grad Celsius
+# extrapolated
+-20 °C	minus zwanzig Grad Celsius
+# extrapolated: "ein" before Grad, a noun of known (neuter) gender — CLDR de units.json angle-degree = neuter
+1 °C	ein Grad Celsius

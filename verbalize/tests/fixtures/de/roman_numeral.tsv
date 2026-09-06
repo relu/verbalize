@@ -1,0 +1,28 @@
+# §7.2 Roman numeral (clinical grading) — only I-IV, word-bounded; a
+# hyphen between two numerals is a range ("bis"); a hyphen with a
+# non-numeral word on either side is a German compound, only the numeral
+# changes. V and above are never expanded. Shapes reflect German clinical
+# grading conventions (NYHA, Mallampati, Billroth, Sozialgesetzbuch).
+NYHA II-III	NYHA zwei bis drei
+NYHA I-II	NYHA eins bis zwei
+NYHA IV	NYHA vier
+Stadium II	Stadium zwei
+Mallampati II	Mallampati zwei
+Billroth II gegenüber Billroth I	Billroth zwei gegenüber Billroth eins
+eine Klasse-I-Empfehlung	eine Klasse-eins-Empfehlung
+indiziert (Klasse I C)	indiziert (Klasse eins C)
+Ableitung I, II und III	Ableitung eins, zwei und drei
+# extrapolated
+Herzgeräusch Grad III von VI	Herzgeräusch Grad drei von VI
+# extrapolated
+Grad III	Grad drei
+# extrapolated
+Typ II	Typ zwei
+# negative: V and above are never expanded — usually "Vena" or SGB
+V. cava inferior im hepatischen Abschnitt	V. cava inferior im hepatischen Abschnitt
+# negative
+Faktor V Leiden	Faktor V Leiden
+# negative: § is expanded around it, the bare V still is not
+Gesundheitsuntersuchung nach § 25 SGB V	Gesundheitsuntersuchung nach Paragraf fünfundzwanzig SGB V
+# negative: "HFrEF" contains no word-bounded I-IV token
+HFrEF	HFrEF

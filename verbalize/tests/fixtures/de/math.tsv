@@ -1,0 +1,31 @@
+# §7.6 Math expression — operator between a numeric operand and a numeric
+# or single-letter operand; comparison operators additionally allow a
+# right-hand-only (prefix) operand, as clinical findings are actually written.
+3 + 4 = 7	drei plus vier gleich sieben
+p < 0,05	p kleiner als null Komma null fünf
+n = 12	n gleich zwölf
+±2 %	plus minus zwei Prozent
+√2	Wurzel aus zwei
+x ≈ 3,14	x ungefähr drei Komma eins vier
+≥65 Jahre	größer oder gleich fünfundsechzig Jahre
+> 37 pmol/l	größer als siebenunddreißig Pikomol pro Liter
+# extrapolated
+x ≠ 0	x ungleich null
+# extrapolated
+∞	unendlich
+# extrapolated
+π ≈ 3,14	Pi ungefähr drei Komma eins vier
+# extrapolated: prefix comparison, no left operand
+≤10 mg	kleiner oder gleich zehn Milligramm
+# negative: no digit anywhere — the gate requires a numeric operand
+a = b	a = b
+# negative: unspaced hyphen between two numbers is Range, not subtraction
+3-5	drei bis fünf
+# negative: spaced minus between two numbers IS subtraction
+3 - 5	drei minus fünf
+# negative: "/" elsewhere (not a math operator here) is untouched
+Lehrer/Lehrerin	Lehrer/Lehrerin
+# negative: date-like slash shape, not a fraction or math token — see
+# fraction_slash.tsv for the full gate
+# extrapolated
+1/2/2026	eins/zwei/zweitausendsechsundzwanzig

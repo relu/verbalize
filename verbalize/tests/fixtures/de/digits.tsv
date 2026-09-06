@@ -1,0 +1,18 @@
+# §7.2 Long digit run — every leading-zero digit run no other class claimed, and any run overflowing the number type; digit by digit. fallback = true.
+007	null null sieben
+# extrapolated: leading-zero run, no phone-shape separators, no other class claims it
+01234	null eins zwei drei vier
+# extrapolated: letters stay attached, digits spelled digit by digit
+DE89 3704 0044 0532 0130 00	DE acht neun drei sieben null vier null null vier vier null fünf drei zwei null eins drei null null null
+# extrapolated: a run that overflows i128 falls back to digit by digit
+123456789012345678901234567890123456789	eins zwei drei vier fünf sechs sieben acht neun null eins zwei drei vier fünf sechs sieben acht neun null eins zwei drei vier fünf sechs sieben acht neun null eins zwei drei vier fünf sechs sieben acht neun
+# extrapolated
+008	null null acht
+# extrapolated
+0000	null null null null
+# extrapolated
+099	null neun neun
+# extrapolated
+0001	null null null eins
+# a 16-digit card number: digit by digit with a pause between groups
+4111 1111 1111 1111	vier eins eins eins, eins eins eins eins, eins eins eins eins, eins eins eins eins

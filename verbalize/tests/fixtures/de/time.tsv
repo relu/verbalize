@@ -1,0 +1,25 @@
+# §7.2 Time — colon form always; dotted form only with a following "Uhr" ("3.10." is a date); ":00" -> "Uhr" alone.
+14:30	vierzehn Uhr dreißig
+9:00 Uhr	neun Uhr
+14.00 Uhr	vierzehn Uhr
+09:00	neun Uhr
+# extrapolated
+23:45	dreiundzwanzig Uhr fünfundvierzig
+# extrapolated
+12:00 Uhr	zwölf Uhr
+# extrapolated
+00:15	null Uhr fünfzehn
+# extrapolated
+18.45 Uhr	achtzehn Uhr fünfundvierzig
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: hh:mm:ss is a clock reading with counted minutes and seconds
+00:00:00 Uhr	null Uhr null Minuten null Sekunden
+02:02:23 Uhr	zwei Uhr zwei Minuten dreiundzwanzig Sekunden
+# extrapolated: "ein Uhr", singular counted nouns
+1:01:01	ein Uhr eine Minute eine Sekunde
+1:00 Uhr	ein Uhr
+# time zones stay as written after the spoken time; a UTC/GMT offset reads as an expression
+14:30 CET	vierzehn Uhr dreißig CET
+14:30 Uhr MEZ	vierzehn Uhr dreißig MEZ
+09:00 UTC	neun Uhr UTC
+12:00 UTC+2	zwölf Uhr UTC plus zwei

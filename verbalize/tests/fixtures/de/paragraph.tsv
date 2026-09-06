@@ -1,0 +1,14 @@
+# §7.6 Paragraph sign — literal symbol substitution, like Abbreviation;
+# does not consume the following number, which reads via ordinary Cardinal.
+§ 25	Paragraf fünfundzwanzig
+§25	Paragraf fünfundzwanzig
+§§ 25, 26	Paragrafen fünfundzwanzig, sechsundzwanzig
+Gesundheitsuntersuchung nach § 25 SGB V	Gesundheitsuntersuchung nach Paragraf fünfundzwanzig SGB V
+# extrapolated: glued digit-letter suffix reads via the existing §9
+# glued-cardinal rule; "vgl." expands via the Abbreviation table
+vgl. § 630c BGB	vergleiche Paragraf sechshundertdreißigc BGB
+§ 1 BGB	Paragraf eins BGB
+# negative: an unrelated word starting with a similar sound is untouched —
+# the gate matches only the literal "§"/"§§" character; the number still
+# reads via Cardinal (§9: no digits in output)
+Paragraf 25	Paragraf fünfundzwanzig

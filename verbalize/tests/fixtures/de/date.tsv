@@ -1,0 +1,25 @@
+# §7.2 Date — day as ordinal with agreement; month from CLDR wide names; year via Year; ISO form read the German way.
+1.11.2026	erster November zweitausendsechsundzwanzig
+01.11.2026	erster November zweitausendsechsundzwanzig
+am 3.10.	am dritten Oktober
+2026-11-01	erster November zweitausendsechsundzwanzig
+1. November 2026	erster November zweitausendsechsundzwanzig
+# extrapolated: bare N. + month (no trigger) -> strong nominative -er
+3.10.	dritter Oktober
+# extrapolated: bare N. + month, strong nominative -er
+24.12.2026	vierundzwanzigster Dezember zweitausendsechsundzwanzig
+# extrapolated
+am 1.1.2027	am ersten Januar zweitausendsiebenundzwanzig
+# extrapolated: ISO form read the German way
+2025-01-01	erster Januar zweitausendfünfundzwanzig
+# extrapolated
+15.03.2024	fünfzehnter März zweitausendvierundzwanzig
+# ISO year-month: month and year, no day (was misread as a range)
+2003-03	März zweitausenddrei
+von 2003-03 bis 2004-01	von März zweitausenddrei bis Januar zweitausendvier
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: zero-padded day.month without the trailing period; "3.10" (unpadded) stays a section number
+02.03	zweiter März
+# extrapolated
+am 02.03	am zweiten März
+3.10	drei Punkt zehn

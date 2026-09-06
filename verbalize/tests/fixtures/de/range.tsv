@@ -1,0 +1,18 @@
+# §7.2 Range — only the unspaced Bis-Strich (DIN 5008); a spaced " – " is a Gedankenstrich and is left alone.
+5–10 Minuten	fünf bis zehn Minuten
+2010–2012	zweitausendzehn bis zweitausendzwölf
+# extrapolated
+5-10	fünf bis zehn
+1.–3. November	erster bis dritter November
+vom 1.–3. November	vom ersten bis dritten November
+# negative: spaced Gedankenstrich is left alone, not a range; the numbers
+# still read via Cardinal (§9: no digits in output)
+5 – 10	fünf – zehn
+# extrapolated
+3–7	drei bis sieben
+# extrapolated: Date range, year on both ends via the Year rule
+2020–2022	zweitausendzwanzig bis zweitausendzweiundzwanzig
+# extrapolated
+1–5	eins bis fünf
+# extrapolated
+100–200	einhundert bis zweihundert

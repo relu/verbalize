@@ -1,0 +1,26 @@
+# §7.6 Scientific notation — DIN 1338 mantissa-times-ten-to-the-exponent
+# reading; ASCII e/E form only when the mantissa has a decimal separator or
+# the exponent is explicitly signed. Priority above Decimal and Measure.
+1,5 × 10⁻⁶	eins Komma fünf mal zehn hoch minus sechs
+1,5 · 10⁻⁶	eins Komma fünf mal zehn hoch minus sechs
+1,5×10^-6	eins Komma fünf mal zehn hoch minus sechs
+1,5e-6	eins Komma fünf mal zehn hoch minus sechs
+1.5E+08	eins Komma fünf mal zehn hoch acht
+# extrapolated: unsigned positive exponent still classifies once the
+# mantissa itself has a decimal separator
+2,0e10	zwei Komma null mal zehn hoch zehn
+# with a trailing unit: exponent and unit are one span
+6,022 · 10²³ mol⁻¹	sechs Komma null zwei zwei mal zehn hoch dreiundzwanzig pro Mol
+# extrapolated
+3 × 10⁸ m/s	drei mal zehn hoch acht Meter pro Sekunde
+# extrapolated
+9,11 · 10⁻³¹ kg	neun Komma eins eins mal zehn hoch minus einunddreißig Kilogramm
+# negative: no decimal separator in the mantissa and no signed exponent —
+# not scientific notation; falls through to the existing glued-digit
+# reading (§9), same mechanism as "B1" -> "B eins"
+# extrapolated
+1e10	einsezehn
+# negative: a caret exponent on a bare integer with no "10 ×"/"10^"/"e"
+# base is not scientific notation — it is Power/exponent (§7.6) instead
+# extrapolated
+2^3	zwei hoch drei

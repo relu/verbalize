@@ -1,0 +1,35 @@
+# §7.6 Dose scheme and Repetition/multiplication. Dose scheme: three or
+# four hyphen-joined groups (≤200, or next to a dosing-unit/context word)
+# read via Cardinal, pause-comma separated (Telephone convention), never
+# "minus" and never collapsed into Range. Repetition: N(x|×) fuses into
+# one cardinal+"mal" word whenever N is a plain integer, regardless of what
+# follows; a decimal N stays a separate "mal" (§7.6). Shapes reflect German
+# clinical documentation conventions (Rote Liste, Fachinformationen).
+20-5-0 mg/d	zwanzig, fünf, null Milligramm pro Tag
+1-0-1	eins, null, eins
+1-1-1-1	eins, eins, eins, eins
+0-0-1	null, null, eins
+2x täglich	zweimal täglich
+2×/Tag	zweimal pro Tag
+4x 500 mg	viermal fünfhundert Milligramm
+3-mal	dreimal
+1× Insulin	einmal Insulin
+1,5 x 2 cm	eins Komma fünf mal zwei Zentimeter
+# extrapolated
+1-0-1-0	eins, null, eins, null
+# extrapolated
+Metformin 1000 mg 2×/Tag	Metformin eintausend Milligramm zweimal pro Tag
+# negative: a two-number hyphen shape is a plain Range, not a dose scheme
+# (needs three or four groups)
+1-2 Gläser Wein	eins bis zwei Gläser Wein
+# negative: a two-group hyphen-digit shape with a rate is Ratio's
+# range-rate reading (§7.6 "Ratio, titer and blood pressure"), not this
+# class either
+100-110/min	einhundert bis einhundertzehn pro Minute
+# negative: hex-looking literal — "x" not followed by a bare number on
+# the right (it is glued to a letter), so the Repetition gate does not
+# fire; the digits still read via Long digit run / Cardinal (§9)
+0x1F	nullx eins F
+# negative: fused "-mal" already spelled needs no digit at all — no rule
+# needed, listed as a shape reminder
+zweimal	zweimal

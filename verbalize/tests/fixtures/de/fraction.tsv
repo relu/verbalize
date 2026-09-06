@@ -1,0 +1,13 @@
+# §7.2 Unicode fractions; slash fractions are the §7.6 class (fraction_slash.tsv).
+½	ein halb
+¼	ein Viertel
+¾	drei Viertel
+# slash fractions read via the §7.6 Slash fraction class
+1/2	ein halb
+3/4	drei Viertel
+# extrapolated: Unicode fraction followed by a unit
+½ Kilogramm	ein halb Kilogramm
+# extrapolated
+¼ Stunde	ein Viertel Stunde
+# extrapolated: Unicode fraction inside a sentence
+Das Rezept braucht ¾ Liter Milch.	Das Rezept braucht drei Viertel Liter Milch.

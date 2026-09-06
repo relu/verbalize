@@ -1,0 +1,18 @@
+# §7.2 Percent, permille
+12 %	zwölf Prozent
+12%	zwölf Prozent
+3,5 ‰	drei Komma fünf Promille
+# extrapolated
+0,5 %	null Komma fünf Prozent
+# extrapolated
+100%	einhundert Prozent
+# extrapolated
+50%	fünfzig Prozent
+# extrapolated: "ein" before permille, a noun of known (neuter) gender — CLDR de units.json concentr-permille = neuter
+1 ‰	ein Promille
+# extrapolated
+0,1 %	null Komma eins Prozent
+# extrapolated
+25 %	fünfundzwanzig Prozent
+# extrapolated: "ein" before percent, a noun of known (neuter) gender — CLDR de units.json concentr-percent = neuter
+1 %	ein Prozent

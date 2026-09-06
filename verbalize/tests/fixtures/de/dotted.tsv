@@ -1,0 +1,11 @@
+# Dotted number — section, version or clause numbers: groups as cardinals joined by "Punkt"; a leading-zero group digit by digit.
+2.3	zwei Punkt drei
+3.10	drei Punkt zehn
+Kapitel 2.3	Kapitel zwei Punkt drei
+Version 1.2.7	Version eins Punkt zwei Punkt sieben
+Build 1.01.5	Build eins Punkt null eins Punkt fünf
+# negative: a grouped cardinal and a date keep their own classes
+1.000	eintausend
+1.000.000	eine Million
+1.11.2026	erster November zweitausendsechsundzwanzig
+02.03	zweiter März

@@ -1,0 +1,47 @@
+# §7.6 Slash fraction — numerator < denominator ≤ 12 (or 100/1000); not
+# adjacent to another digit-slash group or a date-like shape; not preceded
+# by a unit/currency symbol (that "/" stays "pro" — Measure). A number
+# that fails the gate is not left untouched: it still falls through to the
+# ordinary Cardinal reading of each digit run, same as any unclaimed digits.
+1/2	ein halb
+3/4	drei Viertel
+2/3	zwei Drittel
+1/8	ein Achtel
+# extrapolated
+1/6	ein Sechstel
+# extrapolated
+5/12	fünf Zwölftel
+# extrapolated
+1/100	ein Hundertstel
+# extrapolated
+1/1000	ein Tausendstel
+# mixed Unicode + slash fraction reading
+1 ½	ein einhalb
+# negative: numerator not smaller than denominator — falls through to two
+# independent Cardinals, "/" preserved literally
+# extrapolated
+2/2	zwei/zwei
+# denominators 13–99 derive the noun from the cardinal: -tel below 20, -stel from 20
+5/17	fünf Siebzehntel
+1/20	ein Zwanzigstel
+3/22	drei Zweiundzwanzigstel
+# negative: a denominator above 99 that the table does not name falls through
+1/250	eins/zweihundertfünfzig
+# negative: preceded by a currency symbol with no space — not a fraction
+# shape; the glued symbol is Money (`€1` → "ein Euro"), the rest falls through
+# extrapolated
+€1/2	ein Euro/zwei
+# negative: date-like shape (adjacent digit-slash groups); the individual
+# numbers still read through Cardinal and Year
+# extrapolated
+1/2/2026	eins/zwei/zweitausendsechsundzwanzig
+# negative: "/" with no digits on either side is untouched — unrelated
+# reminder from the Measure class
+Lehrer/Lehrerin	Lehrer/Lehrerin
+# known limitation: no adjective agreement before a noun (design §14)
+½ Liter	ein halb Liter
+# Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
+# text-processing-rs: a bare "/N unit" is a fraction, not a rate (a per-segment carries a number only after a numerator unit)
+1/2 ft	ein halb ft
+# extrapolated
+2 ml/min/1,73 m²	zwei Milliliter pro Minute pro eins Komma sieben drei Quadratmeter

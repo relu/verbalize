@@ -1,0 +1,14 @@
+# §7.2 Score — lower priority than Time: only N:M that is not a valid clock time.
+2:1	zwei zu eins
+# extrapolated
+3:0	drei zu null
+# extrapolated: hour > 24 so it cannot be a valid clock time
+25:30	fünfundzwanzig zu dreißig
+# extrapolated
+1:0	eins zu null
+# extrapolated
+10:3	zehn zu drei
+# extrapolated
+5:5	fünf zu fünf
+# extrapolated
+0:0	null zu null

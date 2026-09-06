@@ -1,0 +1,25 @@
+# §7.6 Chemical formula — Unicode subscript digits (U+2080 block) glued to
+# a letter are replaced by the cardinal; letters stay as written. Trailing
+# superscript charge notation reads "plus"/"minus".
+H₂O	H zwei O
+CO₂	CO zwei
+C₆H₁₂O₆	C sechs H zwölf O sechs
+Ca²⁺	Ca zwei plus
+Cl⁻	Cl minus
+# extrapolated
+Na⁺	Na plus
+# extrapolated
+SO₄²⁻	SO vier zwei minus
+# extrapolated
+Fe²⁺	Fe zwei plus
+# extrapolated
+H₂SO₄	H zwei SO vier
+# negative: plain ASCII digits need no dedicated rule — already read via
+# the existing glued-letter-and-digit cardinal rule (§9)
+H2O	H zwei O
+CO2	CO zwei
+# extrapolated negative, same mechanism
+NaCl	NaCl
+# negative: bare superscript with no element symbol in front is left
+# untouched — the gate needs a preceding letter
+²⁺	²⁺

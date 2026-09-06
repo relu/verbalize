@@ -1,0 +1,26 @@
+# §7.6 Power / exponent — Unicode superscript digits or ASCII ^n after a
+# bare number or a single Latin/Greek-letter variable; always "hoch n".
+# Superscripts glued to a CLDR unit symbol (m², km², cm³) are Measure's
+# own compound unit names, not this class — see measure_scientific.tsv.
+2⁵	zwei hoch fünf
+10³	zehn hoch drei
+2^10	zwei hoch zehn
+x²	x hoch zwei
+x^-2	x hoch minus zwei
+5²	fünf hoch zwei
+# extrapolated
+y³	y hoch drei
+# extrapolated
+π²	Pi hoch zwei
+# extrapolated: negative exponent on a variable
+n^-1	n hoch minus eins
+# negative: already resolved by Measure via the CLDR compound unit name,
+# never reached by this class
+80 m²	achtzig Quadratmeter
+# extrapolated negative: same, cubic form
+5 cm³	fünf Kubikzentimeter
+# negative: charge notation is Chemical formula, not Power
+Ca²⁺	Ca zwei plus
+# extrapolated: bare superscript with no operand on either side is left
+# untouched — the gate needs a number or single-letter base
+²	²

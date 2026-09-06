@@ -1,0 +1,35 @@
+# §7.6 clinical prose: lab values, dosing, gradings, shorthand
+Der Blutdruck liegt bei 108/68 mmHg.	Der Blutdruck liegt bei einhundertacht zu achtundsechzig Millimeter Quecksilbersäule.
+RR 90/50 mmHg	RR neunzig zu fünfzig Millimeter Quecksilbersäule
+# "SpO2" reads via the §9 glued-digit rule unless Options::lexicon supplies it
+SpO2 92 %, HF 110/min, AF 24/min.	SpO zwei zweiundneunzig Prozent, HF einhundertzehn pro Minute, AF vierundzwanzig pro Minute.
+# §9: a digit run between letters on both sides is spaced on both sides ("HbA eins c", not "HbA einsc")
+HbA1c 7,5 %	HbA eins c sieben Komma fünf Prozent
+HbA1c-Wert	HbA eins c-Wert
+Belastungsdyspnoe (NYHA II-III)	Belastungsdyspnoe (NYHA zwei bis drei)
+Herzgeräusch Grad III von VI	Herzgeräusch Grad drei von VI
+eine Klasse-I-Empfehlung	eine Klasse-eins-Empfehlung
+Gesundheitsuntersuchung nach § 25 SGB V	Gesundheitsuntersuchung nach Paragraf fünfundzwanzig SGB V
+gelegentlich 1-2 Gläser Wein	gelegentlich eins bis zwei Gläser Wein
+Herzfrequenz ca. 100-110/min	Herzfrequenz zirka einhundert bis einhundertzehn pro Minute
+Hydrocortison 20-5-0 mg/d	Hydrocortison zwanzig, fünf, null Milligramm pro Tag
+Apixaban 5 mg 2x täglich	Apixaban fünf Milligramm zweimal täglich
+Metamizol 4x 500mg/d oral	Metamizol viermal fünfhundert Milligramm pro Tag oral
+Metformin 1000 mg 2×/Tag	Metformin eintausend Milligramm zweimal pro Tag
+ANA 1:640 positiv	ANA eins zu sechshundertvierzig positiv
+Sie ruft Sie um 3:00 Uhr an	Sie ruft Sie um drei Uhr an
+um 3:30 Uhr	um drei Uhr dreißig
+im 75-g-oGTT	im fünfundsiebzig-Gramm-oGTT
+Bulk (>10 cm)	Bulk (größer als zehn Zentimeter)
+Alter ≥65 Jahre	Alter größer oder gleich fünfundsechzig Jahre
+Es handelt sich um eine sog. Pseudothrombophlebitis.	Es handelt sich um eine sogenannte Pseudothrombophlebitis.
+V. a. Myokardinfarkt bei typischer Klinik.	Verdacht auf Myokardinfarkt bei typischer Klinik.
+Die Beschwerden bestehen v. a. nachts.	Die Beschwerden bestehen vor allem nachts.
+Verabreicht werden 500 I. E. Heparin.	Verabreicht werden fünfhundert Internationale Einheiten Heparin.
+# negative: clinical shorthand inside a longer word is left alone,
+# unrelated to any digit class
+Herrn Müller	Herrn Müller
+HFrEF	HFrEF
+# negative: a bare V is usually not the numeral five — see roman_numeral.tsv
+V. cava inferior im hepatischen Abschnitt	V. cava inferior im hepatischen Abschnitt
+Faktor V Leiden	Faktor V Leiden
