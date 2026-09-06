@@ -1,21 +1,13 @@
-//! Oracle-comparison helper for `tools/icu-diff/icu_diff.py` (design §11.2).
+//! Oracle-comparison helper for `tools/icu-diff/icu_diff.py`.
 //!
 //! Reads `<locale>\t<ruleset>\t<n>` lines from stdin (one request per line)
 //! and prints the RBNF spelling of `n` for that locale/ruleset on stdout,
 //! one line per request, in the same order. A request the interpreter has
 //! no answer for prints the literal sentinel `<NONE>`.
 //!
-//! requires verbalize::spell::ruleset — this example will not compile until
-//! it lands. The exact entry point it needs:
-//!
-//! ```ignore
-//! pub fn verbalize::spell::ruleset(language: Language, ruleset: &str, n: i128) -> Option<String>;
-//! ```
-//!
-//! `ruleset` is the exact CLDR ruleset name (public or `%%` private); `None`
-//! for an unknown name. The returned string is already post-processed (soft
-//! hyphens stripped, whitespace collapsed and trimmed), same as everywhere
-//! else in the crate.
+//! `ruleset` is the exact CLDR ruleset name (public or `%%` private). The
+//! spelling is already post-processed (soft hyphens stripped, whitespace
+//! collapsed and trimmed), same as everywhere else in the crate.
 
 use std::io::{self, BufRead, Write};
 use std::str::FromStr;

@@ -1,4 +1,4 @@
-//! Romanian hand tables (design §7.5). Provenance per entry is in
+//! Romanian hand tables. Provenance per entry is in
 //! `docs/rules/ro.md`.
 
 use crate::lang::units::{ExtraUnit, UnitTable};
@@ -270,7 +270,7 @@ pub(super) const NOT_A_NOUN: &[&str] = &[
     "la sută",
 ];
 
-/// Nouns a cardinal commonly counts, with their gender (§7.5), beyond the
+/// Nouns a cardinal commonly counts, with their gender, beyond the
 /// CLDR unit and currency names.
 pub(super) const NOUNS: &[(&str, Gender)] = &[
     ("sută", Feminine),

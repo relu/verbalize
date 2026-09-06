@@ -1,4 +1,4 @@
-//! English hand tables (design §7.4). Provenance per entry is in
+//! English hand tables. Provenance per entry is in
 //! `docs/rules/en.md`.
 
 use crate::lang::units::{ExtraUnit, UnitTable};
@@ -225,7 +225,7 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
     link: "",
 };
 
-/// Bare `G` is giga only before `/l`, `/L` (§7.6).
+/// Bare `G` is giga only before `/l`, `/L`.
 pub(super) const GIGA_CONTEXT: &[&str] = &["G/l", "G/L"];
 
 /// Common English abbreviations, case-sensitive; inter-word spaces are

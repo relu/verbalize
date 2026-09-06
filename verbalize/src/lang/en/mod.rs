@@ -1,4 +1,4 @@
-//! English (design §7.4): the opposite conventions to German — `1,000.50`,
+//! English: the opposite conventions to German — `1,000.50`,
 //! `$8.80`, 12-hour times, `1st`, month-day-year (en-US) or day-month-year
 //! (en-GB) selected by `Options::region`.
 
@@ -149,7 +149,7 @@ impl Context for English {
         (1000..=2999).contains(&year)
     }
 
-    /// Bare `G` is giga only before `/l` (§7.6).
+    /// Bare `G` is giga only before `/l`.
     fn unit(&self, text: &str, bare: bool) -> Option<crate::token::Unit> {
         if super::common::bare_giga(text)
             && !lexicon::GIGA_CONTEXT.iter().any(|g| text.starts_with(g))

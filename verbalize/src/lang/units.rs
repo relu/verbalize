@@ -1,4 +1,4 @@
-//! `resolve_unit` (design §7.1): the CLDR short-symbol reverse index, SI
+//! Unit resolution: the CLDR short-symbol reverse index, SI
 //! prefix composition, and a per-language extra-symbol table and
 //! allow/deny list, with the long names by plural category and case.
 
@@ -10,7 +10,7 @@ use super::Numerals;
 use crate::data::LangData;
 use crate::token::{Case, Gender, Numeral, Unit, UnitPart, UnitRef};
 
-/// What a language adds to the CLDR data (design §6.2, §7.6).
+/// What a language adds to the CLDR data.
 pub(crate) struct UnitTable {
     /// Symbol → CLDR unit id, for spellings CLDR's short form does not
     /// use (`mmHg` for `mm Hg`, `min` for `Min.`).

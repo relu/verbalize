@@ -1,4 +1,4 @@
-//! Romanian (design §7.5): gender agreement on 1 and 2 and their
+//! Romanian: gender agreement on 1 and 2 and their
 //! compounds, the "de" before a noun from 20 on, ordinals with the
 //! `al`/`a` article, and CLDR ro's one/few/other forms.
 
@@ -130,7 +130,7 @@ impl Context for Romanian {
         verbalize::words(n, gender)
     }
 
-    /// CLDR unit names, currency words, the noun lexicon (§7.5).
+    /// CLDR unit names, currency words, the noun lexicon.
     fn noun_gender(&self, word: &str) -> Option<Gender> {
         if let Some(gender) = self.units.gender_of_name(word) {
             return Some(gender);
@@ -176,7 +176,7 @@ impl Context for Romanian {
         (1000..=2999).contains(&year)
     }
 
-    /// Bare `G` is giga only before `/l` (§7.6).
+    /// Bare `G` is giga only before `/l`.
     fn unit(&self, text: &str, bare: bool) -> Option<crate::token::Unit> {
         if super::common::bare_giga(text)
             && !lexicon::GIGA_CONTEXT.iter().any(|g| text.starts_with(g))

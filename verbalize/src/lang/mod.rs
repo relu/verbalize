@@ -1,4 +1,4 @@
-//! The language layer (design §7): per-language classification and
+//! The language layer: per-language classification and
 //! verbalization behind one trait, plus the building blocks every language
 //! shares — the number format, digit-boundary checks, the CLDR unit
 //! resolver and the language-neutral recognisers in [`common`].
@@ -16,9 +16,9 @@ use crate::pipeline::Match;
 use crate::token::{Agreement, Gender, Numeral, Scale, Token, Unit};
 use crate::{Language, Options};
 
-/// Design §7.1. `classify` returns matches with their agreement rather
-/// than bare spans, so the context the classifier saw reaches the
-/// verbalizer; `data()` is not needed by the pipeline and is omitted.
+/// `classify` returns matches with their agreement rather than bare spans,
+/// so the context the classifier saw reaches the verbalizer; `data()` is
+/// not needed by the pipeline and is omitted.
 pub(crate) trait Lang: Send + Sync {
     /// Typed, non-overlapping matches in position order; nothing spoken yet.
     fn classify(&self, text: &str) -> Vec<Match>;
@@ -47,8 +47,8 @@ pub(crate) fn new(language: Language, options: &Options) -> Box<dyn Lang> {
     }
 }
 
-/// What the shared recognisers ask a language for (design §7.1: "a
-/// language module is mostly tables and a recogniser list").
+/// What the shared recognisers ask a language for: a language module is
+/// mostly tables and a recogniser list.
 pub(crate) trait Context: Send + Sync + 'static {
     fn numerals(&self) -> &Numerals;
     fn units(&self) -> &units::Units;
@@ -60,13 +60,13 @@ pub(crate) trait Context: Send + Sync + 'static {
     /// Cardinal words for `n`, with the gendered "ein/eine" when the
     /// language inflects and the gender is known.
     fn words(&self, n: &Numeral, gender: Option<Gender>) -> String;
-    /// Gender of a noun a cardinal governs (§7.3); languages without
+    /// Gender of a noun a cardinal governs; languages without
     /// agreement return `None`.
     fn noun_gender(&self, _word: &str) -> Option<Gender> {
         None
     }
-    /// Whether the word after a cardinal is the noun it counts (§7.5:
-    /// Romanian inserts "de" before it from 20 on); function words are not.
+    /// Whether the word after a cardinal is the noun it counts (in
+    /// Romanian, "de" is inserted before it from 20 on); function words are not.
     fn noun_follows(&self, _word: &str) -> bool {
         true
     }
@@ -103,7 +103,7 @@ pub(crate) trait Context: Send + Sync + 'static {
 
 /// Hand tables the shared recognisers and verbalizers read.
 pub(crate) struct Tables {
-    /// Words before `N:M` that make it a ratio (§7.6).
+    /// Words before `N:M` that make it a ratio.
     pub ratio_triggers: &'static [&'static str],
     /// The blood-pressure shorthand before `N/M` (`RR`, `BP`).
     pub blood_pressure: &'static [&'static str],
@@ -133,7 +133,7 @@ pub(crate) struct Tables {
 }
 
 /// Currencies Money recognises: ISO code, written forms, head-noun gender
-/// (for "ein Euro"), minor unit singular/plural with gender (§6.2).
+/// (for "ein Euro"), minor unit singular/plural with gender.
 pub(crate) struct Currency {
     pub code: &'static str,
     pub written: &'static [&'static str],

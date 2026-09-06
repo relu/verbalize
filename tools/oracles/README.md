@@ -3,7 +3,7 @@
 Runs the golden fixtures (`verbalize/tests/fixtures/<lang>/*.tsv`) through
 every third-party normaliser available on this machine and prints the
 lines where the oracle disagrees with our expected output, as
-`class: input | expected | oracle`. It is a review aid (design §11.4):
+`class: input | expected | oracle`. It is a review aid:
 disagreements are never failures, and the oracles are only executed,
 never linked or copied.
 

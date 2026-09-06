@@ -1,4 +1,4 @@
-//! German (design §7.2, §7.3, §7.6).
+//! German language module.
 
 mod classify;
 pub(crate) mod lexicon;
@@ -136,7 +136,7 @@ impl Context for German {
     }
 
     /// Gender of a noun the number governs: CLDR unit names, the ordinal
-    /// lexicon, currency head nouns (§7.3).
+    /// lexicon, currency head nouns.
     fn noun_gender(&self, word: &str) -> Option<Gender> {
         if let Some(gender) = self.units.gender_of_name(word) {
             return Some(gender);
@@ -155,7 +155,7 @@ impl Context for German {
         None
     }
 
-    /// Bare 1100–1999 is a year (§7.2); 2000–2999 read the same either way.
+    /// Bare 1100–1999 is a year; 2000–2999 read the same either way.
     /// The full words also lower-case (`2 millionen km/h` in loose prose).
     fn scale(&self, word: &str) -> Option<Scale> {
         Some(match word {
@@ -171,7 +171,7 @@ impl Context for German {
         (1100..=2999).contains(&year)
     }
 
-    /// Bare `G` is Giga only before `/l` (§7.6).
+    /// Bare `G` is Giga only before `/l`.
     fn unit(&self, text: &str, bare: bool) -> Option<crate::token::Unit> {
         if super::common::bare_giga(text) && !text.starts_with(lexicon::GIGA_CONTEXT) {
             return None;

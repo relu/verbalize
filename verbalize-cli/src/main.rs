@@ -1,4 +1,4 @@
-//! `verbalize normalize|annotate|survey` (design §11.3, milestone 4).
+//! `verbalize normalize|annotate|survey`.
 
 mod survey;
 

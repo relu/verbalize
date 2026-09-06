@@ -1,8 +1,6 @@
 # Integration guide
 
-How to call `verbalize` from a TTS pipeline (design §10). This document
-expands that section for integrators; the design itself is the source of
-truth for behaviour.
+How to call `verbalize` from a TTS pipeline.
 
 ## Where to call it
 
@@ -33,7 +31,7 @@ normalisation those periods are gone ("zum Beispiel", "Samstag", "neunzehn
 Uhr dreißig"), so splitting after normalising sidesteps the whole class of
 bug. Splitting first and normalising each fragment independently is not
 equivalent — a classifier needs the surrounding sentence for agreement
-(design §7.3) and for multi-word classes (dates, time ranges) that a
+and for multi-word classes (dates, time ranges) that a
 premature split would sever.
 
 ## Local phonemiser engines (Piper / espeak-ng)
@@ -52,7 +50,7 @@ come out different ways on different calls, with nothing to configure.
 Normalising before the call makes their reading deterministic and
 identical to the local path, since both engines now receive the same
 already-spelled-out text. Punctuation and casing outside classified spans
-are preserved byte-for-byte (design §9), which keeps the prosody cues these
+are preserved byte-for-byte, which keeps the prosody cues these
 engines rely on ("Sie ruft Sie um 3:00 Uhr an." keeps its comma, capital
 letters and full stop; only "3:00 Uhr" itself changes).
 
@@ -108,7 +106,7 @@ regression fails the build the same way a broken test would.
 
 ## Idempotence
 
-`normalize(normalize(t)) == normalize(t)` is a hard property (design §9),
+`normalize(normalize(t)) == normalize(t)` is a hard property,
 enforced by a property test over every fixture input and over random
 digit-rich strings (`cargo test -p verbalize --test fixtures`). The output
 of `normalize` never contains an ASCII digit or a classified symbol, so
@@ -133,9 +131,7 @@ The last row is why construction must be cached (§"Where to call it"
 above): compiling the German recognisers and RBNF rulesets once costs tens
 of milliseconds, but calling `normalize` on that already-built `Normalizer`
 costs well under a millisecond even for number-dense paragraphs, and under
-100 µs when there is nothing to classify. Design §12's target — a
-5,000-character paragraph normalising in well under a millisecond — holds
-for ordinary and numberless prose; the number-dense worst case is
-currently a low single-digit number of milliseconds and is not gated by
-this design's stated target, since §12 does not specify a number-dense
-scenario separately.
+100 µs when there is nothing to classify. The target of a 5,000-character
+paragraph normalising in well under a millisecond holds for ordinary and
+numberless prose; the number-dense worst case is currently a low
+single-digit number of milliseconds.

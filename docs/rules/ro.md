@@ -1,7 +1,7 @@
 # Romanian (`ro`) — rule provenance
 
-One section per semiotic class for the Romanian module of design §7.5,
-the design test of the agreement layer. Choices the design leaves open are
+One section per semiotic class for the Romanian module, the proving
+ground of the agreement layer. Readings no source fixes are
 marked **choice**; every reading has a fixture in
 `verbalize/tests/fixtures/ro/`.
 
@@ -15,7 +15,7 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
 ## Cardinal
 
 - **Written**: `.` or space grouping (`1.000`, `22 000`), decimal comma.
-- **Spoken**: CLDR ro RBNF, gendered by the noun that follows (§7.5):
+- **Spoken**: CLDR ro RBNF, gendered by the noun that follows:
   `%spellout-cardinal-masculine` / `-feminine` / `-neuter` when the gender
   is known from a CLDR unit name, a currency word or the noun lexicon
   (`lexicon.rs`: ani, persoane, ore, zile, tablete, milioane, mii …);
@@ -133,7 +133,7 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
 ## Time
 
 - **Written**: `HH:MM`, `H:MM`, `ora H`.
-- **Spoken** (**choice**, §7.5 names only "paisprezece și treizeci"):
+- **Spoken** (**choice**):
   `:00` → "ora paisprezece", "ora nouă"; otherwise "paisprezece și
   treizeci", "nouă și cinci"; `ora 9` → "ora nouă". Hours are feminine
   ("ora două", "ora douăsprezece", "douăzeci și două și cincisprezece")
@@ -200,7 +200,7 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
   as in German (Clasa, Gradul, Tipul, Stadiul, NYHA, …); `sec. XX` is not
   expanded (V and above are out of scope), `sec. al XX-lea` is an Ordinal.
 
-## §7.6 classes (**choice** of standard usage)
+## Scientific, power, chemical, math, ratio, dose, repetition, angle (**choice** of standard usage)
 
 - Scientific: "unu virgulă cinci ori zece la puterea minus șase" (+ unit).
 - Power: "la pătrat", "la cub", otherwise "la puterea".
@@ -220,13 +220,13 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
 - Angle: "treizeci de grade cincisprezece minute douăzeci de secunde
   nord"; compass N/E/S/V.
 
-## What changed in the core for Romanian (§13.6)
+## Core hooks Romanian relies on
 
 - `Context::counted_noun` (default: the next word) lets a language look
   past its linking word (`22 de ore`) and tell the verbalizer the word is
   already written; `Context::noun_follows` (default: always) excludes
   function words. `common::cardinal` records the noun as
-  `NounPosition::After` from these — the field §7.5 asked for.
+  `NounPosition::After` from these.
 - `ExtraUnit` gained a `few` form (`None` in de/en) and `UnitTable` a
   `link` word so an SI prefix attaches after CLDR's "de" ("de picomoli").
 - `Tables::decade_suffix` may be empty.

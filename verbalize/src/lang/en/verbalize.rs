@@ -1,4 +1,4 @@
-//! English spoken forms. Readings the design does not fix are chosen here
+//! English spoken forms. Readings not fixed by CLDR are chosen here
 //! and recorded in `docs/rules/en.md`: "two thirty p m", "nine o'clock",
 //! "fourteen thirty", "two to one", "zero" for telephone digits.
 

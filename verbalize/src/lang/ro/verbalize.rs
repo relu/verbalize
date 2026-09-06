@@ -550,7 +550,7 @@ pub(super) fn verbalize(r: &Romanian, token: &Token, agreement: Agreement) -> Ve
         Token::Range { from, to } => {
             // The noun after the range governs both ends' gender ("două
             // până la trei ore"); only the end next to it takes the "de"
-            // (§7.5: "douăzeci până la treizeci de minute"), and the far
+            // ("douăzeci până la treizeci de minute"), and the far
             // end keeps the pronoun form of one ("una", not the article "o").
             let gender = agreement.gender;
             let near = agreement.noun == NounPosition::After;

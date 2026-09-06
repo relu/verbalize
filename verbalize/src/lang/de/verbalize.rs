@@ -33,7 +33,7 @@ pub(super) fn words(n: &Numeral, gender: Option<Gender>) -> String {
     let words = spell::spell(De, ruleset, value(n));
     if words.bytes().any(|b| b.is_ascii_digit()) {
         // Beyond the rules (10^18 and up) ICU falls back to digits; we
-        // read them one by one instead (§9: no digits in the output).
+        // read them one by one instead (no digits in the output).
         let mut digits = spell::digits(De, &n.integer.to_string());
         if !n.fraction.is_empty() {
             digits.push_str(" Komma ");

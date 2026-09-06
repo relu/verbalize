@@ -1,11 +1,11 @@
-//! classify → verbalize → render (design §4, §9).
+//! classify → verbalize → render.
 //!
 //! A language is a priority-ordered list of [`Recognizer`]s. Each runs its
 //! regex over the whole input; a candidate is kept only if it does not
 //! overlap a span a higher-priority recogniser already claimed, so lower
-//! priorities never see text inside a claimed span. Per-recogniser
-//! `Regex` plus this merge step is the §14 fallback: context words and
-//! digit-boundary checks need more than a `RegexSet` membership test.
+//! priorities never see text inside a claimed span. The `RegexSet` is only
+//! a prefilter: context words and digit-boundary checks need a per-recogniser
+//! `Regex` plus this merge step, not a membership test.
 
 use std::ops::Range;
 
@@ -201,7 +201,7 @@ pub(crate) fn word_bounded(text: &str, range: &Range<usize>) -> bool {
 }
 
 /// Splices the spoken forms over their byte ranges; everything outside a
-/// span is byte-identical to the input (design §9). An integer reading
+/// span is byte-identical to the input. An integer reading
 /// after an uppercase letter (`B1`, `SpO2`) gets a separating space so the
 /// letter is spelled on its own, and one sandwiched between letters of any
 /// case (`H2O`, `HbA1c`) on both sides; a suffix on a word that starts

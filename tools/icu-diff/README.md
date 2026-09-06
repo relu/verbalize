@@ -1,8 +1,8 @@
 # `tools/icu-diff`
 
-Differential test of the verbalize RBNF core against ICU4C, via PyICU
-(design §11.2). Not linked into the crate; PyICU (LGPL) is safe here
-because it is only ever *run*, per §6.4.
+Differential test of the verbalize RBNF core against ICU4C, via PyICU.
+Not linked into the crate; PyICU (LGPL) is safe here because it is only
+ever *run*.
 
 ## What it does
 
@@ -15,7 +15,7 @@ triple with PyICU, and compares it against the same triple spelled by
 `verbalize/examples/rbnf_dump.rs` (built and run via `cargo run --release`).
 Both sides are normalised identically before comparing: CLDR's soft
 hyphens (U+00AD) are stripped and whitespace is collapsed, matching the
-renderer's own post-processing (design §8).
+renderer's own post-processing.
 
 Any mismatch is printed as `MISMATCH locale=... ruleset=... n=... icu=...
 ours=...` on stdout; the process exits non-zero if there is at least one.
@@ -36,24 +36,22 @@ small example binary, `verbalize/examples/rbnf_dump.rs`, that reads
 stdout, one line per request, or the sentinel `<NONE>` for a request the
 interpreter has no answer for.
 
-That example is written against an entry point that does not exist yet:
+That example calls one entry point:
 
 ```rust
 pub fn verbalize::spell::ruleset(language: Language, ruleset: &str, n: i128) -> Option<String>;
 ```
 
 `ruleset` is the exact CLDR ruleset name (public or `%%` private); `None`
-for an unknown name. `rbnf` itself stays private, per the design's
-workspace layout (§4) — this is a `spell`-module entry point, not a new
-public `rbnf` module. Once it lands, the example compiles unchanged and
-this tool works end to end. (The rest of the public API in design §5,
-`verbalize::spell::{cardinal, ordinal, year, digits}`, is a different,
-higher-level surface for callers who already know the semiotic class;
-`ruleset` is the raw ruleset-by-name entry point the differential test
-needs to reach every CLDR ruleset, including ones the higher-level
-functions never call directly. Only integers are compared — ICU's
-`RuleBasedNumberFormat` holds a `double`/`int64` internally, so fractional
-input isn't comparable through this path anyway.)
+for an unknown name. `rbnf` itself stays private — this is a
+`spell`-module entry point, not a public `rbnf` module. The rest of the
+`spell` API (`cardinal`, `ordinal`, `year`, `digits`) is a higher-level
+surface for callers who already know the semiotic class; `ruleset` is the
+raw ruleset-by-name entry point the differential test needs to reach every
+CLDR ruleset, including ones the higher-level functions never call
+directly. Only integers are compared — ICU's `RuleBasedNumberFormat` holds
+a `double`/`int64` internally, so fractional input isn't comparable through
+this path anyway.
 
 ## Install
 
@@ -107,7 +105,7 @@ export LD_LIBRARY_PATH="<path to the icu4c lib/ used at install time>:$LD_LIBRAR
 
 Run from the repository root, or set `--cargo-args` to whatever invocation
 finds the workspace `Cargo.toml`. CI runs this in a job that installs ICU
-(design §11.2) and fails the build on any mismatch.
+and fails the build on any mismatch.
 
 ## Environment checked (2026-09-06)
 

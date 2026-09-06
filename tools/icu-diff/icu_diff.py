@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Differential test of the verbalize RBNF core against ICU4C (design §11.2).
+"""Differential test of the verbalize RBNF core against ICU4C.
 
 For every vendored locale and every public spellout ruleset in that locale's
 CLDR RBNF data, spells the same set of integers through PyICU's
@@ -34,7 +34,7 @@ NONE_SENTINEL = "<NONE>"
 
 
 def normalize(s: str) -> str:
-    """Soft hyphens removed, whitespace collapsed — same rule the renderer applies (§8)."""
+    """Soft hyphens removed, whitespace collapsed — same rule the renderer applies."""
     return WHITESPACE_RE.sub(" ", s.replace(SOFT_HYPHEN, "")).strip()
 
 

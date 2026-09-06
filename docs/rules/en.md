@@ -1,7 +1,7 @@
 # English (`en`) — rule provenance
 
-One section per semiotic class, in the order of the design's §7.2/§7.6
-tables, for the English module of design §7.4. Where the design fixes no
+One section per semiotic class, in the order of the German rule doc,
+for the English module. Where neither CLDR nor a style guide fixes an
 English reading, the choice made here is marked **choice** and is the
 open question for review; every such reading has a fixture in
 `verbalize/tests/fixtures/en/`.
@@ -147,7 +147,7 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
   second", "fourteen hours ten minutes and thirty seconds"); a meridiem or
   a recognised time zone abbreviation after it makes the reading
   unambiguously a clock instead (see below).
-- **Spoken** (**choice**, none fixed by the design): `9:00` "nine
+- **Spoken** (**choice**): `9:00` "nine
   o'clock"; `9:05` "nine oh five"; `9:30` "nine thirty"; 24-hour `14:30`
   "fourteen thirty", `14:00` "fourteen hundred", `00:15` "zero fifteen";
   with a meridiem the hour alone for `:00` and the meridiem spelled as
@@ -187,7 +187,7 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
   twenty twenty-six".
   A year-month is the month name and the year in both regions ("March
   two thousand three").
-- **Source**: Chicago 9.31–9.35; ISO 8601; `Options::region` (design §5).
+- **Source**: Chicago 9.31–9.35; ISO 8601; `Options::region`.
 
 ## Range
 
@@ -271,7 +271,7 @@ readings the engine already produces).
 
 - **Written**: `½`, `¼`, `¾`, `⅓`…; `1/2`, `3/4`, `2/3`, `1/8`, `5/12`,
   `1/100`, `1/1000`, `31/32` (13–99: ordinal + "s", "thirty-one
-  thirty-seconds"), `1/4th` (the suffix joins the span); mixed `1 ½`, `2 ¾`. Gate as in the design: numerator
+  thirty-seconds"), `1/4th` (the suffix joins the span); mixed `1 ½`, `2 ¾`. Gate as in German: numerator
   below a denominator of 2–12, 100 or 1000; not a date shape (`1/2/2026`
   is a Date in English); not after a unit or currency symbol.
 - **Spoken**: numerator as a cardinal, denominator from the hand table
@@ -279,7 +279,7 @@ readings the engine already produces).
   thousandth(s); mixed numbers with "and" and "a" for one ("one and a
   half", "two and three quarters").
 - **Priority**: above Year, so `1/1000` is a thousandth (a deviation from
-  the design's order, harmless: a year can only ever be a denominator).
+  the German order, harmless: a year can only ever be a denominator).
 
 ## Paragraph sign
 
@@ -338,7 +338,7 @@ readings the engine already produces).
 - `30°15′` "thirty degrees fifteen minutes", `52.52° N` "fifty-two point
   five two degrees north"; compass letters N/E/S/W.
 
-## Rendering (§9) — as in German
+## Rendering — as in German
 
 - An integer glued after an uppercase letter gets a space (`B1` → "B
   one", `SpO2` → "SpO two"), and one between letters of any case on both

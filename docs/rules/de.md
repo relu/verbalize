@@ -1,7 +1,7 @@
 # German (`de`) — rule provenance
 
-One section per semiotic class from the design's §7.2 table, in the same
-order. Each section states the written-form rule, the spoken-form rule,
+One section per semiotic class, in recogniser priority order. Each
+section states the written-form rule, the spoken-form rule,
 agreement notes where they apply, and the source it was checked against.
 
 Written-form sources: DIN 5008:2020 (Schreib- und Gestaltungsregeln), Duden
@@ -16,7 +16,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
 - **Agreement**: "eins" standalone. "ein"/"eine" before a noun of known
   gender (currency, unit, or the ordinal noun lexicon) via
   `%spellout-cardinal-masculine`/`-feminine`/`-neuter`; unknown-gender
-  nouns leave the bare "eins" reading (§7.3 of the design).
+  nouns leave the bare "eins" reading (see "Agreement" below).
 - **Source**: DIN 5008:2020; CLDR de `rbnf.json`
   (`spellout-numbering`, `spellout-cardinal-masculine`,
   `spellout-cardinal-feminine`, `spellout-cardinal-neuter`).
@@ -37,7 +37,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
 - **Written**: digit(s) followed by a period (`3.`, `1.`) — DIN 5008:2020
   §5.4.
 - **Spoken**: CLDR de RBNF `%spellout-ordinal` with the ending selected by
-  agreement (§7.3 below): `-r`/`-n`/`` /`-s`/`-m` rulesets.
+  agreement (see "Agreement" below): `-r`/`-n`/`` /`-s`/`-m` rulesets.
 - **Agreement**: only in a resolvable context — before a month name, before
   a lexicon noun (§ Ordinal noun lexicon), inside a numeric date, or after
   a trigger whose ending does not depend on the noun's gender (weak
@@ -106,7 +106,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   `max.mustermann@example.de` → "max Punkt mustermann at example Punkt
   de"; `192.168.0.1` → "eins neun zwei Punkt eins sechs acht Punkt null
   Punkt eins"; `@jensen` → "at jensen". Highest priority of all classes.
-- **Source**: design §7.2 "Electronic"; "at" for `@` is the usual German
+- **Source**: "at" for `@` is the usual German
   reading (Duden lists "At-Zeichen"), "Punkt"/"Schrägstrich"/"Doppelpunkt"
   are the DIN 5008 names of the signs (**choice**).
 
@@ -150,7 +150,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   gender — CLDR de `units.json` `concentr-percent` and `concentr-permille`
   both carry `gender: "neuter"` — so a bare `1` before them takes `ein`
   (`1 %` → `ein Prozent`, `1 ‰` → `ein Promille`), same mechanism as
-  Cardinal (§7.3). A decimal integer part before them stays bare "eins"
+  Cardinal (see "Agreement"). A decimal integer part before them stays bare "eins"
   regardless, since Decimal never applies noun agreement (`0,1 %` → `null
   Komma eins Prozent`).
 - **Source**: DIN 5008:2020; Duden 28th ed. (symbol usage); CLDR de
@@ -273,8 +273,8 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   overflows the `i128` number type.
 - **Spoken**: digit by digit; `Span.fallback = true`, so the survey tool
   can report it as a shape the higher-priority classes should learn.
-- **Source**: design §7.2 "Long digit run" row (no external written-form
-  standard governs arbitrary reference-number strings).
+- **Source**: no external written-form standard governs arbitrary
+  reference-number strings (**choice**).
 - **Digit groups** (`Token::DigitGroups`): a 16-digit card number in four
   groups (`4111 1111 1111 1111`, hyphens or spaces) reads digit by digit
   with a pause comma between groups, like Telephone, `fallback = false`.
@@ -302,7 +302,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
 - **Spoken**: `ein halb`, `ein Viertel`, `drei Viertel`.
 - **Also classified**: ASCII slash fractions (`1/2`) under a
   numerator/denominator gate — see "Slash fraction" below.
-- **Source**: design §7.2 "Unicode fractions" row.
+- **Source**: Unicode fraction characters; spoken form per Duden (**choice**).
 
 ## Roman numeral (clinical grading)
 
@@ -318,15 +318,14 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   Billroth, Ableitung, Stufe, Phase, Kategorie, Gruppe, Weltkrieg, Band,
   Teil, Kapitel, Akt, Abschnitt, Generation), because `I` also occurs as
   the element symbol left in a spelled chemical formula (`I₂`) and in
-  spelled output that a second pass must not re-read (§9 idempotence).
+  spelled output that a second pass must not re-read (idempotence).
   A numeral glued to a sub- or superscript is never expanded.
 - **Out of scope**: `V` and above are never expanded. A bare `V` is far
   more often "Vena" (`V. cava inferior`) or the Sozialgesetzbuch (`SGB V`)
   than the numeral five, and nothing in the written form disambiguates the
-  two without a parser, so the design deliberately stops at `IV`.
-- **Source**: design §7.2 "Roman numeral" row; German clinical grading
-  conventions (NYHA, Mallampati, Billroth staging, Sozialgesetzbuch
-  citation practice).
+  two without a parser, so expansion deliberately stops at `IV`.
+- **Source**: German clinical grading conventions (NYHA, Mallampati,
+  Billroth staging, Sozialgesetzbuch citation practice).
 
 ## Paragraph sign
 
@@ -335,8 +334,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
 - **Spoken**: `§` → "Paragraf", `§§` → "Paragrafen". A literal symbol
   substitution, like Abbreviation — it does not parse or consume the
   following number, which reads via the ordinary Cardinal rule.
-- **Source**: design §7.6 "Paragraph sign" row; DIN 5008:2020 (legal
-  citation abbreviation practice).
+- **Source**: DIN 5008:2020 (legal citation abbreviation practice).
 
 ## Scientific notation
 
@@ -353,8 +351,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   `1e10`, hex literals (`0x1F`), and alphanumeric IDs never match.
 - **Priority**: above Decimal and Measure — the class owns the whole
   mantissa/exponent/unit span so those classes never see its digits.
-- **Source**: DIN 1338 (Formelschreibweise); design §7.6 "Scientific
-  notation" row.
+- **Source**: DIN 1338 (Formelschreibweise).
 
 ## Power / exponent
 
@@ -367,7 +364,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   Measure claims those tokens first, at higher priority.
 - **Note**: charge notation (`²⁺`, `⁻`) after an element symbol is
   Chemical formula, not this class.
-- **Source**: DIN 1338; design §7.6 "Power / exponent" row.
+- **Source**: DIN 1338.
 
 ## Chemical formula
 
@@ -376,13 +373,13 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   element symbol (`Ca²⁺`, `Cl⁻`).
 - **Spoken**: only the subscript digits are replaced by the cardinal; the
   letters stay as written and are spelled by the engine's own
-  glued-letter-and-digit reading (§9 of the design): `H zwei O`, `CO zwei`,
+  glued-letter-and-digit reading (see "Rendering" in `en.md`): `H zwei O`, `CO zwei`,
   `C sechs H zwölf O sechs`. A trailing charge superscript reads
   "plus"/"minus" after the digit: `Ca zwei plus`, `Cl minus`.
 - **Not classified (needs no rule)**: plain ASCII `H2O`/`CO2` already read
   correctly through the existing glued-digit-and-letter cardinal rule
-  (§9) — "H zwei O", "CO zwei" — with no dedicated rule required.
-- **Source**: design §7.6 "Chemical formula" row.
+  — "H zwei O", "CO zwei" — with no dedicated rule required.
+- **Source**: standard chemical nomenclature (**choice**).
 
 ## Math expression
 
@@ -400,13 +397,13 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   digit) is left untouched. The four comparison operators (`<`, `>`,
   `≤`, `≥`) additionally allow a right-hand-only operand (prefix use, as
   clinical findings are actually written). An unspaced `-` between two
-  numbers stays Range (§7.2), not this class.
+  numbers stays Range, not this class.
 - **Priority**: above Decimal, Percent and Measure, for the same reason
   as Scientific notation — a trailing unit or `%` is read inside the same
   span.
 - **Source**: DIN 1338 (relation and operator symbols); German clinical
   documentation conventions for comparison-operator wording (Rote Liste,
-  Fachinformationen, Laborbefunde); design §7.6 "Math expression" row.
+  Fachinformationen, Laborbefunde).
 
 ## Slash fraction
 
@@ -430,10 +427,8 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   1000 Tausendstel.
 - **Known limitation**: adjective agreement before a noun is not
   implemented — `½ Liter`/`1/2 Liter` reads "ein halb Liter", not the
-  grammatically correct "ein halber Liter" (design §7.2 "Out of scope",
-  §14).
-- **Source**: Duden — Richtiges und gutes Deutsch (Bruchzahlen); design
-  §7.6 "Slash fraction" row.
+  grammatically correct "ein halber Liter" (out of scope: needs a parser).
+- **Source**: Duden — Richtiges und gutes Deutsch (Bruchzahlen).
 
 ## Ratio, titer and blood pressure
 
@@ -445,12 +440,12 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   `eins zu achtzig`, `eins zu fünfundzwanzigtausend`.
 - **Gate**: `N/M` reads "zu" (not "pro") when followed by `mmHg` or
   preceded by the bare token `RR` (`RR` itself is left as written — a
-  caller wanting "Blutdruck" supplies it via `Options::lexicon`, design
-  §5). A `N-M/UNIT` range immediately followed by a rate unit reads both
+  caller wanting "Blutdruck" supplies it via `Options::lexicon`).
+  A `N-M/UNIT` range immediately followed by a rate unit reads both
   ends via Range wording and the unit once. `N:M` reads "zu" when preceded
   by a trigger word (Titer, Verhältnis, Mischung, Maßstab, Chance, Quote,
   ANA, Verdünnung) or when `M` is not a plausible clock minute (`M > 59`
-  or 3+ digits) — the same wording Score already produces (§7.2); a bare
+  or 3+ digits) — the same wording Score already produces; a bare
   `2:1` with no trigger and a plausible-score shape still falls to Score.
 - **Priority**: above Measure (so `mmHg`/rate units are claimed whole)
   and above Range and Score.
@@ -468,7 +463,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   next to a dosing-unit/context word (mg, ml, Tbl., Tablette(n),
   Kapsel(n), IE, Tropfen).
 - **Spoken rule**: groups read in order via Cardinal, separated by the
-  Telephone convention's pause comma (design §7.2) — never "minus"; not
+  Telephone convention's pause comma — never "minus"; not
   collapsed into a Range even though it is hyphen-digit-hyphen-digit
   shaped like one. A trailing unit reads once, after the last group.
 - **Priority**: above Range and above Measure, so the whole scheme is one
@@ -491,7 +486,7 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   Already-spelled `N-mal` reads the same fused way (no-op).
 - **Priority**: below Measure, above Range.
 - **Source**: German dosing-frequency documentation conventions (Rote
-  Liste, Fachinformationen); design §7.6 "Repetition / multiplication" row.
+  Liste, Fachinformationen).
 
 ## Angle / coordinate
 
@@ -503,13 +498,12 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   sexagesimal-chain reading the ISO 6709/surveying convention uses, not
   CLDR's full `angle-arc-minute`/`-second` unit names (a deliberate
   deviation: the "Grad … Minuten … Sekunden" chain already disambiguates
-  without the fuller "Winkelminute" wording — design §14). A single
+  without the fuller "Winkelminute" wording). A single
   compass letter (`N`, `O`, `S`, `W`) directly after a degree/prime/second
   value expands to the cardinal-direction word (Nord, Ost, Süd, West).
 - **Priority**: above Degrees, which alone only recognises a bare
   `°`/`°C` group.
-- **Source**: ISO 6709 (geographic coordinate notation); design §7.6
-  "Angle / coordinate" row.
+- **Source**: ISO 6709 (geographic coordinate notation).
 
 ## Measure — scientific and medical unit extension
 
@@ -574,14 +568,14 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
 - `SpO2`→"Sauerstoffsättigung", `RR`→"Blutdruck", `HF`→"Herzfrequenz",
   `AF`→"Atemfrequenz", `BMI`→"B M I", `GFR`→"G F R" are application-domain
   vocabulary, not German-language rules — they are not built into the
-  classifier. A caller supplies them through `Options::lexicon` (design
-  §5): a literal, case-sensitive, word-bounded substitution list applied
+  classifier. A caller supplies them through `Options::lexicon`:
+  a literal, case-sensitive, word-bounded substitution list applied
   after every digit-bearing class, so it can only replace letters the
   digit classes left untouched and can never shadow a phone number, dose,
   or ratio span.
-- **Source**: design §5, §7.6; German clinical-shorthand conventions.
+- **Source**: German clinical-shorthand conventions.
 
-## §7.3 Agreement (German)
+## Agreement (German)
 
 Agreement is decided by the classifier from local surface context — there
 is no parser — and is fixed to exactly these rows:
@@ -611,8 +605,8 @@ declension tables; CLDR de `rbnf.json` ordinal rulesets
 
 Curated from Wiktionary's "Kategorie:Abkürzung (Deutsch)", cross-checked
 against Duden, to the set a TTS context plausibly needs — common
-administrative, academic, and everyday abbreviations, plus DIN/Duden
-abbreviations named explicitly in design §7.2. Weekday and month
+administrative, academic, and everyday abbreviations, plus the DIN/Duden
+abbreviations. Weekday and month
 abbreviations are generated from CLDR, not from this table, and are listed
 separately below for completeness.
 
@@ -753,6 +747,6 @@ Okt. → Oktober, Nov. → November, Dez. → Dezember.
   from NVIDIA NeMo (`nemo-text-processing`), licensed Apache-2.0. Only
   input shapes are imported; every expected output in this repository's
   fixtures is re-derived by hand against DIN 5008:2020 and Duden, since
-  NeMo's own expected outputs disagree with this design in places (e.g.
+  NeMo's own expected outputs disagree with these rules in places (e.g.
   NeMo reads "1 €" as "eins million euro"-style constructions in some
   paths, and only recognises the symbol-before-amount money form).

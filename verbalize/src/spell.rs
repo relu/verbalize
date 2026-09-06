@@ -1,5 +1,5 @@
 //! Number spelling without classification, for callers that already know
-//! what they have (design §5). Stateless: the compiled rulesets of each
+//! what they have. Stateless: the compiled rulesets of each
 //! language live in a `LazyLock`.
 
 use std::sync::LazyLock;
@@ -107,7 +107,7 @@ fn compile(language: Language) -> Rbnf {
 }
 
 /// Which cardinal ruleset the agreement selects. Gender-inflected "ein"
-/// forms only when the gender is known (design §7.3, §7.5).
+/// forms only when the gender is known.
 pub(crate) fn cardinal_ruleset(language: Language, agreement: Agreement) -> &'static str {
     match (language, agreement.gender) {
         (Language::En, _) | (_, None) => "%spellout-numbering",
@@ -118,7 +118,7 @@ pub(crate) fn cardinal_ruleset(language: Language, agreement: Agreement) -> &'st
 }
 
 /// Which ordinal ruleset the agreement selects. German has one ruleset per
-/// adjective ending (design §7.3): the standard strong/weak declension
+/// adjective ending: the standard strong/weak declension
 /// table, with masculine as the default gender (months are masculine).
 pub(crate) fn ordinal_ruleset(language: Language, agreement: Agreement) -> &'static str {
     use Case::*;

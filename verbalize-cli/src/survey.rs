@@ -1,4 +1,4 @@
-//! `verbalize survey <file|dir|sqlite:path>` (design §11.3).
+//! `verbalize survey <file|dir|sqlite:path>`.
 //!
 //! Extracts every token containing a digit or a classified symbol from a
 //! corpus, groups by "shape" (digits mapped to `9`, everything else kept),
@@ -11,9 +11,9 @@ use std::path::Path;
 
 use verbalize::{Language, Normalizer};
 
-/// Symbols the design's semiotic classes recognise besides plain digits
-/// (design §11.3 / prompt): currency, percent/permille, degree, paragraph,
-/// math/scientific operators, Unicode fractions and primes.
+/// Symbols the semiotic classes recognise besides plain digits: currency,
+/// percent/permille, degree, paragraph, math/scientific operators, Unicode
+/// fractions and primes.
 const SYMBOLS: &[char] = &[
     '€', '$', '£', '%', '‰', '°', '§', '×', '·', '±', '≤', '≥', '≠', '≈', '√', '½', '¼', '¾', '′',
     '″',

@@ -1,11 +1,11 @@
-//! German hand tables: what CLDR does not encode (design §6.2, §7.2, §7.6).
+//! German hand tables: what CLDR does not encode.
 //! Provenance per entry is in `docs/rules/de.md`.
 
 use crate::lang::units::{ExtraUnit, UnitTable};
 use crate::lang::{Currency, Tables};
 use crate::token::Gender::{self, Feminine, Masculine, Neuter};
 
-/// Ordinal noun lexicon (§7.2): the nouns before which `N.` is an ordinal.
+/// Ordinal noun lexicon: the nouns before which `N.` is an ordinal.
 pub(super) const ORDINAL_NOUNS: &[(&str, Gender)] = &[
     ("Klasse", Feminine),
     ("Stock", Masculine),
@@ -46,7 +46,7 @@ pub(super) const ORDINAL_NOUNS: &[(&str, Gender)] = &[
 /// Inflection endings a lexicon noun may carry (`Jahrhunderts`, `Platzes`).
 pub(super) const NOUN_ENDINGS: &[&str] = &["", "s", "es", "n", "en", "e"];
 
-/// Contracted prepositions and articles before an ordinal (§7.3), with the
+/// Contracted prepositions and articles before an ordinal, with the
 /// declension and case they impose. `der` depends on the noun's gender and
 /// is handled in code.
 pub(super) const WEAK_DATIVE: &[&str] = &["am", "vom", "zum", "beim", "im", "dem"];
@@ -96,7 +96,7 @@ pub(super) const TABLES: Tables = Tables {
             minor: ("Rappen", "Rappen", Some(Masculine)),
         },
     ],
-    // Slash-fraction denominators (§7.6, §14): ordinal stem + "-el".
+    // Slash-fraction denominators: ordinal stem + "-el".
     fractions: &[
         (2, "halb", "halb"),
         (3, "Drittel", "Drittel"),
@@ -114,7 +114,7 @@ pub(super) const TABLES: Tables = Tables {
     ],
     unicode_fractions: UNICODE_FRACTIONS,
     compass: &[('N', "Nord"), ('O', "Ost"), ('S', "Süd"), ('W', "West")],
-    // Words after which a lone `I` is the numeral one (§7.2 Roman numeral):
+    // Words after which a lone `I` is the numeral one (Roman numeral context):
     // `II`–`IV` stand on their own, a single `I` only in a grading context.
     roman_context: &[
         "Klasse",
@@ -326,7 +326,7 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
             other: "Dezibel",
             gender: Some(Neuter),
         },
-        // Listing shorthand `12 J.` → "zwölf Jahren" (dative, §7.2 Abbreviation).
+        // Listing shorthand `12 J.` → "zwölf Jahren" (dative).
         ExtraUnit {
             symbol: "J.",
             one: "Jahr",
@@ -347,7 +347,7 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
     link: "",
 };
 
-/// Bare `G` is Giga only before `/l` (§7.6).
+/// Bare `G` is Giga only before `/l`.
 pub(super) const GIGA_CONTEXT: &str = "G/l";
 
 /// Duden abbreviation list plus the medical set (`docs/rules/de.md`).

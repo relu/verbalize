@@ -63,7 +63,7 @@ impl Normalizer {
     }
 }
 
-/// Reading options (design §5).
+/// Reading options.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Options {
     /// Expand "z. B." → "zum Beispiel" etc. Default true.

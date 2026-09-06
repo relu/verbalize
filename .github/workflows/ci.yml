@@ -54,7 +54,7 @@ jobs:
         run: cargo build --release -q -p verbalize --example rbnf_dump
       - name: run icu-diff
         # Default stride (997) and seed already keep the sweep well under
-        # 10 minutes (design §11.2, tools/icu-diff/README.md).
+        # 10 minutes (see tools/icu-diff/README.md).
         run: python3 tools/icu-diff/icu_diff.py
 
   bench:

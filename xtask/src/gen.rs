@@ -13,7 +13,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 pub const LANGUAGES: [&str; 3] = ["de", "en", "ro"];
 pub const SUPPLEMENTAL: &str = "cldr-core/supplemental/currencyData.json";
 
-/// The per-language files of design spec §6.1, relative to `cldr-json/` in
+/// The per-language CLDR files the generator needs, relative to `cldr-json/` in
 /// the upstream repository and to `xtask/cldr/` locally.
 pub fn lang_files(lang: &str) -> [String; 5] {
     [
@@ -152,7 +152,7 @@ fn rulesets(json: &Json, lang: &str) -> Result<Rulesets> {
 }
 
 /// Runs the library's RBNF parser over the rules before they are written,
-/// so syntax outside its scope fails here with the rule quoted (design §8).
+/// so syntax outside its scope fails here with the rule quoted.
 fn check_rbnf(lang: &str, symbols: &Symbols, rulesets: &Rulesets) -> Result<()> {
     let rules: Vec<Vec<(&str, &str)>> = rulesets
         .iter()

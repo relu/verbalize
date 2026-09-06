@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Second-opinion oracles over the golden fixtures (design §11.4).
+"""Second-opinion oracles over the golden fixtures.
 
 For every oracle available on this machine, spells each fixture input and
 prints the lines where the oracle disagrees with our expected output as

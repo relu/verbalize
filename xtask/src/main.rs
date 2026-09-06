@@ -1,6 +1,6 @@
 //! `cargo xtask cldr-update <tag> | gen | check-data`
 //!
-//! Vendors the CLDR JSON the library needs (design spec §6.1) and compiles it
+//! Vendors the CLDR JSON the library needs and compiles it
 //! into `verbalize/src/data/`. Both the JSON and the generated Rust are
 //! checked in; `check-data` is the CI guard against stale output.
 
@@ -52,9 +52,9 @@ fn data_dir() -> PathBuf {
     root().join("verbalize/src/data")
 }
 
-/// Downloads the §6.1 files for every supported language plus the upstream
-/// LICENSE into `xtask/cldr/`, replacing whatever was there, and records
-/// the tag in `xtask/cldr.lock`.
+/// Downloads the CLDR files listed in `gen::lang_files` for every supported
+/// language plus the upstream LICENSE into `xtask/cldr/`, replacing whatever
+/// was there, and records the tag in `xtask/cldr.lock`.
 fn update(tag: &str) -> gen::Result<()> {
     let dir = cldr_dir();
     if dir.exists() {

@@ -53,8 +53,8 @@ pub enum NounPosition {
 }
 
 /// What the spoken form of a number must agree with. Decided by the
-/// classifier from local context (design §7.3, §7.5) and consumed by the
-/// verbalizer; `Agreement::default()` is the bare, context-free reading.
+/// classifier from local context and consumed by the verbalizer;
+/// `Agreement::default()` is the bare, context-free reading.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Agreement {
     pub case: Case,
@@ -230,7 +230,7 @@ pub enum Scale {
     Trillion,
 }
 
-/// A classified token. One variant per semiotic class (design §7.2, §7.6).
+/// A classified token. One variant per semiotic class.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Token {
@@ -406,7 +406,7 @@ impl Token {
     }
 }
 
-/// A classified span of the input with its spoken form (design §5).
+/// A classified span of the input with its spoken form.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Span {
     /// Byte offsets into the input.

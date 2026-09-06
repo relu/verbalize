@@ -1,7 +1,7 @@
 //! CLDR/ICU rule-based number format (RBNF), formatting direction only.
 //!
 //! A port of the structure of ICU4J's `RuleBasedNumberFormat`, `NFRuleSet`,
-//! `NFRule` and `NFSubstitution` (design §6.4, §8): the same rule
+//! `NFRule` and `NFSubstitution`: the same rule
 //! selection (largest base value ≤ n, radix/exponent divisors, the rollback
 //! rule), the same bracket splitting into two rules, the same substitution
 //! semantics. Differences: numbers are integers plus a decimal digit

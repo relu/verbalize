@@ -258,7 +258,7 @@ pub(crate) fn unit(units: &Units, numerals: &Numerals, text: &str, bare: bool) -
 }
 
 /// A unit right after `at`, with the byte offset it ends at, for classes
-/// that own a trailing unit (§7.6).
+/// that own a trailing unit.
 pub(crate) fn trailing_unit<C: Context>(c: &C, text: &str, at: usize) -> Option<(Unit, usize)> {
     let rest = &text[at..];
     let start = rest.len() - rest.trim_start().len();
@@ -475,7 +475,7 @@ pub(crate) fn chemical<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option
     if !parts.iter().any(|p| !matches!(p, ChemicalPart::Symbol(_))) {
         return None;
     }
-    // `I₂` would read "I zwei" and then "eins zwei" on a second pass (§9).
+    // `I₂` would read "I zwei" and then "eins zwei" on a second pass.
     let leading: String = formula
         .chars()
         .take_while(char::is_ascii_alphabetic)
@@ -503,7 +503,7 @@ pub(crate) fn power<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
         {
             return None;
         }
-        // `m²`, `cm³` are unit symbols, not powers (§14).
+        // `m²`, `cm³` are unit symbols, not powers.
         if c.units().resolve(&text[whole.clone()], true).is_some() {
             return None;
         }
@@ -987,7 +987,7 @@ pub(crate) fn measure<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<
         return None;
     }
     if glued && unit.numerator.is_some() {
-        // `500mg` is a symbol; `3,5m` and `1,5Liter` keep the input's missing space (§9).
+        // `500mg` is a symbol; `3,5m` and `1,5Liter` keep the input's missing space.
         let numerator = written.split('/').next().unwrap_or("");
         let bare_symbol = matches!(
             unit.numerator,
@@ -1163,7 +1163,7 @@ pub(crate) fn slash_fraction<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> 
     }
     let numerator: u32 = text_of(caps, 1).parse().ok()?;
     let denominator: u32 = text_of(caps, 2).parse().ok()?;
-    // Denominators up to 99 derive their noun from the ordinal (§7.6);
+    // Denominators up to 99 derive their noun from the ordinal;
     // larger ones only when the table names them (100, 1000).
     if numerator >= denominator
         || !(denominator <= 99
@@ -1222,7 +1222,7 @@ pub(crate) fn score<C: Context>(_: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
 /// CLDR's rules end at 10^18; beyond that the reading is digit by digit.
 const SPELLABLE: u128 = 1_000_000_000_000_000_000;
 
-/// §7.3/§7.5: what a number ending at `at` agrees with — the gender of the
+/// What a number ending at `at` agrees with — the gender of the
 /// noun it counts, and whether that noun follows it directly (so a
 /// language may insert its linking word) or the linking word is written.
 fn counted<C: Context>(c: &C, text: &str, at: usize) -> Agreement {

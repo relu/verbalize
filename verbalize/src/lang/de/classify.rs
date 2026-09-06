@@ -1,6 +1,6 @@
-//! German recognisers in priority order (design §7.2 "Priority order").
+//! German recognisers in priority order.
 //! The language-neutral ones come from [`common`]; times, dates, ordinals
-//! and the ordinal range need German shapes and the §7.3 triggers.
+//! and the ordinal range need German shapes and the ordinal trigger words.
 
 use regex::Regex;
 
@@ -95,7 +95,7 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
     list
 }
 
-/// §7.3: the declension and case a trigger word imposes on an ordinal.
+/// The declension and case a trigger word imposes on an ordinal.
 pub(super) fn ordinal_agreement(trigger: Option<&str>, gender: Option<Gender>) -> Agreement {
     let lower = trigger.map(str::to_lowercase);
     let (declension, case) = match lower.as_deref() {
@@ -287,7 +287,7 @@ fn ordinal(g: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
     Some(m)
 }
 
-/// §7.3: triggers that fix the ordinal's ending for every gender (weak
+/// Triggers that fix the ordinal's ending for every gender (weak
 /// dative/accusative/genitive `-en`, weak nominative after `die`/`das` `-e`).
 fn gender_free_trigger(trigger: &str) -> bool {
     let t = trigger.to_lowercase();

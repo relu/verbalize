@@ -1,4 +1,4 @@
-//! Design §12: a 5,000-character paragraph in well under a millisecond.
+//! Target: a 5,000-character paragraph in well under a millisecond.
 
 use criterion::{criterion_group, criterion_main, Criterion, Throughput};
 use verbalize::{Language, Normalizer};

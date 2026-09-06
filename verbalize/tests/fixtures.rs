@@ -1,4 +1,4 @@
-//! Golden fixtures (design §11.1) and property tests (§11.6).
+//! Golden fixtures and property tests.
 //!
 //! `tests/fixtures/<lang>/<class>.tsv`: `input<TAB>expected`, `#` comments.
 //! A `# region: EnGb` directive line switches `Options::region` for the
@@ -149,7 +149,7 @@ fn ro_fixtures() {
     run_fixtures(Language::Ro);
 }
 
-/// The output contains no ASCII digit, and a second pass is a no-op (§9).
+/// The output contains no ASCII digit, and a second pass is a no-op.
 fn check_properties(normalizer: &Normalizer, input: &str) -> Result<(), String> {
     let once = normalizer.normalize(input);
     if once.bytes().any(|b| b.is_ascii_digit()) {
