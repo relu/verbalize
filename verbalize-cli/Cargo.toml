@@ -1,0 +1,20 @@
+[package]
+name = "verbalize-cli"
+version = "0.1.0"
+description = "Command-line front end for verbalize: normalize, annotate, survey"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["tts", "text-normalization", "speech", "cldr", "rbnf"]
+categories = ["text-processing", "localization", "command-line-utilities"]
+readme = "../README.md"
+
+[[bin]]
+name = "verbalize"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.6.6", features = ["derive"] }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde_json = "1.0.151"
+verbalize = { path = "../verbalize", version = "0.1.0" }
