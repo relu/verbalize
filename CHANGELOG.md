@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-06
+
+### Fixed
+
+- Money: an ISO 4217 currency code before the amount (`EUR 22 000`,
+  invoice/statement style) is now recognized; previously only a bare
+  symbol (`€`) worked as a prefix, so the code was left as stray text
+  and the amount read as a plain cardinal. `de`/`en`/`ro`.
+
 ## [0.1.0] - 2026-09-06
 
 First release.
