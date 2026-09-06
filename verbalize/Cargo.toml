@@ -1,0 +1,28 @@
+[package]
+name = "verbalize"
+version = "0.1.0"
+description = "Text normalisation for speech synthesis: numbers, dates, prices and abbreviations as spoken words, driven by CLDR data"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["tts", "text-normalization", "speech", "cldr", "rbnf"]
+categories = ["text-processing", "localization"]
+readme = "../README.md"
+
+[dependencies]
+regex = "1"
+icu_plurals = "2"
+icu_locale_core = "2"
+# Already linked via icu_plurals; listed only to enable `sync`, which makes
+# `PluralRules` (and so the compiled rulesets) `Send + Sync`.
+icu_provider = { version = "2", features = ["sync"] }
+# Already linked via icu_plurals; the stable way to build plural operands
+# for a decimal ("1,5 Liter") is `PluralOperands::from(&Decimal)`.
+fixed_decimal = "0.7"
+
+[dev-dependencies]
+criterion = "0.8"
+
+[[bench]]
+name = "normalize"
+harness = false
