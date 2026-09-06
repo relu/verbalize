@@ -13,6 +13,11 @@
 1.200,50 lei	o mie două sute de lei și cincizeci de bani
 12,5 lei	doisprezece lei și cincizeci de bani
 100 RON	o sută de lei
+# ISO 4217 code before the amount (invoice/statement style): "EUR 1.234,56"
+RON 100	o sută de lei
+EUR 20	douăzeci de euro
+USD 10	zece dolari
+GBP 5	cinci lire
 1 euro	un euro
 20 de euro	douăzeci de euro
 1,50 €	un euro și cincizeci de cenți

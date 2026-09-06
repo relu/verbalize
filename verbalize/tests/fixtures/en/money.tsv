@@ -19,6 +19,11 @@ $8.808	eight point eight zero eight dollars
 $5/month	five dollars per month
 $30/hr	thirty dollars per hour
 US$ 100	one hundred dollars
+# ISO 4217 code before the amount (invoice/statement style): "EUR 1,234.56"
+USD 100	one hundred dollars
+EUR 22,000	twenty-two thousand euros
+GBP 50	fifty pounds
+CHF 10	ten francs
 # scale words between amount and currency: one Money span, plural currency noun, never cents
 $2.5 billion	two point five billion dollars
 3 million euros	three million euros

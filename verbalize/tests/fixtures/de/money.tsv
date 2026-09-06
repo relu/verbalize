@@ -20,6 +20,11 @@
 10 CHF	zehn Franken
 # extrapolated: sub-unit only -> minor unit via masculine cardinal
 1 Cent	ein Cent
+# ISO 4217 code before the amount (invoice/statement style): "EUR 1.234,56"
+EUR 22 000	zweiundzwanzigtausend Euro
+USD 100	einhundert Dollar
+GBP 50	fünfzig Pfund
+CHF 10	zehn Franken
 # Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/de, Apache-2.0); the expected outputs are ours.
 # text-processing-rs: currency symbol glued before the amount
 €2,20	zwei Euro zwanzig

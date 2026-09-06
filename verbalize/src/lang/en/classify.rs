@@ -66,7 +66,7 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         recognizer(r"([0-9]+)(st|nd|rd|th)", ordinal),
         recognizer(
             &format!(
-                r"(?:(US\$|\$|£|€)\s?)?(-?(?:{num}|\.[0-9]+))(?:\s*(thousand|million|billion|trillion|bn|k|M))?(?:\s*(USD|EUR|GBP|CHF|dollars?|euros?|pounds?|francs?))?(?:/(\p{{L}}[\p{{L}}.]*))?"
+                r"(?:(US\$|\$|£|€|USD|EUR|GBP|CHF)\s?)?(-?(?:{num}|\.[0-9]+))(?:\s*(thousand|million|billion|trillion|bn|k|M))?(?:\s*(USD|EUR|GBP|CHF|dollars?|euros?|pounds?|francs?))?(?:/(\p{{L}}[\p{{L}}.]*))?"
             ),
             common::money,
         ),

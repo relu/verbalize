@@ -853,11 +853,19 @@ pub(crate) fn money<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
         c.scale(word).map(|scale| (scale, s.end, letter))
     });
     let (code, start, mut end) = match (&prefix, &suffix) {
-        (Some(p), None) => (
-            currency_code(c.tables(), &text[p.clone()])?,
-            p.start,
-            scale.map_or(amount_group.end, |(_, end, _)| end),
-        ),
+        (Some(p), None) => {
+            let written = &text[p.clone()];
+            if written.chars().all(char::is_alphabetic)
+                && char_before(text, p.start).is_some_and(char::is_alphanumeric)
+            {
+                return None;
+            }
+            (
+                currency_code(c.tables(), written)?,
+                p.start,
+                scale.map_or(amount_group.end, |(_, end, _)| end),
+            )
+        }
         (None, Some(s)) => {
             let written = &text[s.clone()];
             if written.chars().all(char::is_alphabetic)

@@ -51,7 +51,7 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         recognizer(&p.dose, common::dose),
         recognizer(
             &format!(
-                r"(?:(€|\$|£)\s?)?(-?{num})(?:\s*(?:de\s+)?(mii|milioane|milion|mil\.|miliarde|miliard|mld\.))?(?:\s*(?:de\s+)?(lei|leu|Lei|LEI|RON|ron|€|EUR|euro|\$|USD|dolari|dolar|£|GBP|lire|liră))?(?:/(\p{{L}}[\p{{L}}.]*))?"
+                r"(?:(€|\$|£|EUR|USD|GBP|RON)\s?)?(-?{num})(?:\s*(?:de\s+)?(mii|milioane|milion|mil\.|miliarde|miliard|mld\.))?(?:\s*(?:de\s+)?(lei|leu|Lei|LEI|RON|ron|€|EUR|euro|\$|USD|dolari|dolar|£|GBP|lire|liră))?(?:/(\p{{L}}[\p{{L}}.]*))?"
             ),
             common::money,
         ),
