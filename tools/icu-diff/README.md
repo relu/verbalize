@@ -62,6 +62,13 @@ a bundled ICU, so a working `libicu` (with headers, i.e. the `-dev`
 package) must be discoverable via `pkg-config` (or the `ICU_VERSION`
 environment variable) before `pip install PyICU` will build.
 
+The ICU you bind against must carry the same CLDR generation as the
+vendored data (`xtask/cldr.lock`, CLDR 48 → ICU 78). Older ICUs diff
+against older CLDR: Ubuntu 24.04's libicu 74 (CLDR 44) still spells
+Romanian with cedilla `ş`, which CLDR 46+ replaced with comma-below `ș`,
+so every `ro` tuple mismatches. CI therefore installs the official
+`icu4c-78.3-Ubuntu22.04-x64.tgz` build rather than the distro package.
+
 ```sh
 # Debian/Ubuntu
 sudo apt-get install libicu-dev pkg-config

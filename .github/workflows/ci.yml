@@ -34,13 +34,22 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-      - name: install libicu
-        run: sudo apt-get update && sudo apt-get install -y libicu-dev pkg-config
+      # Ubuntu's libicu (74.2, CLDR 44) predates the vendored CLDR 48 data
+      # (xtask/cldr.lock); e.g. Romanian switched ş→ș in between, so PyICU
+      # must bind against an ICU built from the same CLDR generation.
+      - name: install ICU 78.3 (CLDR 48)
+        run: |
+          curl -sSfLO https://github.com/unicode-org/icu/releases/download/release-78.3/icu4c-78.3-Ubuntu22.04-x64.tgz
+          echo "9c8abe58a20cf82ea22341d8125272094f7fca2414173cbc2d8742feb84566a2  icu4c-78.3-Ubuntu22.04-x64.tgz" | sha256sum -c
+          sudo tar xzf icu4c-78.3-Ubuntu22.04-x64.tgz -C / --strip-components=1 && sudo ldconfig
+          echo "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig" >> "$GITHUB_ENV"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.x"
       - name: install PyICU
-        run: pip install -r tools/icu-diff/requirements.txt
+        run: |
+          pip install -r tools/icu-diff/requirements.txt
+          python3 -c 'import icu; assert icu.ICU_VERSION.startswith("78."), icu.ICU_VERSION'
       - name: build rbnf_dump
         run: cargo build --release -q -p verbalize --example rbnf_dump
       - name: run icu-diff
