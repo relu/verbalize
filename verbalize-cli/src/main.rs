@@ -1,5 +1,7 @@
-//! `verbalize normalize|annotate|survey`.
+//! `verbalize normalize|annotate|survey|audit`.
 
+mod audit;
+mod corpus;
 mod survey;
 
 use std::fs;
@@ -25,6 +27,9 @@ enum Command {
     Annotate(AnnotateArgs),
     /// Scan a corpus for digit/symbol shapes and report coverage.
     Survey(SurveyArgs),
+    /// Scan a corpus for unit symbols guessed as an SI prefix on a shorter
+    /// symbol that the corpus also uses as an ordinary word.
+    Audit(AuditArgs),
 }
 
 #[derive(Args)]
@@ -63,12 +68,25 @@ struct SurveyArgs {
     threshold: Option<u64>,
 }
 
+#[derive(Args)]
+struct AuditArgs {
+    /// BCP-47 language tag: de, en, ro.
+    #[arg(long, default_value = "en")]
+    lang: String,
+    /// A text file, a directory of text files, or `sqlite:<path>`.
+    path: String,
+    /// Exit non-zero if any suspect token was composed at least N times.
+    #[arg(long)]
+    threshold: Option<u64>,
+}
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let result = match cli.command {
         Command::Normalize(args) => run_normalize(args),
         Command::Annotate(args) => run_annotate(args),
         Command::Survey(args) => run_survey(args),
+        Command::Audit(args) => run_audit(args),
     };
     match result {
         Ok(code) => code,
@@ -195,6 +213,21 @@ fn run_survey(args: SurveyArgs) -> Result<ExitCode, String> {
     survey::print_report(&report);
     if let Some(threshold) = args.threshold {
         if report.unhandled.iter().any(|s| s.count as u64 >= threshold) {
+            return Ok(ExitCode::FAILURE);
+        }
+    }
+    Ok(ExitCode::SUCCESS)
+}
+
+fn run_audit(args: AuditArgs) -> Result<ExitCode, String> {
+    let language: Language = args
+        .lang
+        .parse()
+        .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
+    let report = audit::run(&args.path, language)?;
+    audit::print_report(&report);
+    if let Some(threshold) = args.threshold {
+        if report.suspicious().any(|e| e.composed as u64 >= threshold) {
             return Ok(ExitCode::FAILURE);
         }
     }
