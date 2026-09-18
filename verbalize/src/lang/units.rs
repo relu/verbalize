@@ -61,8 +61,11 @@ pub(crate) struct Units {
     table: &'static UnitTable,
     by_symbol: HashMap<&'static str, usize>,
     by_id: HashMap<&'static str, usize>,
-    /// Every long name form → unit index, the gender lexicon for "ein/eine".
-    by_name: HashMap<String, usize>,
+    /// Every written-out name a language gives a unit → the unit it names:
+    /// CLDR long forms and `long_name`, plus the extra table's `one`/`other`.
+    /// Two consumers: the gender lexicon for "ein/eine", and [`Self::resolve`],
+    /// where a name must win over SI-prefix composition.
+    by_name: HashMap<String, UnitRef>,
     plural: PluralRules,
 }
 
@@ -99,8 +102,28 @@ impl Units {
             }
             for pattern in unit.long {
                 if let Some(name) = pattern.pattern.strip_prefix("{0}") {
-                    by_name.entry(name.trim().to_string()).or_insert(index);
+                    by_name
+                        .entry(name.trim().to_string())
+                        .or_insert(UnitRef::Cldr {
+                            id: unit.id,
+                            prefix: None,
+                        });
                 }
+            }
+            if let Some(name) = unit.long_name {
+                by_name
+                    .entry(name.trim().to_string())
+                    .or_insert(UnitRef::Cldr {
+                        id: unit.id,
+                        prefix: None,
+                    });
+            }
+        }
+        for extra in table.extra {
+            for name in [extra.one, extra.other] {
+                by_name
+                    .entry(name.trim().to_string())
+                    .or_insert(UnitRef::Extra(extra.symbol));
             }
         }
         let locale = icu_locale_core::Locale::try_from_str(data.language)
@@ -138,15 +161,12 @@ impl Units {
             if let Some(base) = symbol.strip_prefix(prefix) {
                 if !base.is_empty() {
                     if let Some(id) = self.cldr_id(base) {
-                        // A written-out unit name is that unit, not a prefix
+                        // A written-out unit name is that unit, never a prefix
                         // glued to a shorter symbol: German "Grad" spells as
-                        // `G` + `rad`, so composition would read a temperature
-                        // as giga-radiant.
-                        if let Some(&index) = self.by_name.get(symbol) {
-                            return Some(UnitRef::Cldr {
-                                id: self.data.units[index].id,
-                                prefix: None,
-                            });
+                        // `G` + `rad`, so composition would read a degree as
+                        // giga-radiant. The language's own names win.
+                        if let Some(unit) = self.by_name.get(symbol) {
+                            return Some(unit.clone());
                         }
                         return Some(UnitRef::Cldr {
                             id,
@@ -244,9 +264,7 @@ impl Units {
 
     /// Gender of a unit named by one of its long forms (`Litern`, `Stunde`).
     pub(crate) fn gender_of_name(&self, word: &str) -> Option<Gender> {
-        self.by_name
-            .get(word)
-            .and_then(|&i| self.data.units[i].gender)
+        self.by_name.get(word).and_then(|unit| self.gender(unit))
     }
 
     /// The long name for `n` in `case`: `Kilometer`, `Kilometern`, `Millimol`.
@@ -353,5 +371,40 @@ fn strip_placeholder(pattern: &str) -> &str {
     match pattern.strip_prefix("{0}") {
         Some(rest) => rest.trim(),
         None => pattern.trim_end_matches("{0}").trim(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::lang::Context;
+    use crate::Options;
+
+    fn contexts() -> Vec<Box<dyn Context>> {
+        vec![
+            Box::new(crate::lang::de::German::new(&Options::default())),
+            Box::new(crate::lang::en::English::new(&Options::default())),
+            Box::new(crate::lang::ro::Romanian::new(&Options::default())),
+        ]
+    }
+
+    /// A written-out unit name is never split into an SI prefix on a shorter
+    /// symbol ("Grad" would be `G` + `rad`). The name set is each language's
+    /// own data, so this covers every language at once and fails on any
+    /// future CLDR or lexicon change that introduces a new collision.
+    #[test]
+    fn written_unit_names_never_compose() {
+        for lang in contexts() {
+            let units = lang.units();
+            for name in units.by_name.keys() {
+                if let Some(UnitRef::Cldr {
+                    prefix: Some(power),
+                    ..
+                }) = units.resolve(name, false)
+                {
+                    panic!("{name:?} resolved as SI prefix {power} on a shorter symbol");
+                }
+            }
+        }
     }
 }

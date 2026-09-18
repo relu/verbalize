@@ -129,6 +129,11 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
   Digital units from CLDR `digital-*` (`bit`, `byte`, `KB`/`kB`, `MB`,
   `GB`, `TB`, `Mbit`, `Gbit`): "doi gigabyți", "un terabyte", `100 Mbit/s`
   and `100 Mbps` → "o sută de megabiți pe secundă".
+- **Name before prefix**: a written-out unit name after a number is that
+  unit, never an SI prefix glued to a shorter symbol (German `Grad` is
+  `G` + `rad`). The name set is the language's own data (CLDR long forms,
+  `long_name`, the extra table), so the guard is data-driven, not a word
+  list.
 
 ## Time
 

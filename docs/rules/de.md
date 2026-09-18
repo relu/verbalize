@@ -181,6 +181,11 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   "s", "h" out unless the context is unambiguous); `/` directly after a
   unit or currency becomes "pro"; `/` anywhere else is untouched
   (`Lehrer/Lehrerin` stays as written — it is not a measure).
+- **Name before prefix**: a token that is a written-out unit name is that
+  unit, never an SI prefix glued to a shorter symbol — `29 Grad` is
+  "neunundzwanzig Grad", not `G` + `rad` ("Gigaradiant"). The name set is
+  the language's own data (CLDR long forms, `long_name`, the extra table),
+  so no word list and no per-language patch is needed.
 - **Digital units**: CLDR `digital-*` (`Bit`, `Byte`, `kB`/`KB`, `MB`,
   `GB`, `TB`, `PB`, `kbit`, `Mbit`, `Gbit`, `Tbit`) read by their long
   names ("zwei Gigabyte", "ein Terabyte"); data rates as compounds

@@ -124,6 +124,11 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
   form ("kilometers per hour"); a numbered denominator keeps its own
   plural ("per one point seven three square meters"); the hyphenated
   compound takes the singular ("seventy-five-gram").
+- **Name before prefix**: a written-out unit name after a number is that
+  unit, never an SI prefix glued to a shorter symbol (German `Grad` is
+  `G` + `rad`). The name set is the language's own data (CLDR long forms,
+  `long_name`, the extra table), so the guard is data-driven, not a word
+  list.
 - **Allow/deny list**: bare `in` (a word), `a`, `s`, `h`, `d`, `N`, `A`,
   `J`, `G`, `t`, `c`, `y`, `mo` are never units after a bare number; they
   still resolve inside compounds (`m/s`) and as prefix bases (`kN`).

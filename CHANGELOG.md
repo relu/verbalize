@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- Units: the "a written-out unit name wins over an SI-prefix split" rule is
+  now fed by every name a language declares — CLDR long forms, `long_name`,
+  and the extra table's names — instead of only CLDR long patterns, and a
+  test fails on any name that would still be split. The extra table's names
+  also carry their gender now: `1 Kiloeinheit` is "eine Kiloeinheit", not
+  "eins Kiloeinheit". `de`/`en`/`ro`.
+
 ## [0.1.3] - 2026-09-18
 
 ### Fixed
