@@ -124,8 +124,9 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
   symbols carry their own few/other forms ("unități"/"de unități";
   `Gpt`/`Tpt` "gigaparticule"/"teraparticule"). Bare `h` and `m` are
   accepted after a number (hours, meters); `s`, `d`, `N`, `A`, `J`, `G`,
-  `t`, `a`, `c` are not; a bare `G` is giga only before `/l`, other `G…`
-  symbols resolve normally.
+  `t`, `a`, `c`, `din` are not; a bare `G` is giga only before `/l`, other
+  `G…` symbols resolve normally. `cc`/`ccm` are centimetri cubi, not
+  `c` + `c`/`cm`.
   Digital units from CLDR `digital-*` (`bit`, `byte`, `KB`/`kB`, `MB`,
   `GB`, `TB`, `Mbit`, `Gbit`): "doi gigabyți", "un terabyte", `100 Mbit/s`
   and `100 Mbps` → "o sută de megabiți pe secundă".

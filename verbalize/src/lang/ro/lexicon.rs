@@ -126,6 +126,9 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
         ("sec", "duration-second"),
         ("l", "volume-liter"),
         ("L", "volume-liter"),
+        // `cc`/`ccm` would otherwise compose as `c` + `c`/`cm`.
+        ("cc", "volume-cubic-centimeter"),
+        ("ccm", "volume-cubic-centimeter"),
         ("mp", "area-square-meter"),
         ("°", "angle-degree"),
         ("°C", "temperature-celsius"),
@@ -215,7 +218,7 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
         },
     ],
     prefer: &[("°", "angle-degree")],
-    deny_bare: &["s", "d", "N", "A", "J", "G", "t", "a", "c"],
+    deny_bare: &["s", "d", "N", "A", "J", "G", "t", "a", "c", "din"],
     per: "pe",
     link: "de",
 };

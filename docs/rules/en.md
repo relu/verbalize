@@ -130,10 +130,11 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
   `long_name`, the extra table), so the guard is data-driven, not a word
   list.
 - **Allow/deny list**: bare `in` (a word), `a`, `s`, `h`, `d`, `N`, `A`,
-  `J`, `G`, `t`, `c`, `y`, `mo` are never units after a bare number; they
-  still resolve inside compounds (`m/s`) and as prefix bases (`kN`).
+  `J`, `G`, `t`, `c`, `y`, `mo`, `my` are never units after a bare number;
+  they still resolve inside compounds (`m/s`) and as prefix bases (`kN`).
   `L`/`l`, `mL`/`ml` both resolve to liters. A bare `G` is giga only
-  before `/L`; other `G…` symbols (`Gpt`, `GB`) resolve normally.
+  before `/L`; other `G…` symbols (`Gpt`, `GB`) resolve normally. `cc` is
+  cubic centimetre, not `c` + `c`.
 - **Digital units**: CLDR `digital-*` (`bit`, `byte`, `KB`/`kB`, `MB`,
   `GB`, `TB`, `PB`, `kbit`, `Mbit`, `Gbit`, `Tbit`): "two gigabytes",
   "one terabyte"; `100 Mbit/s`, `100 Mbps` → "one hundred megabits per

@@ -38,3 +38,5 @@ Druck 1013 hPa	Druck eintausenddreizehn Hektopascal
 im 75-g-oGTT	im fünfundsiebzig-Gramm-oGTT
 # negative: no rule needed, already correct via Decimal
 pH 7,4	pH sieben Komma vier
+# `ccm` is Kubikzentimeter, not `c` + `cm` ("Zentizentimeter")
+350 ccm	dreihundertfünfzig Kubikzentimeter

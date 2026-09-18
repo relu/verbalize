@@ -522,7 +522,8 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   `mg/dl`, `mg/l`, `mg/g`, `µg/dl`, `µg/l`, `ng/ml`, `ng/l`, `pg/ml`,
   `g/dl`, `g/l`, `Gpt/l`, `G/l`, `IU/ml`, `IU/l`, `kU/l`, `mU/l`, `U/l`,
   `mm/h`, `/µl`, `/nl`, `/min`, `/d`, `/Tag`, `/h`, `500mg` (no space),
-  `75-g-oGTT`, `10-g-Monofilament`.
+  `75-g-oGTT`, `10-g-Monofilament`, `ccm` (Kubikzentimeter, not
+  `c` + `cm`).
 - **Spoken, via CLDR de `units.json`** (id in brackets): Millimeter
   Quecksilbersäule (`pressure-millimeter-ofhg`), Millimol pro Liter
   (`concentr-millimole-per-liter`), Mol/Millimol (`concentr-mole`),

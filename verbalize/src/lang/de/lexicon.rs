@@ -184,6 +184,8 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
         ("sec", "duration-second"),
         ("l", "volume-liter"),
         ("L", "volume-liter"),
+        // `ccm` would otherwise compose as `c` + `cm` ("Zentizentimeter").
+        ("ccm", "volume-cubic-centimeter"),
         ("Sept.", "duration-month"),
         ("ly", "length-light-year"),
         ("AU", "length-astronomical-unit"),

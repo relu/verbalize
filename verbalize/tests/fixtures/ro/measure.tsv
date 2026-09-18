@@ -25,3 +25,8 @@
 1 Gbit/s	un gigabit pe secundă
 100 Mbps	o sută de megabiți pe secundă
 1 Gbps	un gigabit pe secundă
+# `cc`/`ccm` are centimetri cubi, not `c` + `c`/`cm`
+350 cc	trei sute cincizeci de centimetri cubi
+350 ccm	trei sute cincizeci de centimetri cubi
+# negative: `din` is a preposition, not `d` + `in` (deci-inch)
+1 din 10	unu din zece

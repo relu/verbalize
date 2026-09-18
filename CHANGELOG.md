@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- Units: cubic centimetre reads as itself, not as an SI-prefix split of a
+  shorter symbol — `cc` (`en`), `ccm` (`de`), `cc`/`ccm` (`ro`) were
+  "centicenturies"/"Zentizentimeter"/"centicentimetri". Found by the new
+  corpus audit (`verbalize audit`) over ~500k sentences.
+- Units: Romanian `din` is a preposition, not `d` + `in` (deci-inch);
+  `1 din 10` was "unu deciinch zece". English `my` is not `m` + `y`
+  (milli-year). Both are now bare-token denials. `en`/`ro`.
 - Units: the "a written-out unit name wins over an SI-prefix split" rule is
   now fed by every name a language declares — CLDR long forms, `long_name`,
   and the extra table's names — instead of only CLDR long patterns, and a

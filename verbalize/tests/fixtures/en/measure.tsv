@@ -30,3 +30,8 @@ and/or	and/or
 1 Gbit/s	one gigabit per second
 100 Mbps	one hundred megabits per second
 1 Gbps	one gigabit per second
+# `cc` is cubic centimeter, not `c` + `c` ("centicenturies")
+350 cc	three hundred fifty cubic centimeters
+350cc	three hundred fifty cubic centimeters
+# negative: `my` is a word, not `m` + `y` (milli-year)
+3 my	three my

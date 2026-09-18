@@ -103,6 +103,8 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
         ("l", "volume-liter"),
         ("ml", "volume-milliliter"),
         ("dl", "volume-deciliter"),
+        // `cc` would otherwise compose as `c` + `c` ("centicenturies").
+        ("cc", "volume-cubic-centimeter"),
         ("h", "duration-hour"),
         ("hrs", "duration-hour"),
         ("d", "duration-day"),
@@ -219,7 +221,7 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
     prefer: &[("pt", "volume-pint"), ("°", "angle-degree")],
     // Single letters and English words that are also symbols.
     deny_bare: &[
-        "s", "h", "d", "N", "A", "J", "G", "t", "c", "in", "a", "y", "mo",
+        "s", "h", "d", "N", "A", "J", "G", "t", "c", "in", "a", "y", "mo", "my",
     ],
     per: "per",
     link: "",
