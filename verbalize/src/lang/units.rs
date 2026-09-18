@@ -179,6 +179,24 @@ impl Units {
         None
     }
 
+    /// Every token SI-prefix composition could produce, for the coverage
+    /// test: the full prefix × symbol product the resolver might guess at.
+    #[cfg(test)]
+    fn composition_surface(&self) -> Vec<String> {
+        let mut out = Vec::new();
+        for (prefix, _) in SI_PREFIXES {
+            let bases = self
+                .by_symbol
+                .keys()
+                .copied()
+                .chain(self.table.aliases.iter().map(|(s, _)| *s));
+            for base in bases {
+                out.push(format!("{prefix}{base}"));
+            }
+        }
+        out
+    }
+
     fn cldr_id(&self, symbol: &str) -> Option<&'static str> {
         if let Some((_, id)) = self.table.aliases.iter().find(|(s, _)| *s == symbol) {
             return Some(id);
@@ -388,21 +406,38 @@ mod tests {
         ]
     }
 
-    /// A written-out unit name is never split into an SI prefix on a shorter
-    /// symbol ("Grad" would be `G` + `rad`). The name set is each language's
-    /// own data, so this covers every language at once and fails on any
-    /// future CLDR or lexicon change that introduces a new collision.
+    /// The resolver may guess an SI composition (`G` + `rad`) only for a
+    /// token no language declares as a word. This walks the full
+    /// prefix × symbol product — the entire guess surface — and fails if any
+    /// declared word (unit name, abbreviation, month, gendered noun) is
+    /// read as a composition. Data-driven, so it holds for every language
+    /// and any future CLDR or lexicon change at once.
     #[test]
-    fn written_unit_names_never_compose() {
+    fn no_declared_word_is_guessed_as_a_composition() {
         for lang in contexts() {
             let units = lang.units();
-            for name in units.by_name.keys() {
-                if let Some(UnitRef::Cldr {
-                    prefix: Some(power),
-                    ..
-                }) = units.resolve(name, false)
-                {
-                    panic!("{name:?} resolved as SI prefix {power} on a shorter symbol");
+            for token in units.composition_surface() {
+                let guessed = matches!(
+                    units.resolve(&token, false),
+                    Some(UnitRef::Cldr {
+                        prefix: Some(_),
+                        ..
+                    })
+                );
+                if !guessed {
+                    continue;
+                }
+                let declared = [
+                    ("unit name", units.by_name.contains_key(&token)),
+                    ("abbreviation", lang.abbreviation_key(&token).is_some()),
+                    ("month name", lang.month(&token).is_some()),
+                    ("gendered noun", lang.noun_gender(&token).is_some()),
+                ];
+                for (kind, hit) in declared {
+                    assert!(
+                        !hit,
+                        "{token:?} is a declared {kind}, yet resolves as an SI composition"
+                    );
                 }
             }
         }
