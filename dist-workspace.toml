@@ -23,3 +23,7 @@ publish-jobs = ["./publish-crates"]
 github-custom-job-permissions = { "publish-crates" = { id-token = "write", packages = "write", contents = "read" } }
 # Whether to install an updater program
 install-updater = false
+# Dependabot bumps the action pins inside the generated release.yml, which the
+# pinned cargo-dist version regenerates from its own template; without this, a
+# bumped pin makes `dist plan` fail on every PR until the template catches up.
+allow-dirty = ["ci"]
