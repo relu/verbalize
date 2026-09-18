@@ -38,15 +38,29 @@ fn shape_of(s: &str) -> String {
 #[derive(Clone)]
 pub struct ShapeEntry {
     pub shape: String,
+    /// Total occurrences seen.
     pub count: usize,
+    /// An occurrence the classifier claimed.
     pub example: String,
     pub spoken: String,
-    pub unhandled: bool,
+    /// Occurrences left verbatim or read as a last resort.
+    pub unhandled: usize,
+    pub unhandled_example: String,
+    pub unhandled_spoken: String,
 }
 
 pub struct Report {
     pub all: Vec<ShapeEntry>,
     pub unhandled: Vec<ShapeEntry>,
+}
+
+/// Record one unhandled occurrence, keeping the first as the example.
+fn note_unhandled(entry: &mut ShapeEntry, example: &str, spoken: &str) {
+    if entry.unhandled == 0 {
+        entry.unhandled_example = example.to_string();
+        entry.unhandled_spoken = spoken.to_string();
+    }
+    entry.unhandled += 1;
 }
 
 fn survey_text(text: &str, normalizer: &Normalizer, shapes: &mut HashMap<String, ShapeEntry>) {
@@ -62,11 +76,13 @@ fn survey_text(text: &str, normalizer: &Normalizer, shapes: &mut HashMap<String,
             count: 0,
             example: original.to_string(),
             spoken: span.spoken.clone(),
-            unhandled: false,
+            unhandled: 0,
+            unhandled_example: String::new(),
+            unhandled_spoken: String::new(),
         });
         entry.count += 1;
         if span.fallback {
-            entry.unhandled = true;
+            note_unhandled(entry, original, &span.spoken);
         }
     }
 
@@ -83,15 +99,17 @@ fn survey_text(text: &str, normalizer: &Normalizer, shapes: &mut HashMap<String,
             count: 0,
             example: word.to_string(),
             spoken: word.to_string(),
-            unhandled: true,
+            unhandled: 0,
+            unhandled_example: String::new(),
+            unhandled_spoken: String::new(),
         });
         entry.count += 1;
-        entry.unhandled = true;
+        note_unhandled(entry, word, word);
     }
 }
 
-pub fn run(path: &str) -> Result<Report, String> {
-    let normalizer = Normalizer::new(Language::De);
+pub fn run(path: &str, language: Language) -> Result<Report, String> {
+    let normalizer = Normalizer::new(language);
     let mut shapes: HashMap<String, ShapeEntry> = HashMap::new();
     for_each_text(path, &mut |text| {
         survey_text(text, &normalizer, &mut shapes)
@@ -99,7 +117,7 @@ pub fn run(path: &str) -> Result<Report, String> {
 
     let mut all: Vec<ShapeEntry> = shapes.into_values().collect();
     all.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.shape.cmp(&b.shape)));
-    let unhandled: Vec<ShapeEntry> = all.iter().filter(|s| s.unhandled).cloned().collect();
+    let unhandled: Vec<ShapeEntry> = all.iter().filter(|s| s.unhandled > 0).cloned().collect();
 
     Ok(Report { all, unhandled })
 }
@@ -114,11 +132,15 @@ pub fn print_report(report: &Report) {
     }
     println!();
     println!("# unhandled (fallback or left verbatim)");
-    println!("shape\tcount\texample\tspoken");
+    println!("shape\tunhandled\tcount\texample\tspoken");
     for entry in &report.unhandled {
         println!(
-            "{}\t{}\t{}\t{}",
-            entry.shape, entry.count, entry.example, entry.spoken
+            "{}\t{}\t{}\t{}\t{}",
+            entry.shape,
+            entry.unhandled,
+            entry.count,
+            entry.unhandled_example,
+            entry.unhandled_spoken
         );
     }
 }

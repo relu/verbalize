@@ -61,6 +61,9 @@ struct AnnotateArgs {
 
 #[derive(Args)]
 struct SurveyArgs {
+    /// BCP-47 language tag: de, en, ro.
+    #[arg(long, default_value = "en")]
+    lang: String,
     /// A text file, a directory of text files, or `sqlite:<path>`.
     path: String,
     /// Exit non-zero if any unhandled shape has count >= N.
@@ -209,10 +212,18 @@ fn run_annotate(args: AnnotateArgs) -> Result<ExitCode, String> {
 }
 
 fn run_survey(args: SurveyArgs) -> Result<ExitCode, String> {
-    let report = survey::run(&args.path)?;
+    let language: Language = args
+        .lang
+        .parse()
+        .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
+    let report = survey::run(&args.path, language)?;
     survey::print_report(&report);
     if let Some(threshold) = args.threshold {
-        if report.unhandled.iter().any(|s| s.count as u64 >= threshold) {
+        if report
+            .unhandled
+            .iter()
+            .any(|s| s.unhandled as u64 >= threshold)
+        {
             return Ok(ExitCode::FAILURE);
         }
     }
