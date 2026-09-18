@@ -29,3 +29,8 @@ Lehrer/Lehrerin	Lehrer/Lehrerin
 # text-processing-rs: a scale word before a unit, also lower-case in loose prose
 2 millionen km/h	zwei Millionen Kilometer pro Stunde
 2,2 Millionen km/h	zwei Komma zwei Millionen Kilometer pro Stunde
+# a written-out unit name is that unit, never an SI prefix on a shorter symbol: "Grad" is G + rad
+29 Grad	neunundzwanzig Grad
+3,5 Grad Celsius	drei Komma fünf Grad Celsius
+1 Grad	ein Grad
+-5 Grad	minus fünf Grad

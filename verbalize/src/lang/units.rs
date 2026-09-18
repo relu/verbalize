@@ -138,6 +138,16 @@ impl Units {
             if let Some(base) = symbol.strip_prefix(prefix) {
                 if !base.is_empty() {
                     if let Some(id) = self.cldr_id(base) {
+                        // A written-out unit name is that unit, not a prefix
+                        // glued to a shorter symbol: German "Grad" spells as
+                        // `G` + `rad`, so composition would read a temperature
+                        // as giga-radiant.
+                        if let Some(&index) = self.by_name.get(symbol) {
+                            return Some(UnitRef::Cldr {
+                                id: self.data.units[index].id,
+                                prefix: None,
+                            });
+                        }
                         return Some(UnitRef::Cldr {
                             id,
                             prefix: Some(*power),

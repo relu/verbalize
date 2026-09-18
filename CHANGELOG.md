@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Units: a written-out unit name after a number is no longer read as an
+  SI prefix glued to a shorter symbol. German `29 Grad` was
+  "neunundzwanzig Gigaradiant" (`G` + `rad`), now "neunundzwanzig Grad".
+  `de`/`en`/`ro`.
+
 ## [0.1.2] - 2026-09-06
 
 ### Fixed
