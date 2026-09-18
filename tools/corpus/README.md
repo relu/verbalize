@@ -4,7 +4,8 @@ Turns a text corpus into two measurements of how well the normalizer covers
 real input:
 
 - `verbalize survey <path>` — every digit/symbol **shape** seen, with its
-  spoken form and whether it fell back to a last-resort reading.
+  spoken form and how many occurrences fell back to a last-resort reading or
+  were left verbatim.
 - `verbalize audit --lang <lang> <path>` — every unit the resolver **guessed**
   as an SI prefix on a shorter symbol (`Grad` = `G` + `rad`) and that the
   corpus *also* uses as an ordinary word. Each row is a candidate misreading;
@@ -12,41 +13,48 @@ real input:
   does not spell words.
 
 Corpora are never vendored. Fetch or download into a gitignored directory and
-point the tools at it.
+point the tools at it. Attribution for every source is in
+[ATTRIBUTION.md](ATTRIBUTION.md) and in the `<file>.source` sidecar written
+next to each fetched file.
 
 ## Quick start
 
 ```sh
-python3 tools/corpus/fetch.py --lang de --articles 2000      # sample
-cargo run -p verbalize-cli -- survey tools/corpus/.cache/de
-cargo run -p verbalize-cli -- audit --lang de tools/corpus/.cache/de
+python3 tools/corpus/fetch.py --lang de --articles 2000                     # general
+python3 tools/corpus/fetch.py --lang de --source opus --opus-corpus ECDC    # medical
+python3 tools/corpus/fetch.py --lang en --source pubmed --articles 5000     # biomedical
+tools/corpus/check.sh                                                      # both measurements
 ```
 
-`fetch.py` samples Wikipedia article intros (MediaWiki API, CC BY-SA 4.0) or
-the Tatoeba sentence export (CC BY 2.0 FR); it does not mirror. For a large
-run, download a full dump from the table below and point the tools at the
-extracted directory.
+`fetch.py` samples — it does not mirror. For a large run, download a full
+dump from the table below and point the tools at the extracted directory.
 
 ## Sources
 
-All per-language and free to use; prefer ones dense in numerals, units,
-dates and currency — that is where the classes live.
-
-| Source | What | License | Scale | Where |
+| Source | What | Licence | Scale | Where |
 |---|---|---|---|---|
 | Wikipedia dumps | full article text | CC BY-SA 4.0 | tens of GB compressed per language | `https://dumps.wikimedia.org/{de,en,ro}wiki/latest/` |
 | Wikipedia API | article intros | CC BY-SA 4.0 | sampled, no dump needed | `fetch.py --source wiki` |
 | Tatoeba | sentences | CC BY 2.0 FR | `deu` 12 MB, `ron` 0.6 MB | `fetch.py --source tatoeba` |
-| OPUS | parallel corpora, incl. OpenSubtitles (spoken style) | per-corpus, mostly permissive | GBs | `https://opus.nlpl.eu` |
-| Leipzig Corpora (Wortschatz) | news/web/wiki sentences | CC BY | 1M–10M sentences per language | `https://wortschatz.uni-leipzig.de` |
+| OPUS | medical/legal/subtitles, per corpus | per corpus (archive `LICENSE`) | KBs–GBs | `fetch.py --source opus --opus-corpus ECDC` |
+| PubMed | biomedical abstracts | NLM terms; © authors | sampled | `fetch.py --source pubmed --lang en` |
 | OSCAR / FineWeb-2 / CC-100 / mC4 | web crawl | CC BY / ODC-By | TBs | HuggingFace `datasets` |
-| EU DGT TM, JRC-Acquis, ECDC | legal, medical, all three languages incl. Romanian | EUPL / CC BY | MBs–GBs | `https://opus.nlpl.eu`, JRC |
-| PubMed Central OA | biomedical (lab values, doses) | per-article, mostly CC BY | GBs | `https://ftp.ncbi.nlm.nih.gov/pub/pmc/` |
+| Leipzig Corpora (Wortschatz) | news/web/wiki sentences | CC BY | 1M–10M sentences per language | `https://wortschatz.uni-leipzig.de` |
 | Project Gutenberg | books | public domain | MBs–GBs | `https://www.gutenberg.org` |
 
-For the `audit` report specifically, Wikipedia, news, legal and medical text
-are the useful ones: they put `29 Grad`, `5 mg`, `100 Mbit/s` in running
-prose next to the same words used normally.
+Useful OPUS corpora: **ECDC** (medical, all three languages, small),
+**DGT** (EU legal, all three, ~200 MB), **JRC-Acquis** (EU law),
+**OpenSubtitles** (spoken style, GBs). For the `audit` report specifically,
+the domain text is the point: it puts `29 Grad`, `5 mg`, `100 Mbit/s` in
+running prose next to the same words used normally.
+
+## Release check
+
+`check.sh` runs `audit --threshold 1` over every fetched language and fails
+on any suspect token, then prints each language's unhandled survey shapes.
+It does not use the network — fetch first. Corpora are not vendored and CI
+has no network, so this is a release-checklist step, not a CI job; see the
+"Releasing" section of the top-level README.
 
 ## Reading a dump
 
