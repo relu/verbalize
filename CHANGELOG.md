@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- Units: German `dem` is the article, not `d` + `em` (deci-em); `2007 dem`
+  was "zweitausendsieben Deziem". German `in` is a preposition, not the
+  inch symbol; `5 in der Woche` was "fünf Zoll der Woche". Both are denied
+  after a bare number. Found by the corpus audit over the ECDC medical
+  sample. `de`.
 - Units: cubic centimetre reads as itself, not as an SI-prefix split of a
   shorter symbol — `cc` (`en`), `ccm` (`de`), `cc`/`ccm` (`ro`) were
   "centicenturies"/"Zentizentimeter"/"centicentimetri". Found by the new

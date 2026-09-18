@@ -186,6 +186,10 @@ CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
   "neunundzwanzig Grad", not `G` + `rad` ("Gigaradiant"). The name set is
   the language's own data (CLDR long forms, `long_name`, the extra table),
   so no word list and no per-language patch is needed.
+- **Denied bare tokens**: `s`, `h`, `d`, `N`, `A`, `J`, `L`, `G`, `t`, `in`,
+  `dem` never resolve as a unit directly after a number (`5 N` is a letter,
+  `5 in der Woche` keeps `in`, `2007 dem` keeps `dem`); they still resolve
+  inside compounds and as prefix bases (`kN`, `52,52° N`).
 - **Digital units**: CLDR `digital-*` (`Bit`, `Byte`, `kB`/`KB`, `MB`,
   `GB`, `TB`, `PB`, `kbit`, `Mbit`, `Gbit`, `Tbit`) read by their long
   names ("zwei Gigabyte", "ein Terabyte"); data rates as compounds

@@ -34,3 +34,6 @@ Lehrer/Lehrerin	Lehrer/Lehrerin
 3,5 Grad Celsius	drei Komma fünf Grad Celsius
 1 Grad	ein Grad
 -5 Grad	minus fünf Grad
+# `dem` is the article, not `d` + `em` (deci-em); `in` is a preposition, not the inch symbol
+2007 dem	zweitausendsieben dem
+5 in der Woche	fünf in der Woche

@@ -342,9 +342,11 @@ pub(super) const UNIT_TABLE: UnitTable = UnitTable {
         ("°", "angle-degree"),
         ("kcal", "energy-kilocalorie"),
     ],
-    // Single letters that are words or ambiguous after a bare number.
+    // Single letters that are words or ambiguous after a bare number, plus
+    // the words that would otherwise compose or match: `dem` is `d` + `em`
+    // ("Deziem"), `in` is the inch symbol but also a preposition.
     // `N` stays a letter (`5 N`, `52,52° N`), Newton only composes (`kN`).
-    deny_bare: &["s", "h", "d", "N", "A", "J", "L", "G", "t"],
+    deny_bare: &["s", "h", "d", "N", "A", "J", "L", "G", "t", "in", "dem"],
     per: "pro",
     link: "",
 };
