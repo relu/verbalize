@@ -67,6 +67,14 @@ fn unit_word(written: &str) -> Option<&str> {
     (!word.is_empty()).then_some(word)
 }
 
+/// A word-like token: at least two letters and one lower-case letter. Table
+/// cells and symbol runs (`kV`, `µg`, `mmol/L`) are not word evidence; prose
+/// is (`Der Grad der …`).
+fn prose_word(token: &str) -> bool {
+    let token = token.trim_matches(|c: char| !c.is_alphabetic());
+    token.chars().count() >= 2 && token.chars().any(char::is_lowercase)
+}
+
 fn audit_text(
     text: &str,
     normalizer: &Normalizer,
@@ -86,13 +94,25 @@ fn audit_text(
             entry.0 += 1;
         }
     }
+    let tokens = word_spans(text);
     let mut cursor = 0;
-    for (start, end, word) in word_spans(text) {
-        if covered(&spans, &mut cursor, start, end) {
+    for (at, (start, end, token)) in tokens.iter().enumerate() {
+        if covered(&spans, &mut cursor, *start, *end) {
             continue;
         }
-        let word = word.trim_matches(|c: char| !c.is_alphanumeric());
-        if word.chars().any(char::is_alphabetic) {
+        let word = token.trim_matches(|c: char| !c.is_alphanumeric());
+        if !word.chars().any(char::is_alphabetic) {
+            continue;
+        }
+        // Only a prose neighbour makes the token evidence of word use.
+        let prose = at
+            .checked_sub(1)
+            .and_then(|i| tokens.get(i))
+            .is_some_and(|(_, _, prev)| prose_word(prev))
+            || tokens
+                .get(at + 1)
+                .is_some_and(|(_, _, next)| prose_word(next));
+        if prose {
             *words.entry(word.to_string()).or_default() += 1;
         }
     }

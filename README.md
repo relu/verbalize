@@ -170,8 +170,9 @@ crates share one version and one tag.
 1. Bump `version` in `verbalize/Cargo.toml` and `verbalize-cli/Cargo.toml`
    (and the `verbalize` dependency in the latter); move the `[Unreleased]`
    notes in `CHANGELOG.md` under a dated `## [x.y.z]` heading.
-2. Corpus coverage check: fetch samples (`tools/corpus/fetch.py`) and run
-   `tools/corpus/check.sh`; `audit` must report nothing. See
+2. Corpus coverage report: fetch samples (`tools/corpus/fetch.py`) and run
+   `tools/corpus/check.sh`, then review it — the `audit` list is a triage of
+   units read as an SI composition, not a verdict. See
    [`tools/corpus/`](tools/corpus/) and its
    [attribution](tools/corpus/ATTRIBUTION.md).
 3. `dist plan` shows what the tag will produce; commit.

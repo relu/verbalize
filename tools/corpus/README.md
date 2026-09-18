@@ -48,12 +48,14 @@ Useful OPUS corpora: **ECDC** (medical, all three languages, small),
 the domain text is the point: it puts `29 Grad`, `5 mg`, `100 Mbit/s` in
 running prose next to the same words used normally.
 
-## Release check
+## Release report
 
-`check.sh` runs `audit --threshold 1` over every fetched language and fails
-on any suspect token, then prints each language's unhandled survey shapes.
-It does not use the network — fetch first. Corpora are not vendored and CI
-has no network, so this is a release-checklist step, not a CI job; see the
+`check.sh` runs `audit` and prints each language's unhandled survey shapes.
+The `audit` list is a **triage**, not a verdict: a genuine unit appears in
+prose too (`kV`, `mGy`, `mmol/L`), so a hit needs a human eye — `Palacios MA`
+is an author initial, not megaampere. `check.sh --strict` turns any hit into
+a failure, for a curated corpus. Corpora are not vendored and CI has no
+network, so this is a release-checklist step, not a CI job; see the
 "Releasing" section of the top-level README.
 
 ## Reading a dump
