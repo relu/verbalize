@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use verbalize::{Language, Normalizer};
 
-use crate::corpus::{for_each_text, overlaps, word_spans};
+use crate::corpus::{covered, for_each_text, word_spans};
 
 /// Symbols the semiotic classes recognise besides plain digits: currency,
 /// percent/permille, degree, paragraph, math/scientific operators, Unicode
@@ -86,8 +86,9 @@ fn survey_text(text: &str, normalizer: &Normalizer, shapes: &mut HashMap<String,
         }
     }
 
+    let mut cursor = 0;
     for (start, end, word) in word_spans(text) {
-        if spans.iter().any(|s| overlaps(&s.range, start, end)) {
+        if covered(&spans, &mut cursor, start, end) {
             continue;
         }
         if !contains_target(word) {

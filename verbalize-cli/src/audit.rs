@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use verbalize::token::{Token, Unit, UnitRef};
 use verbalize::{Language, Normalizer};
 
-use crate::corpus::{for_each_text, overlaps, word_spans};
+use crate::corpus::{covered, for_each_text, word_spans};
 
 pub struct Entry {
     pub symbol: String,
@@ -86,8 +86,9 @@ fn audit_text(
             entry.0 += 1;
         }
     }
+    let mut cursor = 0;
     for (start, end, word) in word_spans(text) {
-        if spans.iter().any(|s| overlaps(&s.range, start, end)) {
+        if covered(&spans, &mut cursor, start, end) {
             continue;
         }
         let word = word.trim_matches(|c: char| !c.is_alphanumeric());

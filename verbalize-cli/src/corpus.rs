@@ -2,8 +2,9 @@
 //! file, a directory tree, or a SQLite database to a callback.
 
 use std::fs;
-use std::ops::Range;
 use std::path::Path;
+
+use verbalize::token::Span;
 
 /// Whitespace-delimited words with their byte ranges.
 pub(crate) fn word_spans(text: &str) -> Vec<(usize, usize, &str)> {
@@ -24,8 +25,16 @@ pub(crate) fn word_spans(text: &str) -> Vec<(usize, usize, &str)> {
     out
 }
 
-pub(crate) fn overlaps(range: &Range<usize>, start: usize, end: usize) -> bool {
-    start < range.end && range.start < end
+/// Whether the sorted, disjoint `spans` cover `[start, end)`. `cursor` is
+/// carried across calls: words and spans are both in position order, so the
+/// whole text costs one pass instead of a scan per word.
+pub(crate) fn covered(spans: &[Span], cursor: &mut usize, start: usize, end: usize) -> bool {
+    while *cursor < spans.len() && spans[*cursor].range.end <= start {
+        *cursor += 1;
+    }
+    spans
+        .get(*cursor)
+        .is_some_and(|span| span.range.start < end)
 }
 
 /// Every text of `path` — a file, a directory tree, or `sqlite:<path>` —
@@ -109,4 +118,30 @@ fn each_sqlite(path: &str, f: &mut dyn FnMut(&str)) -> Result<(), String> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use verbalize::token::{Numeral, Token};
+
+    fn span(start: usize, end: usize) -> Span {
+        Span {
+            range: start..end,
+            token: Token::Cardinal(Numeral::int(1)),
+            spoken: String::new(),
+            fallback: false,
+        }
+    }
+
+    #[test]
+    fn covered_advances_over_sorted_disjoint_spans() {
+        let spans = vec![span(0, 3), span(10, 12)];
+        let mut cursor = 0;
+        assert!(covered(&spans, &mut cursor, 0, 3));
+        assert!(covered(&spans, &mut cursor, 2, 5));
+        assert!(!covered(&spans, &mut cursor, 4, 8));
+        assert!(covered(&spans, &mut cursor, 10, 12));
+        assert!(!covered(&spans, &mut cursor, 20, 22));
+    }
 }
