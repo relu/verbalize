@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-09-20
+
 ### Fixed
 
 - Units: German `dem` is the article, not `d` + `em` (deci-em); `2007 dem`
