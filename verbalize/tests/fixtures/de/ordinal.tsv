@@ -53,3 +53,8 @@ am 5. des Monats	am fünften des Monats
 im 3. Jahr	im dritten Jahr
 # negative: a strong trigger still needs a noun of known gender
 seit 5.	seit fünf.
+# extrapolated: reaches the ordinal "ß" form ("dreißigste"), kept by default
+der 30. Geburtstag	der dreißigste Geburtstag
+# region: DeCh
+der 30. Geburtstag	der dreissigste Geburtstag
+# region: default

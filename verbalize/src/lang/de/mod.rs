@@ -14,7 +14,7 @@ use super::{next_word, Context, Lang, Numerals, Tables, Verbalized, SPACE_GROUPS
 use crate::data::LangData;
 use crate::pipeline::{self, Match, Recognizers};
 use crate::token::{Agreement, Gender, NounPosition, Numeral, Scale, Token};
-use crate::{Language, Options};
+use crate::{Language, Options, Region};
 
 pub(super) const NUMERALS: Numerals = Numerals {
     groups: &[
@@ -36,6 +36,9 @@ pub(crate) struct German {
     /// Whitespace-stripped abbreviation → (as written in the table, expansion),
     /// plus CLDR weekday and month abbreviations.
     abbreviations: HashMap<String, (String, String)>,
+    /// `DeAt`/`DeCh` change a spelling (Austrian "Jänner", no Swiss "ß");
+    /// other regions and `None` read the CLDR/Duden default.
+    region: Option<Region>,
 }
 
 impl German {
@@ -45,6 +48,11 @@ impl German {
         for (i, name) in data.months_wide.iter().enumerate() {
             months.insert(*name, i as u8 + 1);
         }
+        // Austrian standard German (Duden, Österreichisches Wörterbuch):
+        // "Jänner"/"Jän." beside "Januar"/"Jan.", recognised regardless of
+        // region so a DeDe reader's text using either spelling still parses.
+        months.insert("Jänner", 1);
+        months.insert("Jän.", 1);
         for (i, name) in data.months_abbreviated.iter().enumerate() {
             months.insert(*name, i as u8 + 1);
         }
@@ -63,14 +71,25 @@ impl German {
             add(abbreviated, wide);
         }
         for (i, wide) in data.months_wide.iter().enumerate() {
+            // Keep the abbreviation's expansion in sync with the region's
+            // spelled month name, so `Jan.`/`Jän.` and `1. Januar` never
+            // disagree.
+            let expansion = if i == 0 && options.region == Some(Region::DeAt) {
+                "Jänner"
+            } else {
+                wide
+            };
+            if i == 0 {
+                add("Jän.", expansion);
+            }
             let abbreviated = data.months_abbreviated[i];
             if abbreviated.ends_with('.') {
-                add(abbreviated, wide);
+                add(abbreviated, expansion);
             }
             // The three-letter form (`Sep.`) beside CLDR's own (`Sept.`).
             let three: String = wide.chars().take(3).collect();
             if three != *wide {
-                add(&format!("{three}."), wide);
+                add(&format!("{three}."), expansion);
             }
         }
         let abbreviation_regex = options.expand_abbreviations.then(|| {
@@ -96,7 +115,17 @@ impl German {
             )),
             months,
             abbreviations,
+            region: options.region,
         }
+    }
+
+    /// Spelled month name: Austrian standard German (Duden) uses "Jänner"
+    /// for January; every other region and `None` use the CLDR name.
+    pub(super) fn month_name(&self, month: u8) -> &'static str {
+        if month == 1 && self.region == Some(Region::DeAt) {
+            return "Jänner";
+        }
+        self.data.months_wide[usize::from(month) - 1]
     }
 
     fn expansion(&self, key: &str) -> Option<&str> {

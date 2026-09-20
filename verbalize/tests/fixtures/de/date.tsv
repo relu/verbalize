@@ -23,3 +23,15 @@ von 2003-03 bis 2004-01	von März zweitausenddrei bis Januar zweitausendvier
 # extrapolated
 am 02.03	am zweiten März
 3.10	drei Punkt zehn
+# region: DeAt
+# Austrian standard German (Duden, Österreichisches Wörterbuch): "Jänner" for January.
+1.1.2027	erster Jänner zweitausendsiebenundzwanzig
+# "Jänner" is also recognised as input in any region
+1. Jänner 2027	erster Jänner zweitausendsiebenundzwanzig
+# "Jän." (abbreviated) is also recognised as a Date month, any region
+1. Jän. 2027	erster Jänner zweitausendsiebenundzwanzig
+# region: default
+# "Jänner" recognised as input, spelled the CLDR default outside DeAt
+1. Jänner 2027	erster Januar zweitausendsiebenundzwanzig
+# "Jän." recognised as input, spelled the CLDR default outside DeAt
+1. Jän. 2027	erster Januar zweitausendsiebenundzwanzig

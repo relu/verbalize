@@ -18,3 +18,32 @@ Die Fahrt dauert 5–10 Minuten und kostet 12,5 €.	Die Fahrt dauert fünf bis 
 Der Anteil beträgt 3,5 % (gerundet).	Der Anteil beträgt drei Komma fünf Prozent (gerundet).
 # telephone + abbreviation interaction, casing outside spans preserved
 Tel. 030 12 34 56 78	Telefon null drei null, eins zwei, drei vier, fünf sechs, sieben acht
+# Score immediately followed by Time: the two colon-shaped spans stay
+# separate, neither reads as a clock nor swallows the other's digits.
+Der Spielstand war 2:1 um 14:30 Uhr.	Der Spielstand war zwei zu eins um vierzehn Uhr dreißig.
+# Blood pressure reading next to a Date: BloodPressure's "/" claim and
+# Date's "." claim never bleed into each other.
+Der Blutdruck war 120/80 mmHg am 1.11.2026.	Der Blutdruck war einhundertzwanzig zu achtzig Millimeter Quecksilbersäule am ersten November zweitausendsechsundzwanzig.
+# Ratio next to a Slash fraction: both ":" and "/" shapes classify
+# independently within one sentence.
+Verhältnis 1:3 bei 1/2 Tasse Wasser.	Verhältnis eins zu drei bei ein halb Tasse Wasser.
+# Dose scheme immediately followed by a plain numeric Range: the "-"
+# separated classes don't merge into one span.
+Nehmen Sie 20-5-0 mg über 5-10 Minuten ein.	Nehmen Sie zwanzig, fünf, null Milligramm über fünf bis zehn Minuten ein.
+# Telephone pattern immediately adjacent to a Date: the higher-priority
+# Date claims its digits first, so Telephone never reclaims them.
+Rufen Sie 030 12 34 56 78 direkt nach dem Termin am 1.11.2026 an.	Rufen Sie null drei null, eins zwei, drei vier, fünf sechs, sieben acht direkt nach dem Termin am ersten November zweitausendsechsundzwanzig an.
+# Near-miss Electronic (no TLD after "@") right next to a real Money
+# token: the near miss falls through instead of corrupting the amount.
+Kontaktieren Sie info@firma oder zahlen Sie einfach 8,80 €.	Kontaktieren Sie info@firma oder zahlen Sie einfach acht Euro achtzig.
+# Near-miss Electronic (bare handle glued to a word, no dot) right next
+# to a real Measure token.
+Schreiben Sie an user@intranet vor dem 10 km Lauf.	Schreiben Sie an user@intranet vor dem zehn Kilometer Lauf.
+# Long digit run immediately followed by a dotted/section number: the
+# leading-zero and multi-dot shapes don't merge into one span.
+Fehler 007 im Abschnitt 3.10.5 muss geprüft werden.	Fehler null null sieben im Abschnitt drei Punkt zehn Punkt fünf muss geprüft werden.
+# Range-rate ratio next to a blood-pressure reading: both "/"-claiming
+# classes coexist without stealing each other's digits.
+HF 100-110/min und RR 120/80 mmHg waren normal.	HF einhundert bis einhundertzehn pro Minute und RR einhundertzwanzig zu achtzig Millimeter Quecksilbersäule waren normal.
+# Nested: Time, Score and Date all in one sentence.
+Um 14:30 stand es 2:1, bis zum 1.11.2026 änderte sich nichts.	Um vierzehn Uhr dreißig stand es zwei zu eins, bis zum ersten November zweitausendsechsundzwanzig änderte sich nichts.

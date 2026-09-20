@@ -102,7 +102,19 @@ Sep.	September
 Okt.	Oktober
 Nov.	November
 Dez.	Dezember
+# region: DeAt
+# the "Jan."/"Jän." abbreviation follows the region too, same as the Date reading
+Jan.	Jänner
+Jän.	Jänner
+# region: default
+# "Jän." recognised as input in any region, spelled the CLDR default outside DeAt
+Jän.	Januar
 # listing shorthand: "J." for "Jahren" after a cardinal
 12 J.	zwölf Jahren
 # negative: not in the Duden abbreviation list, left alone
 GmbH	GmbH
+# region: DeCh
+# Swiss "ss" replaces "ß" in abbreviation expansions too, not just numbers.
+d. h.	das heisst
+Str.	Strasse
+# region: default

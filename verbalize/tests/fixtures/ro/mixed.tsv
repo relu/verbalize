@@ -9,3 +9,32 @@ Ponderea este de 3,5 % (rotunjit).	Ponderea este de trei virgulă cinci la sută
 TA 120/80 mmHg, AV 110/min, SpO2 92 %.	TA o sută douăzeci cu optzeci de milimetri coloană de mercur, AV o sută zece pe minut, SpO doi nouăzeci și doi la sută.
 # §9: a digit run between letters on both sides is spaced on both sides
 HbA1c 7,5 %	HbA unu c șapte virgulă cinci la sută
+# Score immediately followed by Time: the two colon-shaped spans stay
+# separate, neither reads as a clock nor swallows the other's digits.
+Scorul a fost 2:1 la ora 14:30.	Scorul a fost doi la unu la paisprezece și treizeci.
+# Blood pressure reading next to a Date: BloodPressure's "/" claim and
+# Date's "." claim never bleed into each other.
+Tensiunea a fost 120/80 mmHg pe 1.11.2026.	Tensiunea a fost o sută douăzeci cu optzeci de milimetri coloană de mercur pe întâi noiembrie două mii douăzeci și șase.
+# Ratio next to a Slash fraction: both ":" and "/" shapes classify
+# independently within one sentence.
+Raport 1:3 cu 1/2 cană de apă.	Raport unu la trei cu o jumătate cană de apă.
+# Dose scheme immediately followed by a plain numeric Range: the "-"
+# separated classes don't merge into one span.
+Luați 20-5-0 mg timp de 5-10 minute.	Luați douăzeci, cinci, zero miligrame timp de cinci până la zece minute.
+# Telephone pattern immediately adjacent to a Date: the higher-priority
+# Date claims its digits first, so Telephone never reclaims them.
+Sunați la +40 21 123 4567 imediat după programarea din 1.11.2026.	Sunați la plus patru zero, doi unu, unu doi trei, patru cinci șase șapte imediat după programarea din întâi noiembrie două mii douăzeci și șase.
+# Near-miss Electronic (no TLD after "@") right next to a real Money
+# token: the near miss falls through instead of corrupting the amount.
+Contactați info@firma sau plătiți doar 5 lei.	Contactați info@firma sau plătiți doar cinci lei.
+# Near-miss Electronic (bare handle glued to a word, no dot) right next
+# to a real Measure token.
+Scrieți la user@intranet înainte de alergarea de 10 km.	Scrieți la user@intranet înainte de alergarea de zece kilometri.
+# Long digit run immediately followed by a dotted/section number: the
+# leading-zero and multi-dot shapes don't merge into one span.
+Eroarea 007 din secțiunea 3.10.5 trebuie verificată.	Eroarea zero zero șapte din secțiunea trei punct zece punct cinci trebuie verificată.
+# Range-rate ratio next to a blood-pressure reading: both "/"-claiming
+# classes coexist without stealing each other's digits.
+AV 100-110/min și TA 120/80 mmHg erau normale.	AV o sută până la o sută zece pe minut și TA o sută douăzeci cu optzeci de milimetri coloană de mercur erau normale.
+# Nested: Time, Score and Date all in one sentence.
+La ora 14:30 scorul era 2:1, iar până pe 1.11.2026 nimic nu s-a schimbat.	La paisprezece și treizeci scorul era doi la unu, iar până pe întâi noiembrie două mii douăzeci și șase nimic nu s-a schimbat.

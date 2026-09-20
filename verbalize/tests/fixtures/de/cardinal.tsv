@@ -32,3 +32,9 @@ Die Antwort ist 1.	Die Antwort ist eins.
 20 Mio. Einwohner	zwanzig Millionen Einwohner
 # negative: a scale word glued into a compound is not a scale
 Millionenstadt	Millionenstadt
+# region: DeCh
+# Swiss standard orthography has no "ß" (Bundeskanzlei "Weisungen zur
+# Rechtschreibung"): every spelled form uses "ss".
+30	dreissig
+130	einhundertdreissig
+# region: default

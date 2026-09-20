@@ -352,7 +352,7 @@ pub(super) fn verbalize(g: &German, token: &Token, agreement: Agreement) -> Verb
                 out.push_str(&ordinal_words(u64::from(*day), agreement));
                 out.push(' ');
             }
-            out.push_str(g.data.months_wide[usize::from(*month) - 1]);
+            out.push_str(g.month_name(*month));
             if let Some(year) = year {
                 out.push(' ');
                 out.push_str(&year_words(*year));
@@ -516,6 +516,13 @@ pub(super) fn verbalize(g: &German, token: &Token, agreement: Agreement) -> Verb
             out
         }
         Token::Lexicon(key) => key.clone(),
+    };
+    // Swiss standard orthography has no "ß" (Duden/Bundeskanzlei "Weisungen
+    // zur Rechtschreibung"): every spelled form uses "ss" instead.
+    let spoken = if g.region == Some(crate::Region::DeCh) {
+        spoken.replace('ß', "ss")
+    } else {
+        spoken
     };
     Verbalized { spoken, fallback }
 }

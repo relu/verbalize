@@ -127,7 +127,7 @@ SpO2	Sauerstoffsättigung
 ```
 
 ```sh
-$ echo "SpO2 92 %" | verbalize normalize --lexicon lexicon.tsv
+$ echo "SpO2 92 %" | verbalize normalize --lang de --lexicon lexicon.tsv
 Sauerstoffsättigung zweiundneunzig Prozent
 ```
 

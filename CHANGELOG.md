@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-09-20
+
+### Added
+
+- `Options::region` now changes German readings: `DeAt` (Austria) spells
+  and recognises January as "Jänner"/"Jän." instead of "Januar"/"Jan."
+  (Duden, Österreichisches Wörterbuch), consistently across the Date
+  reading and the abbreviation expansion; `DeCh` (Switzerland) has no "ß"
+  (Bundeskanzlei "Weisungen zur Rechtschreibung") — every generated
+  spoken form uses "ss" instead ("dreißig" → "dreissig"). Previously
+  these regions were accepted but read identically to `DeDe`.
+
+### Fixed
+
+- README: the `--lexicon` example produced English, not the documented
+  German output, after the 0.1.2 default-`--lang` change; now passes
+  `--lang de` explicitly.
+
 ## [0.1.4] - 2026-09-20
 
 ### Fixed

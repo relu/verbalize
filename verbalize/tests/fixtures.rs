@@ -6,8 +6,11 @@
 //! language; every failing line is reported with input, expected and actual.
 
 use std::fs;
+use std::panic;
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 
+use verbalize::token::Span;
 use verbalize::{Language, Normalizer, Options, Region};
 
 fn fixture_dir(language: Language) -> PathBuf {
@@ -286,6 +289,184 @@ fn ro_properties_over_random_digit_strings() {
             "mp",
         ],
     );
+}
+
+/// Scalar values from ranges likely to break naive UTF-8/byte assumptions:
+/// combining marks, right-to-left scripts, CJK, emoji, the zero-width
+/// joiner, and fully arbitrary code points. `char::from_u32` already
+/// rejects surrogate halves and out-of-range values, so a rejection just
+/// retries.
+fn random_unicode_char(rng: &mut XorShift) -> char {
+    loop {
+        let code = match rng.next() % 7 {
+            0 => 0x0300 + (rng.next() as u32 % 0x70), // combining marks
+            1 => 0x0590 + (rng.next() as u32 % 0x70), // Hebrew block
+            2 => 0x0600 + (rng.next() as u32 % 0x100), // Arabic block
+            3 => 0x4E00 + (rng.next() as u32 % 0x5200), // CJK unified ideographs
+            4 => 0x1F300 + (rng.next() as u32 % 0x800), // emoji/pictographs
+            5 => 0x200D,                              // zero-width joiner
+            _ => rng.next() as u32 % 0x11_0000,       // any scalar value
+        };
+        if let Some(c) = char::from_u32(code) {
+            return c;
+        }
+    }
+}
+
+/// A piece shaped to probe near-miss separator/nesting/digit-run handling:
+/// bare separator runs, deeply nested brackets, and digit runs long enough
+/// to exceed any RBNF rule and fall back to digit-by-digit spelling
+/// (`spell::digits`).
+fn random_pathological_piece(rng: &mut XorShift) -> String {
+    match rng.next() % 4 {
+        0 => rng
+            .pick(&[".", ":", "/", "-"])
+            .repeat(1 + (rng.next() % 24) as usize),
+        1 => {
+            let depth = 1 + (rng.next() % 12) as usize;
+            let mut s = String::new();
+            for _ in 0..depth {
+                s.push_str(rng.pick(&["(", "[", "{"]));
+            }
+            for _ in 0..depth {
+                s.push_str(rng.pick(&[")", "]", "}"]));
+            }
+            s
+        }
+        2 => rng
+            .pick(&["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
+            .repeat(200 + (rng.next() % 400) as usize),
+        _ => random_unicode_char(rng).to_string(),
+    }
+}
+
+/// One piece of an adversarial input: common shapes, raw Unicode noise, or
+/// a pathological near-miss shape, in roughly equal measure.
+fn random_wide_piece(rng: &mut XorShift) -> String {
+    match rng.next() % 4 {
+        0 => COMMON_PIECES[(rng.next() % COMMON_PIECES.len() as u64) as usize].to_string(),
+        1 => random_unicode_char(rng).to_string(),
+        2 => random_pathological_piece(rng),
+        _ => random_unicode_char(rng).to_string(),
+    }
+}
+
+/// Every span is in-bounds, sorted, non-overlapping, and cut on a UTF-8
+/// char boundary, so a caller slicing `input` by span range never panics.
+fn check_spans(input: &str, spans: &[Span]) -> Result<(), String> {
+    let mut prev_end = 0usize;
+    for span in spans {
+        if span.range.start < prev_end {
+            return Err(format!("span {:?} overlaps or is out of order", span.range));
+        }
+        if span.range.start > span.range.end {
+            return Err(format!("span {:?} has start after end", span.range));
+        }
+        if span.range.end > input.len() {
+            return Err(format!(
+                "span {:?} exceeds input length {}",
+                span.range,
+                input.len()
+            ));
+        }
+        if !input.is_char_boundary(span.range.start) || !input.is_char_boundary(span.range.end) {
+            return Err(format!(
+                "span {:?} does not fall on a char boundary",
+                span.range
+            ));
+        }
+        prev_end = span.range.end;
+    }
+    Ok(())
+}
+
+/// `normalize` and `annotate` must never panic, on any input whatsoever,
+/// every span `annotate` returns must be a valid slice of the input, and
+/// a second pass must be a no-op (the crate's documented idempotence
+/// contract, `Normalizer::normalize`, holds unconditionally — it is not
+/// scoped to digit-bearing input). Narrower than `check_properties` only
+/// in dropping "no digit left behind": arbitrary Unicode noise carrying
+/// no digits to begin with trivially satisfies that one and adds nothing.
+///
+/// `panic::set_hook`/`take_hook` are process-global; cargo runs the three
+/// per-language instances of this test concurrently in one binary, so the
+/// hook swap is serialized through `HOOK_LOCK` to avoid one test silently
+/// leaving another's stderr suppressed for the rest of the run.
+static HOOK_LOCK: Mutex<()> = Mutex::new(());
+
+fn panic_safety_over_arbitrary_unicode(language: Language, seed: u64) {
+    let normalizer = Normalizer::new(language);
+    let mut rng = XorShift(seed);
+    let mut failures = Vec::new();
+
+    let guard = HOOK_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let previous_hook = panic::take_hook();
+    panic::set_hook(Box::new(|_| {}));
+    for i in 0..300 {
+        let piece_count = if i % 40 == 0 {
+            // Occasionally build a multi-KB input: catches quadratic
+            // blowup or scale-only panics the short cases miss.
+            500 + (rng.next() % 500) as usize
+        } else {
+            1 + (rng.next() % 16) as usize
+        };
+        let input: String = (0..piece_count)
+            .map(|_| random_wide_piece(&mut rng))
+            .collect();
+
+        let once = panic::catch_unwind(panic::AssertUnwindSafe(|| normalizer.normalize(&input)));
+        match &once {
+            Err(_) => failures.push(format!("normalize panicked on: {input:?}")),
+            Ok(once) => {
+                match panic::catch_unwind(panic::AssertUnwindSafe(|| normalizer.normalize(once))) {
+                    Err(_) => {
+                        failures.push(format!("normalize(normalize(t)) panicked on: {input:?}"))
+                    }
+                    Ok(twice) if &twice != once => failures.push(format!(
+                        "not idempotent: {input:?} -> {once:?} -> {twice:?}"
+                    )),
+                    Ok(_) => {}
+                }
+            }
+        }
+        match panic::catch_unwind(panic::AssertUnwindSafe(|| normalizer.annotate(&input))) {
+            Err(_) => failures.push(format!("annotate panicked on: {input:?}")),
+            Ok(spans) => {
+                if let Err(e) = check_spans(&input, &spans) {
+                    failures.push(format!("{e}: {input:?}"));
+                }
+            }
+        }
+    }
+    panic::set_hook(previous_hook);
+    drop(guard);
+
+    assert!(
+        failures.is_empty(),
+        "{} failures, first 5:\n{}",
+        failures.len(),
+        failures
+            .iter()
+            .take(5)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("\n")
+    );
+}
+
+#[test]
+fn de_panic_safety_over_arbitrary_unicode() {
+    panic_safety_over_arbitrary_unicode(Language::De, 0xC0FF_EE00_1234_5678);
+}
+
+#[test]
+fn en_panic_safety_over_arbitrary_unicode() {
+    panic_safety_over_arbitrary_unicode(Language::En, 0xC0FF_EE00_1234_9ABC);
+}
+
+#[test]
+fn ro_panic_safety_over_arbitrary_unicode() {
+    panic_safety_over_arbitrary_unicode(Language::Ro, 0xC0FF_EE00_1234_DEF0);
 }
 
 #[test]

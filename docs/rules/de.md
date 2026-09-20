@@ -8,6 +8,15 @@ Written-form sources: DIN 5008:2020 (Schreib- und Gestaltungsregeln), Duden
 — Die deutsche Rechtschreibung (28th ed.), CLDR de. Spoken-form sources:
 CLDR de RBNF, Duden — Die Grammatik, Duden — Richtiges und gutes Deutsch.
 
+Regional variants (`Options::region`): `DeDe` is the default. `DeAt`
+(Austria) spells and recognises January as "Jänner" instead of "Januar"
+(Duden, Österreichisches Wörterbuch) — both the Date reading and the
+`Jan.`/`Jän.` abbreviation follow it; "Jänner" is accepted as input in
+every region. `DeCh` (Switzerland) has no "ß" (Bundeskanzlei "Weisungen
+zur Rechtschreibung"): every generated spoken form uses "ss" instead
+("dreißig" → "dreissig"), applied to the spoken text only — verbatim
+passthrough input keeps its own spelling. Nothing else differs in v1.
+
 ## Cardinal
 
 - **Written**: digit groups separated by `.`, a regular space, NBSP
