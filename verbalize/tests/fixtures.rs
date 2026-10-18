@@ -5,10 +5,11 @@
 //! lines that follow (`# region: default` switches back). One test per
 //! language; every failing line is reported with input, expected and actual.
 
+use std::cell::{Cell, RefCell};
 use std::fs;
 use std::panic;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Mutex, Once};
 
 use verbalize::token::Span;
 use verbalize::{Language, Normalizer, Options, Region};
@@ -152,19 +153,64 @@ fn ro_fixtures() {
     run_fixtures(Language::Ro);
 }
 
-/// The output contains no ASCII digit, and a second pass is a no-op.
+thread_local! {
+    static QUIET: Cell<bool> = const { Cell::new(false) };
+    static PANIC_SITE: RefCell<String> = const { RefCell::new(String::new()) };
+}
+
+static QUIET_HOOK: Once = Once::new();
+
+/// Runs `f`, turning a panic into its message and source location. The
+/// process-wide hook is wrapped once and stays quiet only for threads inside
+/// this function, so many caught panics neither flood the output nor mute the
+/// hook for other tests.
+fn catch_quietly<R>(f: impl FnOnce() -> R) -> Result<R, String> {
+    QUIET_HOOK.call_once(|| {
+        // `panic_safety_over_arbitrary_unicode` swaps the hook while holding this lock.
+        let _guard = HOOK_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        let previous = panic::take_hook();
+        panic::set_hook(Box::new(move |info| {
+            if QUIET.get() {
+                let site = info
+                    .location()
+                    .map_or_else(String::new, |l| format!("{}:{}", l.file(), l.line()));
+                PANIC_SITE.with_borrow_mut(|s| *s = site);
+            } else {
+                previous(info);
+            }
+        }));
+    });
+    QUIET.set(true);
+    let result = panic::catch_unwind(panic::AssertUnwindSafe(f));
+    QUIET.set(false);
+    result.map_err(|payload| {
+        let message = payload
+            .downcast_ref::<&str>()
+            .map(|s| s.to_string())
+            .or_else(|| payload.downcast_ref::<String>().cloned())
+            .unwrap_or_default();
+        format!("{message} at {}", PANIC_SITE.with_borrow(String::clone))
+    })
+}
+
+/// The output contains no ASCII digit, a second pass is a no-op, and every
+/// span has a clean shape. Panics are reported as failures so one bad input
+/// does not hide the rest.
 fn check_properties(normalizer: &Normalizer, input: &str) -> Result<(), String> {
-    let once = normalizer.normalize(input);
-    if once.bytes().any(|b| b.is_ascii_digit()) {
-        return Err(format!("digits left: {input:?} -> {once:?}"));
-    }
-    let twice = normalizer.normalize(&once);
-    if twice != once {
-        return Err(format!(
-            "not idempotent: {input:?} -> {once:?} -> {twice:?}"
-        ));
-    }
-    Ok(())
+    let run = || -> Result<(), String> {
+        let once = normalizer.normalize(input);
+        if once.bytes().any(|b| b.is_ascii_digit()) {
+            return Err(format!("digits left: {input:?} -> {once:?}"));
+        }
+        let twice = normalizer.normalize(&once);
+        if twice != once {
+            return Err(format!(
+                "not idempotent: {input:?} -> {once:?} -> {twice:?}"
+            ));
+        }
+        check_spans(input, &normalizer.annotate(input)).map_err(|e| format!("{e}: {input:?}"))
+    };
+    catch_quietly(run).unwrap_or_else(|panic| Err(format!("panicked ({panic}) on: {input:?}")))
 }
 
 fn properties_over_fixture_inputs(language: Language) {
@@ -192,6 +238,222 @@ fn ro_properties_over_fixture_inputs() {
     properties_over_fixture_inputs(Language::Ro);
 }
 
+/// Contexts a fixture input is embedded in: (name, prefix, suffix). The fillers
+/// `qq` and `zzq` are pronounceable nonsense that is no abbreviation, unit,
+/// month, numeral, roman numeral or counted noun in de, en or ro, so any
+/// difference they cause comes from how the recogniser treats its
+/// surroundings. A comma or period is followed by a word, not by the end of the
+/// text, so the number is not "at the end of the input".
+///
+/// Romanian reads any non-function word after a cardinal of 20 or more as the
+/// counted noun ("21 de zzq"), so an unknown word on the same line legitimately
+/// changes the reading; its same-line suffix is the conjunction `dar`, which
+/// the language never takes for a noun. A line break ends the counted-noun
+/// relationship, so the `lines` wrapper keeps `zzq` in every language.
+fn wrappers(language: Language) -> [(&'static str, &'static str, &'static str); 5] {
+    let word_suffix = if language == Language::Ro {
+        " dar"
+    } else {
+        " zzq"
+    };
+    [
+        ("words", "qq ", word_suffix),
+        ("lines", "qq\n", "\nzzq"),
+        ("parens", "(", ")"),
+        ("comma", "", ", zzq"),
+        ("period", "", ". zzq"),
+    ]
+}
+
+/// Whether `wrapper` makes a different input rather than embedding the same
+/// one: "X.." and "X,," are not "X. zzq", and in de and ro a period after a
+/// dotted number (`2.3` + `.`) is the closing dot of a date, which the date
+/// reading consumes.
+fn wrapper_applies(language: Language, wrapper: &str, input: &str) -> bool {
+    match wrapper {
+        "comma" => !input.ends_with(','),
+        "period" => {
+            let dotted_number = input
+                .rsplit(|c: char| !c.is_ascii_digit() && c != '.')
+                .next()
+                .is_some_and(|run| {
+                    run.contains('.') && run.ends_with(|c: char| c.is_ascii_digit())
+                });
+            !input.ends_with('.') && !(language != Language::En && dotted_number)
+        }
+        _ => true,
+    }
+}
+
+/// Embedding a fixture input in text must change nothing outside it: the
+/// output keeps the prefix and suffix byte for byte, equals
+/// `prefix + expected + suffix`, and the spans are clean tokens.
+fn context_invariance(language: Language) {
+    let mut normalizers = Normalizers::new(language);
+    for (name, prefix, suffix) in wrappers(language) {
+        let filler = format!("{prefix}{suffix}");
+        assert_eq!(
+            normalizers.get(None).normalize(&filler),
+            filler,
+            "wrapper {name:?} filler is not neutral in {}",
+            language.code()
+        );
+    }
+    let mut report = String::new();
+    let mut total = 0;
+    let mut failed = 0;
+    for file in fixture_files(language) {
+        let file_name = file.file_name().unwrap().to_string_lossy().into_owned();
+        for case in cases(&file) {
+            let normalizer = normalizers.get(case.region);
+            for (wrapper, prefix, suffix) in wrappers(language) {
+                if !wrapper_applies(language, wrapper, &case.input) {
+                    continue;
+                }
+                total += 1;
+                let wrapped = format!("{prefix}{}{suffix}", case.input);
+                let expected = format!("{prefix}{}{suffix}", case.expected);
+                let outcome = catch_quietly(|| {
+                    (
+                        normalizer.normalize(&wrapped),
+                        normalizer.annotate(&wrapped),
+                    )
+                });
+                let mut broken = Vec::new();
+                let actual = match outcome {
+                    Err(panic) => {
+                        broken.push(format!("panic: {panic}"));
+                        String::new()
+                    }
+                    Ok((actual, spans)) => {
+                        if !actual.starts_with(prefix) || !actual.ends_with(suffix) {
+                            broken.push("wrapper not preserved".to_string());
+                        }
+                        if actual != expected {
+                            broken.push("differs from prefix+expected+suffix".to_string());
+                        }
+                        if let Err(e) = check_spans(&wrapped, &spans) {
+                            broken.push(e);
+                        }
+                        actual
+                    }
+                };
+                if broken.is_empty() {
+                    continue;
+                }
+                failed += 1;
+                report.push_str(&format!(
+                    "{}/{file_name}:{} [{wrapper}] {}\n  input:    {wrapped:?}\n  expected: {expected:?}\n  actual:   {actual:?}\n",
+                    language.code(),
+                    case.line,
+                    broken.join("; ")
+                ));
+            }
+        }
+    }
+    assert!(
+        failed == 0,
+        "{failed} of {total} {} wrapped fixture cases failed:\n{report}",
+        language.code()
+    );
+}
+
+#[test]
+fn de_context_invariance() {
+    context_invariance(Language::De);
+}
+
+#[test]
+fn en_context_invariance() {
+    context_invariance(Language::En);
+}
+
+#[test]
+fn ro_context_invariance() {
+    context_invariance(Language::Ro);
+}
+
+/// Every head, gap, tail combination of number shapes with the spaces and
+/// invisible characters of pasted text: where the crashes and glued words
+/// live, and too rare in random strings to hit reliably.
+fn properties_over_space_shapes(language: Language) {
+    const HEADS: &[&str] = &["270°", "2°", "1-0-1", "5", "§", "1,5 × 10³", "5 mg", "2x"];
+    const GAPS: &[&str] = &[
+        " ", "\u{a0}", "\u{202f}", "\u{2009}", "\u{200b}", "\u{2011}", "\u{ad}", "\n",
+    ];
+    const TAILS: &[&str] = &["Nord", "EUR", "mg", "foo", "x", "kg", ""];
+    let normalizer = Normalizer::new(language);
+    let failures: Vec<String> = HEADS
+        .iter()
+        .flat_map(|h| {
+            GAPS.iter()
+                .flat_map(move |g| TAILS.iter().map(move |t| format!("{h}{g}{t}")))
+        })
+        .filter_map(|input| check_properties(&normalizer, &input).err())
+        .collect();
+    assert!(
+        failures.is_empty(),
+        "{} failures:\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
+}
+
+#[test]
+fn de_properties_over_space_shapes() {
+    properties_over_space_shapes(Language::De);
+}
+
+#[test]
+fn en_properties_over_space_shapes() {
+    properties_over_space_shapes(Language::En);
+}
+
+#[test]
+fn ro_properties_over_space_shapes() {
+    properties_over_space_shapes(Language::Ro);
+}
+
+/// A URL or address followed by a word that is an abbreviation in some
+/// language: the spoken URL must not leave text that a second pass reads
+/// differently, since the output of `normalize` is routinely normalized again.
+fn properties_over_url_shapes(language: Language) {
+    const HEADS: &[&str] = &[
+        "www.example.com/",
+        "https://example.org/a/",
+        "example.com/",
+        "user@example.com/",
+    ];
+    const TAILS: &[&str] = &["Nr.", "nr.", "St.", "Dr.", "Abs.", "z. B.", "e.g.", "Std."];
+    let normalizer = Normalizer::new(language);
+    let failures: Vec<String> = HEADS
+        .iter()
+        .flat_map(|h| TAILS.iter().map(move |t| format!("qq {h}{t}")))
+        .filter_map(|input| check_properties(&normalizer, &input).err())
+        .collect();
+    assert!(
+        failures.is_empty(),
+        "{} failures:\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
+}
+
+#[test]
+fn de_properties_over_url_shapes() {
+    properties_over_url_shapes(Language::De);
+}
+
+#[test]
+fn en_properties_over_url_shapes() {
+    properties_over_url_shapes(Language::En);
+}
+
+#[test]
+fn ro_properties_over_url_shapes() {
+    properties_over_url_shapes(Language::Ro);
+}
+
 /// xorshift64*: deterministic random digit-rich strings without a dev-dependency.
 struct XorShift(u64);
 
@@ -208,12 +470,106 @@ impl XorShift {
     }
 }
 
+/// Digit-bearing shapes, separators, units and the noise of text pasted from
+/// documents, as pieces of random inputs.
 const COMMON_PIECES: &[&str] = &[
-    "0", "1", "2", "5", "9", "10", "19", "30", "99", "100", "1990", "2024", "12345", "007", " ",
-    " ", " ", ".", ",", ":", "/", "-", "–", "+", "%", "°", "°C", "€", "$", "mg", "km", "m²", "x",
-    "×", "e", "^", "½", "§", "II", "(", ")", "\n", "a", "B", "Ω", "µ", "⁻¹", "²", "₂", "H", "O",
-    "IE", "'", "″", "N", "±", "√", "≥", "=", "1,5", "3,14", "0,5", "1.5", "3.14", "0.5", "mmHg",
-    "min", "l", "L",
+    "0",
+    "1",
+    "2",
+    "5",
+    "9",
+    "10",
+    "19",
+    "30",
+    "99",
+    "100",
+    "1990",
+    "2024",
+    "12345",
+    "007",
+    " ",
+    " ",
+    " ",
+    ".",
+    ",",
+    ":",
+    "/",
+    "-",
+    "–",
+    "+",
+    "%",
+    "°",
+    "°C",
+    "€",
+    "$",
+    "mg",
+    "km",
+    "m²",
+    "x",
+    "×",
+    "e",
+    "^",
+    "½",
+    "§",
+    "II",
+    "(",
+    ")",
+    "\n",
+    "a",
+    "B",
+    "Ω",
+    "µ",
+    "⁻¹",
+    "²",
+    "₂",
+    "H",
+    "O",
+    "IE",
+    "'",
+    "″",
+    "N",
+    "±",
+    "√",
+    "≥",
+    "=",
+    "1,5",
+    "3,14",
+    "0,5",
+    "1.5",
+    "3.14",
+    "0.5",
+    "mmHg",
+    "min",
+    "l",
+    "L",
+    // Text pasted from Word/PDF: non-ASCII spaces, non-breaking and soft hyphens, true minus,
+    // zero-width space, typographic quotes, ellipsis, CRLF and tab.
+    "\u{a0}",
+    "\u{202f}",
+    "\u{2009}",
+    "\u{2011}",
+    "\u{2212}",
+    "\u{ad}",
+    "\u{200b}",
+    "\u{201c}",
+    "\u{201d}",
+    "\u{2019}",
+    "\u{201e}",
+    "…",
+    "\r\n",
+    "\t",
+    // Heads and tails that meet those spaces in the shapes that have crashed or glued words.
+    "270°",
+    "2°",
+    "1-0-1",
+    "20 mg",
+    "Nord",
+    "EUR",
+    "foo",
+    "1,5 × 10³",
+    "(§)",
+    // A subscript count too large for any integer type.
+    "H₅₀₀₀₀₀₀₀₀₀O",
 ];
 
 fn properties_over_random_strings(language: Language, pieces: &[&str]) {
@@ -351,8 +707,11 @@ fn random_wide_piece(rng: &mut XorShift) -> String {
     }
 }
 
-/// Every span is in-bounds, sorted, non-overlapping, and cut on a UTF-8
-/// char boundary, so a caller slicing `input` by span range never panics.
+/// Every span is in-bounds, sorted, non-overlapping, cut on a UTF-8 char
+/// boundary (so a caller slicing `input` by span range never panics), and
+/// shaped like a token: no leading or trailing whitespace of any kind and no
+/// line break inside. Whitespace and line breaks around a token belong to the
+/// surrounding text, which a caller must be able to keep byte for byte.
 fn check_spans(input: &str, spans: &[Span]) -> Result<(), String> {
     let mut prev_end = 0usize;
     for span in spans {
@@ -372,6 +731,19 @@ fn check_spans(input: &str, spans: &[Span]) -> Result<(), String> {
         if !input.is_char_boundary(span.range.start) || !input.is_char_boundary(span.range.end) {
             return Err(format!(
                 "span {:?} does not fall on a char boundary",
+                span.range
+            ));
+        }
+        let text = &input[span.range.clone()];
+        if text.starts_with(char::is_whitespace) || text.ends_with(char::is_whitespace) {
+            return Err(format!(
+                "span {:?} {text:?} starts or ends with whitespace",
+                span.range
+            ));
+        }
+        if text.contains(['\n', '\r', '\u{85}', '\u{2028}', '\u{2029}']) {
+            return Err(format!(
+                "span {:?} {text:?} contains a line break",
                 span.range
             ));
         }
