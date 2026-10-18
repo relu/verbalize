@@ -9,8 +9,10 @@ ever *run*.
 `icu_diff.py` enumerates every public spellout ruleset — via
 `RuleBasedNumberFormat.getRuleSetName()` — for each vendored locale
 (`de`, `en`, `ro`), builds a shared sample of integers (the full range
-0–10,000, a configurable stride over 0–1,000,000, powers of ten to 10^18,
-and 10,000 seeded random values), spells every `(locale, ruleset, n)`
+0–10,000 and its negatives, so the `-x` rules are compared too; a
+configurable stride over 0–1,000,000; powers of ten and their negatives to
+10^18; and 10,000 seeded random values, a fifth of them negative), spells
+every `(locale, ruleset, n)`
 triple with PyICU, and compares it against the same triple spelled by
 `verbalize/examples/rbnf_dump.rs` (built and run via `cargo run --release`).
 Both sides are normalised identically before comparing: CLDR's soft
@@ -18,7 +20,17 @@ hyphens (U+00AD) are stripped and whitespace is collapsed, matching the
 renderer's own post-processing.
 
 Any mismatch is printed as `MISMATCH locale=... ruleset=... n=... icu=...
-ours=...` on stdout; the process exits non-zero if there is at least one.
+ours=...` on stdout. The run exits non-zero if there is at least one
+mismatch, or if any ruleset ends with zero comparisons made (a ruleset
+renamed or dropped by ICU would otherwise pass vacuously), or if ICU lists
+no spellout rulesets for a locale.
+
+A value ICU cannot spell (it throws `ICUError`) is skipped rather than
+compared. Those skips are counted per `(locale, ruleset)` and printed on
+stderr next to the number of comparisons actually made, as in
+`de %spellout-numbering: compared 31022 of 31022, 0 ICU error(s), 0
+mismatch(es)`. The final summary line reports comparisons made separately
+from tuples requested.
 
 **Precision note**: the script formats every value through
 `icu.Formattable().setInt64(n)`, not `rbnf.format(n)` directly. PyICU's
@@ -83,14 +95,22 @@ uv venv .venv
 uv pip install --python .venv/bin/python -r requirements.txt
 ```
 
-On NixOS (no system-wide `libicu-dev`), point `pkg-config` and the runtime
-loader at a built `icu4c` derivation instead, e.g.:
+On NixOS (no system-wide `libicu-dev`), take ICU and PyICU from nixpkgs
+instead of pip. With the nixpkgs revision this was checked against, the
+first command prints `78.3 2.16.2`:
 
 ```sh
-export PKG_CONFIG_PATH="$(nix eval --raw nixpkgs#icu74.dev)/lib/pkgconfig:$PKG_CONFIG_PATH"
-uv pip install --python .venv/bin/python -r requirements.txt
-export LD_LIBRARY_PATH="$(nix eval --raw nixpkgs#icu74)/lib:$LD_LIBRARY_PATH"
+nix shell --impure --expr 'with import <nixpkgs> {}; python3.withPackages (p: [p.pyicu])' \
+  -c python3 -c 'import icu; print(icu.ICU_VERSION, icu.VERSION)'   # 78.3 2.16.2
+nix shell --impure --expr 'with import <nixpkgs> {}; python3.withPackages (p: [p.pyicu])' \
+  -c python3 tools/icu-diff/icu_diff.py
 ```
+
+`requirements.txt` pins `PyICU==2.16.2`: 2.16 added ICU 78.1 support and
+2.16.1 added 78.2, and 2.16.2 is the release nixpkgs builds against
+ICU 78.3, the version CI installs. Releases before 2.16 predate ICU 78.
+When CI moves to another ICU, check the PyICU changelog before bumping
+the pin.
 
 The `.venv/` directory is local and gitignored; it is never committed.
 
@@ -106,17 +126,3 @@ export LD_LIBRARY_PATH="<path to the icu4c lib/ used at install time>:$LD_LIBRAR
 Run from the repository root, or set `--cargo-args` to whatever invocation
 finds the workspace `Cargo.toml`. CI runs this in a job that installs ICU
 and fails the build on any mismatch.
-
-## Environment checked (2026-09-06)
-
-`python3 -c 'import icu'` fails out of the box on this NixOS machine: there
-is no `libicu-dev`-equivalent on `PKG_CONFIG_PATH` by default, so `pip
-install PyICU` cannot find ICU's headers/pkg-config files. A prebuilt
-`icu4c-76.1` (with a `-dev` output carrying `icu-i18n.pc`/`icu-uc.pc`) was
-already present in the local Nix store as a transitive dependency of
-another package; pointing `PKG_CONFIG_PATH` at its `-dev` output's
-`lib/pkgconfig` and `LD_LIBRARY_PATH` at its `lib` let `uv pip install
-PyICU` build and import successfully against **ICU 76.1**
-(`icu.ICU_VERSION == "76.1"`). This is host-specific — a fresh clone
-should follow the Debian/Fedora/Homebrew/Nix instructions above rather
-than rely on a store path found by chance.

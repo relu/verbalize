@@ -16,7 +16,9 @@ import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 try:
     import icu
@@ -44,10 +46,13 @@ def public_rulesets(locale: str) -> list[str]:
 
 
 def sample_values(stride: int, seed: int) -> list[int]:
-    """Full 0-10,000; a stride over 0-1,000,000; powers of ten to 10^18; 10,000 seeded randoms."""
+    """0-10,000 and their negatives (the `-x` rules); a stride over 0-1,000,000; ±10^k to 10^18;
+    10,000 seeded randoms, a fifth of them negative."""
+    powers = {10**k for k in range(19)}
     values = set(range(0, 10_001))
     values.update(range(0, 1_000_001, stride))
-    values.update(10**k for k in range(19))  # 10^0 .. 10^18
+    values.update(powers)
+    values.update(-n for n in [*range(0, 10_001), *powers])
     rng = random.Random(seed)
     for _ in range(10_000):
         n = rng.randint(0, 10**18)
@@ -88,6 +93,43 @@ def run_rust(cargo_args: list[str], requests: list[tuple[str, str, int]]) -> lis
     return [None if line == NONE_SENTINEL else line for line in lines]
 
 
+@dataclass
+class Tally:
+    """Outcome counts for one (locale, ruleset)."""
+
+    requested: int = 0
+    compared: int = 0  # ICU produced an answer, so there is a ground truth to compare against
+    icu_errors: int = 0  # ICU refused (unknown ruleset, or no rule for this value); nothing compared
+    mismatches: int = 0
+
+
+def compare(
+    requests: list[tuple[str, str, int]],
+    ours: list[str | None],
+    icu_answer: Callable[[str, str, int], str | None],
+) -> tuple[dict[tuple[str, str], Tally], list[str]]:
+    """Compares each of our answers with ICU's, tallying outcomes per (locale, ruleset)."""
+    tallies: dict[tuple[str, str], Tally] = {}
+    mismatch_lines: list[str] = []
+    for (locale, ruleset, n), our in zip(requests, ours):
+        tally = tallies.setdefault((locale, ruleset), Tally())
+        tally.requested += 1
+        expected = icu_answer(locale, ruleset, n)
+        if expected is None:
+            tally.icu_errors += 1
+            continue
+        tally.compared += 1
+        if our is None or normalize(expected) != normalize(our):
+            tally.mismatches += 1
+            mismatch_lines.append(f"MISMATCH locale={locale} ruleset={ruleset} n={n} icu={expected!r} ours={our!r}")
+    return tallies, mismatch_lines
+
+
+def vacuous(tallies: dict[tuple[str, str], Tally]) -> list[tuple[str, str]]:
+    """Rulesets for which no comparison was made; a renamed ruleset must not pass silently."""
+    return [key for key, tally in tallies.items() if tally.compared == 0]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--locales", default=",".join(DEFAULT_LOCALES))
@@ -103,6 +145,11 @@ def main() -> int:
     locales = [loc.strip() for loc in args.locales.split(",") if loc.strip()]
     values = sample_values(args.stride, args.seed)
 
+    empty_locales = [locale for locale in locales if not public_rulesets(locale)]
+    if empty_locales:
+        print(f"ICU lists no spellout rulesets for: {', '.join(empty_locales)}", file=sys.stderr)
+        return 1
+
     requests: list[tuple[str, str, int]] = [
         (locale, ruleset, n)
         for locale in locales
@@ -110,21 +157,35 @@ def main() -> int:
         for n in values
     ]
 
-    print(f"testing {len(requests)} (locale, ruleset, n) tuples", file=sys.stderr)
+    print(f"requesting {len(requests)} (locale, ruleset, n) tuples", file=sys.stderr)
     ours = run_rust(args.cargo_args.split(), requests)
 
     rbnf_cache: dict[str, "icu.RuleBasedNumberFormat"] = {}
-    mismatches = 0
-    for (locale, ruleset, n), our in zip(requests, ours):
-        expected = icu_spell(rbnf_cache, locale, ruleset, n)
-        if expected is None:
-            continue  # no ICU ground truth for this tuple
-        if our is None or normalize(expected) != normalize(our):
-            print(f"MISMATCH locale={locale} ruleset={ruleset} n={n} icu={expected!r} ours={our!r}")
-            mismatches += 1
+    tallies, mismatch_lines = compare(
+        requests, ours, lambda locale, ruleset, n: icu_spell(rbnf_cache, locale, ruleset, n)
+    )
+    for line in mismatch_lines:
+        print(line)
 
-    print(f"{mismatches} mismatch(es) out of {len(requests)} tuples", file=sys.stderr)
-    return 1 if mismatches else 0
+    for (locale, ruleset), t in tallies.items():
+        print(
+            f"{locale} {ruleset}: compared {t.compared} of {t.requested}, "
+            f"{t.icu_errors} ICU error(s), {t.mismatches} mismatch(es)",
+            file=sys.stderr,
+        )
+    compared = sum(t.compared for t in tallies.values())
+    icu_errors = sum(t.icu_errors for t in tallies.values())
+    print(
+        f"{len(mismatch_lines)} mismatch(es) in {compared} comparisons "
+        f"({len(requests)} requested, {icu_errors} skipped on ICU error)",
+        file=sys.stderr,
+    )
+
+    failed = False
+    for locale, ruleset in vacuous(tallies):
+        print(f"no comparison made for locale={locale} ruleset={ruleset}", file=sys.stderr)
+        failed = True
+    return 1 if failed or mismatch_lines else 0
 
 
 if __name__ == "__main__":
