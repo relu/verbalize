@@ -498,7 +498,7 @@ fn region_must_match_language() {
     }
 }
 
-/// With `--strict` a missing corpus is a failure: otherwise a release check
+/// With `--strict` a missing or empty corpus is a failure: otherwise a release check
 /// run before fetching anything would pass having checked nothing. The script
 /// is copied into a scratch tree so the repository's own `.cache` is not read.
 #[cfg(unix)]
@@ -527,6 +527,56 @@ fn corpus_check_strict_fails_without_a_corpus() {
         .output()
         .expect("run check.sh");
     assert!(lenient.status.success());
+
+    // `fetch.py` creates the directory before downloading, so a failed fetch
+    // leaves it empty: that is still no corpus.
+    fs::create_dir_all(here.join(".cache").join("de")).expect("create empty corpus dir");
+    let empty = Command::new("bash")
+        .arg(&script)
+        .arg("--strict")
+        .output()
+        .expect("run check.sh");
+    assert!(!empty.status.success(), "an empty corpus directory passed");
+    assert!(
+        stderr_str(&empty).contains("no corpus"),
+        "stderr: {:?}",
+        stderr_str(&empty)
+    );
+}
+
+/// A failing `--threshold` gate stays failing when the reader has already
+/// closed stdout: `survey … | grep -q …` under `pipefail` must not pass a
+/// corpus that trips the threshold. The pipe's read end is closed before the
+/// child starts, so its first write fails deterministically.
+#[cfg(unix)]
+#[test]
+fn threshold_verdict_survives_a_closed_stdout() {
+    let dir = TempPath::dir("threshold_pipe");
+    fs::write(
+        dir.path.join("a.txt"),
+        "Case 007 opened. Case 007 reopened. Case 007 closed. \
+         Wert 5 Gs und 6 Gs. Der Gs der Erkrankung war hoch.",
+    )
+    .expect("write corpus file");
+
+    let closed_stdout = |args: &[&str]| {
+        let (reader, writer) = std::io::pipe().expect("create pipe");
+        drop(reader);
+        Command::new(bin())
+            .args(args)
+            .stdout(writer)
+            .stderr(Stdio::piped())
+            .output()
+            .expect("run verbalize")
+    };
+
+    let survey = closed_stdout(&["survey", dir.str(), "--lang", "en", "--threshold", "3"]);
+    assert_eq!(survey.status.code(), Some(1), "{}", stderr_str(&survey));
+    let audit = closed_stdout(&["audit", dir.str(), "--lang", "de", "--threshold", "1"]);
+    assert_eq!(audit.status.code(), Some(1), "{}", stderr_str(&audit));
+
+    let passing = closed_stdout(&["survey", dir.str(), "--lang", "en", "--threshold", "4"]);
+    assert_eq!(passing.status.code(), Some(0), "{}", stderr_str(&passing));
 }
 
 /// Any other write failure is reported, with a non-zero exit, not swallowed

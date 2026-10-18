@@ -1,3 +1,5 @@
 /target
 /tools/icu-diff/.venv
 __pycache__/
+/xtask/cldr.new
+/xtask/cldr.old

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Differential test of the verbalize RBNF core against ICU4C.
 
-For every vendored locale and every public spellout ruleset in that locale's
-CLDR RBNF data, spells the same set of integers through PyICU's
+For every vendored locale and every public spellout ruleset ICU lists for it,
+first checks that ICU and the vendored data name the same public rulesets (a
+ruleset on only one side is a failure), then spells the same set of integers through PyICU's
 RuleBasedNumberFormat and through the `rbnf_dump` Rust example, and reports
 any disagreement. Exits non-zero if any mismatch is found.
 
@@ -30,6 +31,9 @@ except ImportError:
     raise SystemExit(2)
 
 DEFAULT_LOCALES = ["de", "en", "ro"]
+DATA_DIR = Path(__file__).resolve().parents[2] / "verbalize" / "src" / "data"
+# A generated table entry: `Ruleset { name: "%spellout-numbering", rules: &[`.
+RULESET_NAME_RE = re.compile(r'Ruleset \{ name: "([^"]+)"')
 SOFT_HYPHEN = "\u00ad"
 WHITESPACE_RE = re.compile(r"\s+")
 NONE_SENTINEL = "<NONE>"
@@ -43,6 +47,28 @@ def normalize(s: str) -> str:
 def public_rulesets(locale: str) -> list[str]:
     rbnf = icu.RuleBasedNumberFormat(icu.URBNFRuleSetTag.SPELLOUT, icu.Locale(locale))
     return [rbnf.getRuleSetName(i) for i in range(rbnf.getNumberOfRuleSetNames())]
+
+
+def vendored_public_rulesets(locale: str) -> list[str]:
+    """Public (single `%`) ruleset names in the shipped table for `locale`.
+
+    Read from the generated source because the crate exposes no listing; the
+    table is checked in sync with the vendored CLDR data by `cargo xtask check-data`."""
+    path = DATA_DIR / f"{locale}.rs"
+    if not path.is_file():
+        print(f"no vendored data for locale {locale!r} ({path})", file=sys.stderr)
+        raise SystemExit(2)
+    names = RULESET_NAME_RE.findall(path.read_text(encoding="utf-8"))
+    if not names:
+        print(f"found no rulesets in {path}; has the generated format changed?", file=sys.stderr)
+        raise SystemExit(2)
+    return [name for name in names if not name.startswith("%%")]
+
+
+def ruleset_drift(icu_names: list[str], vendored_names: list[str]) -> tuple[list[str], list[str]]:
+    """(only in ICU, only in the vendored data): names the comparison would never exercise
+    or never request, since requests are built from ICU's list."""
+    return sorted(set(icu_names) - set(vendored_names)), sorted(set(vendored_names) - set(icu_names))
 
 
 def sample_values(stride: int, seed: int) -> list[int]:
@@ -148,6 +174,17 @@ def main() -> int:
     empty_locales = [locale for locale in locales if not public_rulesets(locale)]
     if empty_locales:
         print(f"ICU lists no spellout rulesets for: {', '.join(empty_locales)}", file=sys.stderr)
+        return 1
+
+    drifted = False
+    for locale in locales:
+        only_icu, only_vendored = ruleset_drift(public_rulesets(locale), vendored_public_rulesets(locale))
+        for name in only_icu:
+            print(f"ruleset drift: locale={locale} {name} is listed by ICU but not vendored", file=sys.stderr)
+        for name in only_vendored:
+            print(f"ruleset drift: locale={locale} {name} is vendored but not listed by ICU", file=sys.stderr)
+        drifted = drifted or bool(only_icu or only_vendored)
+    if drifted:
         return 1
 
     requests: list[tuple[str, str, int]] = [

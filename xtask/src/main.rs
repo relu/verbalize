@@ -89,7 +89,8 @@ fn download(tag: &str, dir: &Path) -> gen::Result<()> {
 
 /// Puts `new` in place of `live`. A non-empty directory cannot be replaced by
 /// `rename` in one step, so the old one is moved aside and put back if the
-/// second rename fails.
+/// second rename fails. Failing to delete the old copy afterwards is only a
+/// warning.
 fn swap_dir(new: &Path, live: &Path) -> gen::Result<()> {
     let old = live.with_extension("old");
     let _ = fs::remove_dir_all(&old);
@@ -104,7 +105,11 @@ fn swap_dir(new: &Path, live: &Path) -> gen::Result<()> {
         return Err(e.into());
     }
     if had_live {
-        fs::remove_dir_all(&old)?;
+        // The new data is already live; a leftover only costs disk space and
+        // is removed by the next update.
+        if let Err(e) = fs::remove_dir_all(&old) {
+            eprintln!("warning: could not remove {}: {e}", old.display());
+        }
     }
     Ok(())
 }
@@ -163,5 +168,41 @@ fn check() -> gen::Result<()> {
             stale.join(", ")
         )
         .into())
+    }
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+
+    /// The data is already swapped in when the old copy cannot be removed, so
+    /// that is a warning: failing here would leave `cldr.lock` naming the old
+    /// tag over new data.
+    #[test]
+    fn swap_dir_succeeds_when_the_old_copy_cannot_be_removed() {
+        let tmp = std::env::temp_dir().join(format!("xtask_swap_dir_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&tmp);
+        let (new, live, locked) = (tmp.join("new"), tmp.join("live"), tmp.join("live/locked"));
+        fs::create_dir_all(&new).unwrap();
+        fs::write(new.join("b.txt"), "new").unwrap();
+        fs::create_dir_all(&locked).unwrap();
+        fs::write(locked.join("a.txt"), "old").unwrap();
+        fs::set_permissions(&locked, fs::Permissions::from_mode(0o555)).unwrap();
+
+        // Root ignores the permission bits, so the removal would succeed.
+        let enforced = fs::write(locked.join("probe"), "").is_err();
+        let swapped = enforced.then(|| swap_dir(&new, &live));
+
+        fs::set_permissions(&locked, fs::Permissions::from_mode(0o755)).ok();
+        let old = live.with_extension("old");
+        fs::set_permissions(old.join("locked"), fs::Permissions::from_mode(0o755)).ok();
+        let new_data = fs::read_to_string(live.join("b.txt")).ok();
+        let _ = fs::remove_dir_all(&tmp);
+
+        if let Some(swapped) = swapped {
+            swapped.unwrap();
+            assert_eq!(new_data.as_deref(), Some("new"));
+        }
     }
 }

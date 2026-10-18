@@ -189,7 +189,9 @@ then `verbalize-cli`, authenticated by crates.io Trusted Publishing — each
 crate lists `relu/verbalize` / `release.yml` as a trusted publisher, no
 token secret), and only if that succeeds creates the GitHub release with
 the archives, installers, checksums and the changelog section for that
-version as release notes. A failed publish therefore leaves no release.
+version as release notes. A failed publish therefore leaves no release;
+re-running the failed job resumes, because a crate whose version is already
+on crates.io is skipped rather than published again.
 
 ## Licence
 

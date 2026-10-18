@@ -31,7 +31,8 @@ status=0
 checked=0
 for lang in de en ro; do
     dir="$here/.cache/$lang"
-    if [ ! -d "$dir" ]; then
+    # fetch.py creates the directory before downloading, so it can be empty.
+    if [ -z "$(find "$dir" -type f -print -quit 2>/dev/null)" ]; then
         echo "skip $lang: no corpus in $dir"
         continue
     fi

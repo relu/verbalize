@@ -91,10 +91,11 @@ struct AuditArgs {
 }
 
 /// Why a command stopped. Output errors are kept apart because a closed
-/// stdout (`| head`) is the reader's choice, not a failure.
+/// stdout (`| head`) is the reader's choice, not a failure; they carry the
+/// exit code the run had earned, so a closed pipe never hides a failed gate.
 enum Failure {
     Message(String),
-    Output(io::Error),
+    Output(io::Error, ExitCode),
 }
 
 impl From<String> for Failure {
@@ -105,7 +106,7 @@ impl From<String> for Failure {
 
 impl From<io::Error> for Failure {
     fn from(e: io::Error) -> Self {
-        Failure::Output(e)
+        Failure::Output(e, ExitCode::SUCCESS)
     }
 }
 
@@ -113,7 +114,7 @@ impl fmt::Display for Failure {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Failure::Message(message) => f.write_str(message),
-            Failure::Output(e) => write!(f, "writing output: {e}"),
+            Failure::Output(e, _) => write!(f, "writing output: {e}"),
         }
     }
 }
@@ -131,10 +132,14 @@ fn main() -> ExitCode {
         Command::Audit(args) => run_audit(args, &mut out),
     }
     // A `BufWriter` drops its flush error, so flush where it can be reported.
-    .and_then(|code| out.flush().map(|()| code).map_err(Failure::from));
+    .and_then(|code| {
+        out.flush()
+            .map(|()| code)
+            .map_err(|e| Failure::Output(e, code))
+    });
     match result {
         Ok(code) => code,
-        Err(Failure::Output(e)) if e.kind() == io::ErrorKind::BrokenPipe => ExitCode::SUCCESS,
+        Err(Failure::Output(e, code)) if e.kind() == io::ErrorKind::BrokenPipe => code,
         Err(e) => {
             eprintln!("verbalize: {e}");
             ExitCode::FAILURE
@@ -290,17 +295,19 @@ fn run_survey(args: SurveyArgs, out: &mut impl Write) -> Outcome {
         .parse()
         .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
     let report = survey::run(&args.path, language)?;
-    survey::print_report(&report, out)?;
-    if let Some(threshold) = args.threshold {
-        if report
-            .unhandled
-            .iter()
-            .any(|s| s.unhandled as u64 >= threshold)
+    let code = match args.threshold {
+        Some(threshold)
+            if report
+                .unhandled
+                .iter()
+                .any(|s| s.unhandled as u64 >= threshold) =>
         {
-            return Ok(ExitCode::FAILURE);
+            ExitCode::FAILURE
         }
-    }
-    Ok(ExitCode::SUCCESS)
+        _ => ExitCode::SUCCESS,
+    };
+    survey::print_report(&report, out).map_err(|e| Failure::Output(e, code))?;
+    Ok(code)
 }
 
 fn run_audit(args: AuditArgs, out: &mut impl Write) -> Outcome {
@@ -309,13 +316,14 @@ fn run_audit(args: AuditArgs, out: &mut impl Write) -> Outcome {
         .parse()
         .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
     let report = audit::run(&args.path, language)?;
-    audit::print_report(&report, out)?;
-    if let Some(threshold) = args.threshold {
-        if report.suspicious().any(|e| e.composed as u64 >= threshold) {
-            return Ok(ExitCode::FAILURE);
+    let code = match args.threshold {
+        Some(threshold) if report.suspicious().any(|e| e.composed as u64 >= threshold) => {
+            ExitCode::FAILURE
         }
-    }
-    Ok(ExitCode::SUCCESS)
+        _ => ExitCode::SUCCESS,
+    };
+    audit::print_report(&report, out).map_err(|e| Failure::Output(e, code))?;
+    Ok(code)
 }
 
 #[cfg(test)]

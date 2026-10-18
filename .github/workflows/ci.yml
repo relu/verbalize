@@ -66,8 +66,9 @@ jobs:
       - name: build rbnf_dump
         run: cargo build --release -q -p verbalize --example rbnf_dump
       - name: run icu-diff
-        # Default stride (997) and seed already keep the sweep well under
-        # 10 minutes (see tools/icu-diff/README.md).
+        # The default sweep is ~806k comparisons, about 11 minutes locally;
+        # --stride barely changes that (the 0-10,000 and random samples
+        # dominate), so the figure is the job's floor.
         run: python3 tools/icu-diff/icu_diff.py
 
   bench:

@@ -6,9 +6,13 @@ ever *run*.
 
 ## What it does
 
-`icu_diff.py` enumerates every public spellout ruleset — via
+`icu_diff.py` takes every public spellout ruleset ICU lists — via
 `RuleBasedNumberFormat.getRuleSetName()` — for each vendored locale
-(`de`, `en`, `ro`), builds a shared sample of integers (the full range
+(`de`, `en`, `ro`), and first checks that list against the public (single
+`%`) rulesets in the shipped tables, `verbalize/src/data/<locale>.rs` (the
+crate exposes no listing, so the script reads the generated source; `cargo
+xtask check-data` keeps it in sync with the vendored CLDR). It then builds a
+shared sample of integers (the full range
 0–10,000 and its negatives, so the `-x` rules are compared too; a
 configurable stride over 0–1,000,000; powers of ten and their negatives to
 10^18; and 10,000 seeded random values, a fifth of them negative), spells
@@ -21,9 +25,10 @@ renderer's own post-processing.
 
 Any mismatch is printed as `MISMATCH locale=... ruleset=... n=... icu=...
 ours=...` on stdout. The run exits non-zero if there is at least one
-mismatch, or if any ruleset ends with zero comparisons made (a ruleset
-renamed or dropped by ICU would otherwise pass vacuously), or if ICU lists
-no spellout rulesets for a locale.
+mismatch; if ICU and the shipped tables disagree on the public ruleset
+names in either direction (`ruleset drift: ...` on stderr; the sweep is
+skipped); if any ruleset ends with zero comparisons made (ICU refusing
+every value); or if ICU lists no spellout rulesets for a locale.
 
 A value ICU cannot spell (it throws `ICUError`) is skipped rather than
 compared. Those skips are counted per `(locale, ruleset)` and printed on
@@ -118,7 +123,7 @@ The `.venv/` directory is local and gitignored; it is never committed.
 
 ```sh
 export LD_LIBRARY_PATH="<path to the icu4c lib/ used at install time>:$LD_LIBRARY_PATH"
-.venv/bin/python icu_diff.py                       # de,en,ro; default stride and seed
+.venv/bin/python icu_diff.py                       # de,en,ro; default stride and seed (~806k comparisons, ~11 min)
 .venv/bin/python icu_diff.py --locales de --stride 10007
 .venv/bin/python icu_diff.py --cargo-args "run --release -q -p verbalize --example rbnf_dump"
 ```
