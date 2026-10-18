@@ -5,6 +5,7 @@
 //! and reports frequency plus current coverage.
 
 use std::collections::HashMap;
+use std::io::{self, Write};
 
 use verbalize::{Language, Normalizer};
 
@@ -123,25 +124,28 @@ pub fn run(path: &str, language: Language) -> Result<Report, String> {
     Ok(Report { all, unhandled })
 }
 
-pub fn print_report(report: &Report) {
-    println!("shape\tcount\texample\tspoken");
+pub fn print_report(report: &Report, out: &mut impl Write) -> io::Result<()> {
+    writeln!(out, "shape\tcount\texample\tspoken")?;
     for entry in &report.all {
-        println!(
+        writeln!(
+            out,
             "{}\t{}\t{}\t{}",
             entry.shape, entry.count, entry.example, entry.spoken
-        );
+        )?;
     }
-    println!();
-    println!("# unhandled (fallback or left verbatim)");
-    println!("shape\tunhandled\tcount\texample\tspoken");
+    writeln!(out)?;
+    writeln!(out, "# unhandled (fallback or left verbatim)")?;
+    writeln!(out, "shape\tunhandled\tcount\texample\tspoken")?;
     for entry in &report.unhandled {
-        println!(
+        writeln!(
+            out,
             "{}\t{}\t{}\t{}\t{}",
             entry.shape,
             entry.unhandled,
             entry.count,
             entry.unhandled_example,
             entry.unhandled_spoken
-        );
+        )?;
     }
+    Ok(())
 }

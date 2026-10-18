@@ -4,8 +4,10 @@ mod audit;
 mod corpus;
 mod survey;
 
+use std::borrow::Cow;
+use std::fmt;
 use std::fs;
-use std::io::{self, Read};
+use std::io::{self, BufWriter, Read, Write};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
@@ -24,6 +26,11 @@ enum Command {
     /// Print the normalized (spoken-form) text.
     Normalize(CommonArgs),
     /// Print one classified span per line (or a JSON array with --json).
+    ///
+    /// Lines are `start-end<TAB>class<TAB>original<TAB>spoken<TAB>fallback`.
+    /// Inside the original and spoken fields a backslash, tab, newline and
+    /// carriage return are written as `\\`, `\t`, `\n` and `\r`, so every span
+    /// stays on one line with exactly five fields.
     Annotate(AnnotateArgs),
     /// Scan a corpus for digit/symbol shapes and report coverage.
     Survey(SurveyArgs),
@@ -83,16 +90,51 @@ struct AuditArgs {
     threshold: Option<u64>,
 }
 
+/// Why a command stopped. Output errors are kept apart because a closed
+/// stdout (`| head`) is the reader's choice, not a failure.
+enum Failure {
+    Message(String),
+    Output(io::Error),
+}
+
+impl From<String> for Failure {
+    fn from(message: String) -> Self {
+        Failure::Message(message)
+    }
+}
+
+impl From<io::Error> for Failure {
+    fn from(e: io::Error) -> Self {
+        Failure::Output(e)
+    }
+}
+
+impl fmt::Display for Failure {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Failure::Message(message) => f.write_str(message),
+            Failure::Output(e) => write!(f, "writing output: {e}"),
+        }
+    }
+}
+
+type Outcome = Result<ExitCode, Failure>;
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    let stdout = io::stdout();
+    let mut out = BufWriter::new(stdout.lock());
     let result = match cli.command {
-        Command::Normalize(args) => run_normalize(args),
-        Command::Annotate(args) => run_annotate(args),
-        Command::Survey(args) => run_survey(args),
-        Command::Audit(args) => run_audit(args),
-    };
+        Command::Normalize(args) => run_normalize(args, &mut out),
+        Command::Annotate(args) => run_annotate(args, &mut out),
+        Command::Survey(args) => run_survey(args, &mut out),
+        Command::Audit(args) => run_audit(args, &mut out),
+    }
+    // A `BufWriter` drops its flush error, so flush where it can be reported.
+    .and_then(|code| out.flush().map(|()| code).map_err(Failure::from));
     match result {
         Ok(code) => code,
+        Err(Failure::Output(e)) if e.kind() == io::ErrorKind::BrokenPipe => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("verbalize: {e}");
             ExitCode::FAILURE
@@ -113,14 +155,15 @@ fn read_input(input: &Option<String>) -> Result<String, String> {
     }
 }
 
-fn parse_region(s: &str) -> Result<Region, String> {
+/// The region named by `s` and the language it belongs to.
+fn parse_region(s: &str) -> Result<(Language, Region), String> {
     match s.to_ascii_lowercase().replace('_', "-").as_str() {
-        "de-de" | "dede" => Ok(Region::DeDe),
-        "de-at" | "deat" => Ok(Region::DeAt),
-        "de-ch" | "dech" => Ok(Region::DeCh),
-        "en-us" | "enus" => Ok(Region::EnUs),
-        "en-gb" | "engb" => Ok(Region::EnGb),
-        "ro-ro" | "roro" => Ok(Region::RoRo),
+        "de-de" | "dede" => Ok((Language::De, Region::DeDe)),
+        "de-at" | "deat" => Ok((Language::De, Region::DeAt)),
+        "de-ch" | "dech" => Ok((Language::De, Region::DeCh)),
+        "en-us" | "enus" => Ok((Language::En, Region::EnUs)),
+        "en-gb" | "engb" => Ok((Language::En, Region::EnGb)),
+        "ro-ro" | "roro" => Ok((Language::Ro, Region::RoRo)),
         other => Err(format!("unknown region: {other:?}")),
     }
 }
@@ -143,8 +186,20 @@ fn read_lexicon(path: &PathBuf) -> Result<Vec<(String, String)>, String> {
     Ok(entries)
 }
 
-fn build_options(common: &CommonArgs) -> Result<Options, String> {
-    let region = common.region.as_deref().map(parse_region).transpose()?;
+fn build_options(common: &CommonArgs, language: Language) -> Result<Options, String> {
+    let region = match common.region.as_deref() {
+        Some(tag) => {
+            let (region_language, region) = parse_region(tag)?;
+            if region_language != language {
+                return Err(format!(
+                    "--region {tag} is not a region of language {}",
+                    language.code()
+                ));
+            }
+            Some(region)
+        }
+        None => None,
+    };
     let lexicon = match &common.lexicon {
         Some(path) => read_lexicon(path)?,
         None => Vec::new(),
@@ -161,18 +216,37 @@ fn build_normalizer(common: &CommonArgs) -> Result<Normalizer, String> {
         .lang
         .parse()
         .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
-    let options = build_options(common)?;
+    let options = build_options(common, language)?;
     Ok(Normalizer::with_options(language, options))
 }
 
-fn run_normalize(args: CommonArgs) -> Result<ExitCode, String> {
+/// Escapes the characters that would break the one-record-per-line,
+/// tab-separated layout of `annotate`.
+fn tsv_field(field: &str) -> Cow<'_, str> {
+    if !field.contains(['\\', '\t', '\n', '\r']) {
+        return Cow::Borrowed(field);
+    }
+    let mut escaped = String::with_capacity(field.len() + 8);
+    for c in field.chars() {
+        match c {
+            '\\' => escaped.push_str("\\\\"),
+            '\t' => escaped.push_str("\\t"),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            c => escaped.push(c),
+        }
+    }
+    Cow::Owned(escaped)
+}
+
+fn run_normalize(args: CommonArgs, out: &mut impl Write) -> Outcome {
     let text = read_input(&args.input)?;
     let normalizer = build_normalizer(&args)?;
-    print!("{}", normalizer.normalize(&text));
+    write!(out, "{}", normalizer.normalize(&text))?;
     Ok(ExitCode::SUCCESS)
 }
 
-fn run_annotate(args: AnnotateArgs) -> Result<ExitCode, String> {
+fn run_annotate(args: AnnotateArgs, out: &mut impl Write) -> Outcome {
     let text = read_input(&args.common.input)?;
     let normalizer = build_normalizer(&args.common)?;
     let spans = normalizer.annotate(&text);
@@ -191,33 +265,32 @@ fn run_annotate(args: AnnotateArgs) -> Result<ExitCode, String> {
                 })
             })
             .collect();
-        println!(
-            "{}",
-            serde_json::to_string(&json).map_err(|e| e.to_string())?
-        );
+        serde_json::to_writer(&mut *out, &json).map_err(io::Error::from)?;
+        writeln!(out)?;
     } else {
         for span in &spans {
-            println!(
+            writeln!(
+                out,
                 "{}-{}\t{}\t{}\t{}\t{}",
                 span.range.start,
                 span.range.end,
                 span.token.class(),
-                &text[span.range.clone()],
-                span.spoken,
+                tsv_field(&text[span.range.clone()]),
+                tsv_field(&span.spoken),
                 span.fallback,
-            );
+            )?;
         }
     }
     Ok(ExitCode::SUCCESS)
 }
 
-fn run_survey(args: SurveyArgs) -> Result<ExitCode, String> {
+fn run_survey(args: SurveyArgs, out: &mut impl Write) -> Outcome {
     let language: Language = args
         .lang
         .parse()
         .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
     let report = survey::run(&args.path, language)?;
-    survey::print_report(&report);
+    survey::print_report(&report, out)?;
     if let Some(threshold) = args.threshold {
         if report
             .unhandled
@@ -230,17 +303,28 @@ fn run_survey(args: SurveyArgs) -> Result<ExitCode, String> {
     Ok(ExitCode::SUCCESS)
 }
 
-fn run_audit(args: AuditArgs) -> Result<ExitCode, String> {
+fn run_audit(args: AuditArgs, out: &mut impl Write) -> Outcome {
     let language: Language = args
         .lang
         .parse()
         .map_err(|e: verbalize::UnsupportedLanguage| e.to_string())?;
     let report = audit::run(&args.path, language)?;
-    audit::print_report(&report);
+    audit::print_report(&report, out)?;
     if let Some(threshold) = args.threshold {
         if report.suspicious().any(|e| e.composed as u64 >= threshold) {
             return Ok(ExitCode::FAILURE);
         }
     }
     Ok(ExitCode::SUCCESS)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn tsv_field_escapes_separators_and_the_escape_character() {
+        assert_eq!(tsv_field("plain"), "plain");
+        assert_eq!(tsv_field("a\tb\nc\rd\\e"), "a\\tb\\nc\\rd\\\\e");
+    }
 }

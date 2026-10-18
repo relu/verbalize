@@ -10,7 +10,8 @@
 # left verbatim (dominated by leading-zero runs, which read digit-by-digit by
 # design).
 #
-# With `--strict` any suspect token fails the run (a gate for a curated corpus).
+# With `--strict` any suspect token fails the run (a gate for a curated corpus),
+# and so does having no corpus to check at all.
 # Fetch first; this script does not use the network:
 #
 #   python3 tools/corpus/fetch.py --lang de --articles 2000
@@ -27,12 +28,14 @@ strict=0
 [ "${1:-}" = "--strict" ] && strict=1
 
 status=0
+checked=0
 for lang in de en ro; do
     dir="$here/.cache/$lang"
     if [ ! -d "$dir" ]; then
         echo "skip $lang: no corpus in $dir"
         continue
     fi
+    checked=$((checked + 1))
     echo "== $lang: audit"
     if [ "$strict" = 1 ]; then
         "${cli[@]}" audit --lang "$lang" --threshold 1 "$dir" || status=1
@@ -42,4 +45,8 @@ for lang in de en ro; do
     echo "== $lang: survey unhandled"
     "${cli[@]}" survey --lang "$lang" "$dir" | sed -n '/# unhandled/,$p'
 done
+if [ "$strict" = 1 ] && [ "$checked" = 0 ]; then
+    echo "check.sh: --strict, but no corpus to check; fetch one first (tools/corpus/README.md)" >&2
+    status=1
+fi
 exit $status

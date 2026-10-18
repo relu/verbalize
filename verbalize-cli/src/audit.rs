@@ -7,6 +7,7 @@
 //! is a word the corpus uses as prose, so the composition guess is suspect.
 
 use std::collections::HashMap;
+use std::io::{self, Write};
 
 use verbalize::token::{Token, Unit, UnitRef};
 use verbalize::{Language, Normalizer};
@@ -144,21 +145,27 @@ pub fn run(path: &str, language: Language) -> Result<Report, String> {
     Ok(Report { entries })
 }
 
-pub fn print_report(report: &Report) {
-    println!("# composed units that also occur as ordinary words");
-    println!("symbol\tcomposed\tas_word\texample");
+pub fn print_report(report: &Report, out: &mut impl Write) -> io::Result<()> {
+    writeln!(out, "# composed units that also occur as ordinary words")?;
+    writeln!(out, "symbol\tcomposed\tas_word\texample")?;
     for entry in report.suspicious() {
-        println!(
+        writeln!(
+            out,
             "{}\t{}\t{}\t{}",
             entry.symbol, entry.composed, entry.word, entry.example
-        );
+        )?;
     }
-    println!();
-    println!("# composed units, no ordinary-word use in this corpus");
-    println!("symbol\tcomposed\texample");
+    writeln!(out)?;
+    writeln!(out, "# composed units, no ordinary-word use in this corpus")?;
+    writeln!(out, "symbol\tcomposed\texample")?;
     for entry in report.entries.iter().filter(|e| e.word == 0) {
-        println!("{}\t{}\t{}", entry.symbol, entry.composed, entry.example);
+        writeln!(
+            out,
+            "{}\t{}\t{}",
+            entry.symbol, entry.composed, entry.example
+        )?;
     }
+    Ok(())
 }
 
 #[cfg(test)]

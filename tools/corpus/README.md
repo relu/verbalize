@@ -54,7 +54,8 @@ running prose next to the same words used normally.
 The `audit` list is a **triage**, not a verdict: a genuine unit appears in
 prose too (`kV`, `mGy`, `mmol/L`), so a hit needs a human eye — `Palacios MA`
 is an author initial, not megaampere. `check.sh --strict` turns any hit into
-a failure, for a curated corpus. Corpora are not vendored and CI has no
+a failure, for a curated corpus; with no corpus fetched at all it fails
+rather than pass having checked nothing. Corpora are not vendored and CI has no
 network, so this is a release-checklist step, not a CI job; see the
 "Releasing" section of the top-level README.
 
@@ -63,5 +64,13 @@ network, so this is a release-checklist step, not a CI job; see the
 A `pages-articles.xml.bz2` dump is wikitext, not plain text. Extract it
 (e.g. `wikiextractor`, `mwxml`) to one text file per article in a directory
 and pass that directory; `survey`/`audit` walk a directory tree and skip
-non-UTF-8 files. `sqlite:<path>` is also accepted — every `TEXT` column of
-every table is scanned.
+non-UTF-8 files. Symlinked directories inside the tree are not followed (a
+link to an ancestor would repeat its files); symlinked files are read like any
+other file. The path you pass is followed even if it is itself a symlink.
+
+`sqlite:<path>` is also accepted. The database is opened read-only, so a
+missing path is an error rather than a new empty file. Every column with TEXT
+affinity of every table is scanned — by SQLite's rule, any declared type
+containing `CHAR`, `CLOB` or `TEXT` and not `INT` (`VARCHAR(50)` counts).
+BLOB, NULL and non-UTF-8 values in those columns are skipped, and SQLite's own
+`sqlite_*` tables are left out.

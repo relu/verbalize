@@ -3,7 +3,7 @@
 //! `README.md`'s "## CLI" section.
 
 use std::fs;
-use std::io::Write;
+use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::process::{Command, Output, Stdio};
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -313,4 +313,247 @@ fn non_utf8_file_is_a_clean_error() {
     );
     assert!(stderr.contains("UTF-8"), "stderr: {stderr:?}");
     assert!(!stderr.contains("panicked"), "stderr: {stderr:?}");
+}
+
+/// Spawn `verbalize <args>`, feed it far more input than the output pipe can
+/// buffer, read a single line of output, then close the pipe like `| head -1`
+/// does. The child must stop quietly: the reader going away is not an error.
+fn assert_quiet_exit_when_reader_closes(args: &[&str], line: &'static str) {
+    let mut child = Command::new(bin())
+        .args(args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn verbalize");
+
+    let mut stdin = child.stdin.take().expect("child stdin");
+    let feeder = std::thread::spawn(move || {
+        let chunk = line.repeat(1000);
+        for _ in 0..40 {
+            // The child may exit before it has read everything.
+            if stdin.write_all(chunk.as_bytes()).is_err() {
+                break;
+            }
+        }
+    });
+
+    let mut first = String::new();
+    let mut stdout = BufReader::new(child.stdout.take().expect("child stdout"));
+    stdout.read_line(&mut first).expect("read first line");
+    assert!(!first.is_empty(), "no output before the pipe closed");
+    drop(stdout);
+
+    let output = child.wait_with_output().expect("wait for verbalize");
+    feeder.join().expect("feeder thread");
+    let stderr = stderr_str(&output);
+    assert!(!stderr.contains("panicked"), "stderr: {stderr:?}");
+    assert!(stderr.is_empty(), "stderr: {stderr:?}");
+    assert_eq!(output.status.code(), Some(0));
+}
+
+#[test]
+fn normalize_exits_quietly_when_stdout_closes() {
+    assert_quiet_exit_when_reader_closes(&["normalize", "--lang", "de"], "5 kg\n");
+}
+
+#[test]
+fn annotate_exits_quietly_when_stdout_closes() {
+    assert_quiet_exit_when_reader_closes(&["annotate", "--lang", "de"], "5 kg\n");
+}
+
+/// `sqlite:` input is read-only: a mistyped path is an error, and no empty
+/// database appears at that path (which would also make a CI gate pass).
+#[test]
+fn missing_sqlite_database_is_an_error_and_is_not_created() {
+    let missing = unique_path("missing_db");
+    let spec = format!("sqlite:{}", missing.to_str().expect("utf8 path"));
+    for command in ["survey", "audit"] {
+        let output = run_no_stdin(&[command, &spec, "--threshold", "1"]);
+        assert_eq!(output.status.code(), Some(1), "{command}");
+        assert!(stdout_str(&output).is_empty(), "{command}");
+        let stderr = stderr_str(&output);
+        assert!(stderr.starts_with("verbalize: opening "), "{stderr:?}");
+        assert!(stderr.contains("unable to open"), "{stderr:?}");
+        assert!(!missing.exists(), "{command} created {}", missing.display());
+    }
+}
+
+/// Columns are scanned by SQLite's type affinity, so `VARCHAR(50)` counts as
+/// text; a BLOB or NULL in a text column is skipped, not fatal; and a user
+/// table whose name merely resembles `sqlite_*` is still scanned.
+#[test]
+fn sqlite_scans_every_text_affinity_column_and_skips_other_values() {
+    let db = TempPath::file("db", "");
+    {
+        let conn = rusqlite::Connection::open(&db.path).expect("create db");
+        conn.execute_batch(
+            "CREATE TABLE notes (id INTEGER, body VARCHAR(50), raw TEXT, n INT);
+             INSERT INTO notes VALUES (1, 'Case 007 opened.', NULL, 5);
+             INSERT INTO notes VALUES (2, 'Case 007 closed.', x'ff00fe', 6);
+             CREATE TABLE sqlitex (t TEXT);
+             INSERT INTO sqlitex VALUES ('Case 007 reopened.');",
+        )
+        .expect("populate db");
+    }
+
+    let spec = format!("sqlite:{}", db.str());
+    let output = run_no_stdin(&["survey", &spec, "--lang", "en"]);
+    assert!(output.status.success(), "stderr: {}", stderr_str(&output));
+    let report = stdout_str(&output);
+    // The shape row of "007": two VARCHAR rows plus the `sqlitex` row.
+    let row = report
+        .lines()
+        .find(|l| l.split('\t').nth(2) == Some("007"))
+        .unwrap_or_else(|| panic!("no 007 shape row in {report:?}"));
+    assert_eq!(row.split('\t').nth(1), Some("3"), "{report:?}");
+}
+
+/// A directory link pointing at an ancestor must not multiply the files
+/// beneath it; a root given explicitly is followed even if it is a link.
+#[cfg(unix)]
+#[test]
+fn symlinked_directories_are_not_followed() {
+    let dir = TempPath::dir("loop");
+    let sub = dir.path.join("sub");
+    fs::create_dir(&sub).expect("create sub");
+    fs::write(sub.join("a.txt"), "Case 007 opened.").expect("write corpus file");
+    std::os::unix::fs::symlink("..", sub.join("up")).expect("create loop link");
+
+    let output = run_no_stdin(&["survey", dir.str(), "--lang", "en"]);
+    assert!(output.status.success());
+    let report = stdout_str(&output);
+    let row = report
+        .lines()
+        .find(|l| l.split('\t').nth(2) == Some("007"))
+        .unwrap_or_else(|| panic!("no 007 shape row in {report:?}"));
+    assert_eq!(row.split('\t').nth(1), Some("1"), "{report:?}");
+
+    let link_root = unique_path("loop_root");
+    std::os::unix::fs::symlink(&dir.path, &link_root).expect("create root link");
+    let output = run_no_stdin(&[
+        "survey",
+        link_root.to_str().expect("utf8 path"),
+        "--lang",
+        "en",
+    ]);
+    let _ = fs::remove_file(&link_root);
+    assert!(
+        stdout_str(&output).contains("007"),
+        "root link not followed"
+    );
+}
+
+/// Symlinked files hold no loop risk and are read like regular files.
+#[cfg(unix)]
+#[test]
+fn symlinked_files_are_read() {
+    let dir = TempPath::dir("filelink");
+    let outside = TempPath::file("filelink_target", "Case 007 opened.");
+    std::os::unix::fs::symlink(&outside.path, dir.path.join("link.txt")).expect("link");
+
+    let output = run_no_stdin(&["survey", dir.str(), "--lang", "en"]);
+    assert!(stdout_str(&output).contains("007"));
+}
+
+/// `annotate` TSV stays one record per line with five fields, however odd
+/// the span text is: `\`, tab, newline and CR are written as `\\`, `\t`,
+/// `\n`, `\r`.
+#[test]
+fn annotate_tsv_escapes_tabs_and_backslashes() {
+    let lexicon = TempPath::file("lexicon_escape", "foo\ta\tb\\c\n");
+    let output = run(
+        &["annotate", "--lang", "en", "--lexicon", lexicon.str()],
+        "foo\n",
+    );
+    assert!(output.status.success(), "stderr: {}", stderr_str(&output));
+    let stdout = stdout_str(&output);
+    let mut lines = stdout.lines();
+    let line = lines.next().expect("one record");
+    assert!(lines.next().is_none(), "{stdout:?}");
+    let fields: Vec<&str> = line.split('\t').collect();
+    assert_eq!(fields.len(), 5, "{line:?}");
+    assert_eq!(fields[2], "foo");
+    assert_eq!(fields[3], "a\\tb\\\\c");
+}
+
+/// A `--region` for another language than `--lang` is an error, not a silent
+/// no-op; a region of the same language still works, with or without a
+/// region subtag on `--lang`.
+#[test]
+fn region_must_match_language() {
+    let mismatch = run(&["normalize", "--lang", "de", "--region", "en-GB"], "5 kg");
+    assert_eq!(mismatch.status.code(), Some(1));
+    assert!(stdout_str(&mismatch).is_empty());
+    let stderr = stderr_str(&mismatch);
+    assert!(stderr.starts_with("verbalize: "), "{stderr:?}");
+    assert!(stderr.contains("en-GB"), "{stderr:?}");
+
+    for args in [
+        ["normalize", "--lang", "de", "--region", "de-CH"],
+        ["normalize", "--lang", "de-AT", "--region", "de_ch"],
+    ] {
+        let ok = run(&args, "5 kg");
+        assert!(ok.status.success(), "{args:?}: {}", stderr_str(&ok));
+    }
+}
+
+/// With `--strict` a missing corpus is a failure: otherwise a release check
+/// run before fetching anything would pass having checked nothing. The script
+/// is copied into a scratch tree so the repository's own `.cache` is not read.
+#[cfg(unix)]
+#[test]
+fn corpus_check_strict_fails_without_a_corpus() {
+    let tree = TempPath::dir("check_sh");
+    let here = tree.path.join("tools").join("corpus");
+    fs::create_dir_all(&here).expect("create script dir");
+    let script = here.join("check.sh");
+    fs::write(&script, include_str!("../../tools/corpus/check.sh")).expect("write script");
+
+    let strict = Command::new("bash")
+        .arg(&script)
+        .arg("--strict")
+        .output()
+        .expect("run check.sh");
+    assert!(!strict.status.success());
+    assert!(
+        stderr_str(&strict).contains("no corpus"),
+        "stderr: {:?}",
+        stderr_str(&strict)
+    );
+
+    let lenient = Command::new("bash")
+        .arg(&script)
+        .output()
+        .expect("run check.sh");
+    assert!(lenient.status.success());
+}
+
+/// Any other write failure is reported, with a non-zero exit, not swallowed
+/// like a closed pipe. `/dev/full` fails every write with ENOSPC.
+#[cfg(target_os = "linux")]
+#[test]
+fn write_errors_other_than_a_closed_pipe_fail_the_run() {
+    let full = fs::OpenOptions::new()
+        .write(true)
+        .open("/dev/full")
+        .expect("open /dev/full");
+    let output = Command::new(bin())
+        .args(["normalize", "--lang", "en"])
+        .stdin(Stdio::piped())
+        .stdout(full)
+        .stderr(Stdio::piped())
+        .spawn()
+        .and_then(|mut child| {
+            child.stdin.take().expect("stdin").write_all(b"5 kg")?;
+            child.wait_with_output()
+        })
+        .expect("run verbalize");
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = stderr_str(&output);
+    assert!(
+        stderr.starts_with("verbalize: writing output: "),
+        "{stderr:?}"
+    );
+    assert!(!stderr.contains("panicked"), "{stderr:?}");
 }

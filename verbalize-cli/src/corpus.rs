@@ -40,6 +40,10 @@ pub(crate) fn covered(spans: &[Span], cursor: &mut usize, start: usize, end: usi
 /// Every text of `path` — a file, a directory tree, or `sqlite:<path>` —
 /// in turn. Non-UTF-8/binary files are silently skipped: this is a text
 /// corpus tool.
+///
+/// A directory tree is walked without following symlinked directories, so a
+/// link back to an ancestor cannot repeat files; symlinked files are read.
+/// `path` itself may be a symlink.
 pub(crate) fn for_each_text(path: &str, f: &mut dyn FnMut(&str)) -> Result<(), String> {
     if let Some(db_path) = path.strip_prefix("sqlite:") {
         each_sqlite(db_path, f)
@@ -60,7 +64,12 @@ fn each_dir(dir: &Path, f: &mut dyn FnMut(&str)) -> Result<(), String> {
     for entry in entries {
         let entry = entry.map_err(|e| format!("reading {}: {e}", dir.display()))?;
         let path = entry.path();
-        if path.is_dir() {
+        let file_type = entry
+            .file_type()
+            .map_err(|e| format!("reading {}: {e}", path.display()))?;
+        // `file_type` does not resolve links: a link to a directory is not a
+        // directory here, and reading it as a file fails and is skipped.
+        if file_type.is_dir() {
             each_dir(&path, f)?;
         } else if let Ok(text) = fs::read_to_string(&path) {
             f(&text);
@@ -69,11 +78,32 @@ fn each_dir(dir: &Path, f: &mut dyn FnMut(&str)) -> Result<(), String> {
     Ok(())
 }
 
+/// Whether a column declared as `declared_type` has SQLite TEXT affinity
+/// (https://www.sqlite.org/datatype3.html#determination_of_column_affinity):
+/// an `INT` in the name makes it INTEGER before `CHAR`/`CLOB`/`TEXT` is
+/// considered.
+fn has_text_affinity(declared_type: &str) -> bool {
+    let declared = declared_type.to_ascii_uppercase();
+    !declared.contains("INT")
+        && ["CHAR", "CLOB", "TEXT"]
+            .iter()
+            .any(|marker| declared.contains(marker))
+}
+
 fn each_sqlite(path: &str, f: &mut dyn FnMut(&str)) -> Result<(), String> {
-    let conn = rusqlite::Connection::open(path).map_err(|e| format!("opening {path}: {e}"))?;
+    // Read-only, and without SQLITE_OPEN_CREATE: a mistyped path must fail
+    // instead of silently producing an empty database.
+    let conn = rusqlite::Connection::open_with_flags(
+        path,
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
+    )
+    .map_err(|e| format!("opening {path}: {e}"))?;
 
     let mut tables_stmt = conn
-        .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
+        .prepare(
+            "SELECT name FROM sqlite_master \
+             WHERE type = 'table' AND name NOT LIKE 'sqlite\\_%' ESCAPE '\\'",
+        )
         .map_err(|e| e.to_string())?;
     let tables: Vec<String> = tables_stmt
         .query_map([], |row| row.get::<_, String>(0))
@@ -95,7 +125,7 @@ fn each_sqlite(path: &str, f: &mut dyn FnMut(&str)) -> Result<(), String> {
             .collect::<Result<Vec<_>, _>>()
             .map_err(|e| e.to_string())?
             .into_iter()
-            .filter(|(_, ty)| ty.to_ascii_uppercase().contains("TEXT"))
+            .filter(|(_, ty)| has_text_affinity(ty))
             .map(|(name, _)| name)
             .collect();
         drop(cols_stmt);
@@ -107,12 +137,14 @@ fn each_sqlite(path: &str, f: &mut dyn FnMut(&str)) -> Result<(), String> {
                 table.replace('"', "\"\"")
             );
             let mut stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
-            let rows = stmt
-                .query_map([], |row| row.get::<_, Option<String>>(0))
-                .map_err(|e| e.to_string())?;
-            for value in rows {
-                if let Some(text) = value.map_err(|e| e.to_string())? {
-                    f(&text);
+            let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
+            while let Some(row) = rows.next().map_err(|e| e.to_string())? {
+                // A text-affinity column can still hold a BLOB or NULL, and
+                // text that is not UTF-8: none of those are corpus text.
+                if let Ok(rusqlite::types::ValueRef::Text(bytes)) = row.get_ref(0) {
+                    if let Ok(text) = std::str::from_utf8(bytes) {
+                        f(text);
+                    }
                 }
             }
         }
@@ -131,6 +163,27 @@ mod tests {
             token: Token::Cardinal(Numeral::int(1)),
             spoken: String::new(),
             fallback: false,
+        }
+    }
+
+    #[test]
+    fn text_affinity_follows_sqlites_declared_type_rules() {
+        for text in [
+            "TEXT",
+            "VARCHAR(50)",
+            "character(20)",
+            "NCHAR(55)",
+            "CLOB",
+            "STRING TEXT",
+        ] {
+            assert!(has_text_affinity(text), "{text}");
+        }
+        // `INT` wins over `CHAR`; no `TEXT` marker, or no declared type, is
+        // not text.
+        for other in [
+            "", "INTEGER", "BIGINT", "POINT", "CHARINT", "BLOB", "REAL", "NUMERIC", "DATETIME",
+        ] {
+            assert!(!has_text_affinity(other), "{other:?}");
         }
     }
 
