@@ -54,12 +54,25 @@ fn data_dir() -> PathBuf {
 
 /// Downloads the CLDR files listed in `gen::lang_files` for every supported
 /// language plus the upstream LICENSE into `xtask/cldr/`, replacing whatever
-/// was there, and records the tag in `xtask/cldr.lock`.
+/// was there, and records the tag in `xtask/cldr.lock`. The download lands in
+/// a sibling directory first, so a failed download leaves the vendored data
+/// as it was.
 fn update(tag: &str) -> gen::Result<()> {
     let dir = cldr_dir();
-    if dir.exists() {
-        fs::remove_dir_all(&dir)?;
+    let staging = dir.with_extension("new");
+    // An interrupted run may have left a staging directory behind.
+    let _ = fs::remove_dir_all(&staging);
+    let staged = download(tag, &staging).and_then(|()| swap_dir(&staging, &dir));
+    if staged.is_err() {
+        let _ = fs::remove_dir_all(&staging);
     }
+    staged?;
+    fs::write(lock_path(), format!("{tag}\n"))?;
+    println!("pinned cldr-json {tag} in xtask/cldr.lock");
+    Ok(())
+}
+
+fn download(tag: &str, dir: &Path) -> gen::Result<()> {
     let mut files: Vec<String> = gen::LANGUAGES
         .iter()
         .flat_map(|l| gen::lang_files(l))
@@ -71,8 +84,28 @@ fn update(tag: &str) -> gen::Result<()> {
     }
     fetch(&format!("{RAW}/{tag}/LICENSE"), &dir.join("LICENSE"))?;
     println!("fetched LICENSE");
-    fs::write(lock_path(), format!("{tag}\n"))?;
-    println!("pinned cldr-json {tag} in xtask/cldr.lock");
+    Ok(())
+}
+
+/// Puts `new` in place of `live`. A non-empty directory cannot be replaced by
+/// `rename` in one step, so the old one is moved aside and put back if the
+/// second rename fails.
+fn swap_dir(new: &Path, live: &Path) -> gen::Result<()> {
+    let old = live.with_extension("old");
+    let _ = fs::remove_dir_all(&old);
+    let had_live = live.exists();
+    if had_live {
+        fs::rename(live, &old)?;
+    }
+    if let Err(e) = fs::rename(new, live) {
+        if had_live {
+            let _ = fs::rename(&old, live);
+        }
+        return Err(e.into());
+    }
+    if had_live {
+        fs::remove_dir_all(&old)?;
+    }
     Ok(())
 }
 

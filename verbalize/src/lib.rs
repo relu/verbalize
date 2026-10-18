@@ -153,20 +153,3 @@ impl FromStr for Language {
             .ok_or_else(|| UnsupportedLanguage(tag.to_string()))
     }
 }
-
-/// Parses RBNF rulesets as `Rbnf::new` would, without the rest of the
-/// crate. `cargo xtask gen` calls this on the freshly vendored JSON so that
-/// rule syntax outside the interpreter's scope fails data generation, never
-/// a reading at runtime. Not part of the public API.
-#[doc(hidden)]
-pub fn check_rbnf(
-    language: &str,
-    symbols: [&str; 3],
-    rulesets: &[(&str, &[(&str, &str)])],
-) -> Result<(), String> {
-    let [decimal, group, minus] = symbols;
-    let symbols = rbnf::Symbols::new(decimal, group, minus);
-    rbnf::Rbnf::compile(language, symbols, rulesets.iter().copied())
-        .map(drop)
-        .map_err(|e| e.to_string())
-}

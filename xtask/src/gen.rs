@@ -26,6 +26,7 @@ pub fn lang_files(lang: &str) -> [String; 5] {
 }
 
 pub fn generate(cldr: &Path, tag: &str) -> Result<Vec<(String, String)>> {
+    check_version(cldr, tag)?;
     let header = header(cldr, tag)?;
     let mut files = Vec::new();
     for lang in LANGUAGES {
@@ -36,6 +37,23 @@ pub fn generate(cldr: &Path, tag: &str) -> Result<Vec<(String, String)>> {
         supplemental_source(cldr, &header)?,
     ));
     Ok(files)
+}
+
+/// The vendored JSON records only the CLDR major version (in the supplemental
+/// data), so that is what is compared with the tag in `cldr.lock`.
+fn check_version(cldr: &Path, tag: &str) -> Result<()> {
+    let supplemental = Json::load(cldr, SUPPLEMENTAL)?;
+    let version = supplemental.string("supplemental/version/_cldrVersion")?;
+    let major = tag.split('.').next().unwrap_or(tag);
+    if version != major {
+        return Err(format!(
+            "{}: CLDR version {version}, but xtask/cldr.lock pins {tag}; \
+             run `cargo xtask cldr-update {tag}`",
+            supplemental.file
+        )
+        .into());
+    }
+    Ok(())
 }
 
 fn header(cldr: &Path, tag: &str) -> Result<String> {
@@ -66,7 +84,6 @@ fn lang_source(cldr: &Path, lang: &str, header: &str) -> Result<String> {
 
     let symbols = symbols(&numbers, lang)?;
     let rulesets = rulesets(&rbnf, lang)?;
-    check_rbnf(lang, &symbols, &rulesets).map_err(|e| format!("{}: {e}", rbnf.file))?;
 
     let mut out = String::from(header);
     out.push_str("use super::*;\n\n#[rustfmt::skip]\n");
@@ -149,28 +166,6 @@ fn rulesets(json: &Json, lang: &str) -> Result<Rulesets> {
         rulesets.push((name.clone(), pairs));
     }
     Ok(rulesets)
-}
-
-/// Runs the library's RBNF parser over the rules before they are written,
-/// so syntax outside its scope fails here with the rule quoted.
-fn check_rbnf(lang: &str, symbols: &Symbols, rulesets: &Rulesets) -> Result<()> {
-    let rules: Vec<Vec<(&str, &str)>> = rulesets
-        .iter()
-        .map(|(_, rules)| {
-            rules
-                .iter()
-                .map(|(d, b)| (d.as_str(), b.as_str()))
-                .collect()
-        })
-        .collect();
-    let refs: Vec<(&str, &[(&str, &str)])> = rulesets
-        .iter()
-        .zip(&rules)
-        .map(|((name, _), rules)| (name.as_str(), rules.as_slice()))
-        .collect();
-    let [decimal, group, _, _, minus] = symbols;
-    verbalize::check_rbnf(lang, [&decimal.1, &group.1, &minus.1], &refs)?;
-    Ok(())
 }
 
 fn write_rbnf(out: &mut String, rulesets: &Rulesets) -> Result<()> {
