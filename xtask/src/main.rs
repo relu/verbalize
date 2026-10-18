@@ -190,9 +190,13 @@ mod tests {
         fs::write(locked.join("a.txt"), "old").unwrap();
         fs::set_permissions(&locked, fs::Permissions::from_mode(0o555)).unwrap();
 
-        // Root ignores the permission bits, so the removal would succeed.
-        let enforced = fs::write(locked.join("probe"), "").is_err();
-        let swapped = enforced.then(|| swap_dir(&new, &live));
+        // Root ignores the permission bits, so the removal cannot be made to fail.
+        if fs::write(locked.join("probe"), "").is_ok() {
+            let _ = fs::remove_dir_all(&tmp);
+            eprintln!("skipped: permission bits are not enforced for this user");
+            return;
+        }
+        let swapped = swap_dir(&new, &live);
 
         fs::set_permissions(&locked, fs::Permissions::from_mode(0o755)).ok();
         let old = live.with_extension("old");
@@ -200,9 +204,7 @@ mod tests {
         let new_data = fs::read_to_string(live.join("b.txt")).ok();
         let _ = fs::remove_dir_all(&tmp);
 
-        if let Some(swapped) = swapped {
-            swapped.unwrap();
-            assert_eq!(new_data.as_deref(), Some("new"));
-        }
+        swapped.unwrap();
+        assert_eq!(new_data.as_deref(), Some("new"));
     }
 }
