@@ -79,6 +79,8 @@ cargo install verbalize-cli          # from crates.io; installs the `verbalize` 
 cargo install --path verbalize-cli   # from a checkout
 ```
 
+Building from source needs Rust 1.88 or newer.
+
 Prebuilt binaries for Linux (x86_64, aarch64), macOS (x86_64, aarch64) and
 Windows (x86_64) ship with every [GitHub release](https://github.com/relu/verbalize/releases),
 with shell/PowerShell installers.

@@ -5,6 +5,7 @@ description = "Command-line front end for verbalize: normalize, annotate, survey
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+rust-version.workspace = true
 keywords = ["tts", "text-normalization", "speech", "cldr", "rbnf"]
 categories = ["text-processing", "localization", "command-line-utilities"]
 readme = "../README.md"

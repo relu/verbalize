@@ -5,6 +5,7 @@ description = "Text normalisation for speech synthesis: numbers, dates, prices a
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
+rust-version.workspace = true
 keywords = ["tts", "text-normalization", "speech", "cldr", "rbnf"]
 categories = ["text-processing", "localization"]
 readme = "../README.md"
