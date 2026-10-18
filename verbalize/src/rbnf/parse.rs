@@ -410,7 +410,7 @@ impl Ctx<'_> {
                         "decimal-format patterns are only supported in =…=",
                     ));
                 }
-                Target::Decimal(DecimalPattern::parse(inner).map_err(&unsupported)?)
+                Target::Decimal(DecimalPattern::parse(inner).map_err(unsupported)?)
             }
             Some(_) => return Err(unsupported("unknown substitution")),
         };
