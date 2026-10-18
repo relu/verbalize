@@ -196,7 +196,7 @@ impl English {
         // Table for 2–12, 100, 1000; otherwise the ordinal ("thirty-seconds").
         let derived;
         let name = match TABLES.fractions.iter().find(|(d, _, _)| *d == denominator) {
-            Some((_, s, p)) if numerator == 1 => *s,
+            Some((_, s, _)) if numerator == 1 => *s,
             Some((_, _, p)) => *p,
             None => {
                 derived =
