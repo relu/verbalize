@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-18
+
 ### Added
 
 - Minimum supported Rust version declared: `rust-version = "1.88"` (set
@@ -46,7 +48,7 @@ All notable changes to this project are documented here. The format follows
 - A degree value or dose scheme followed by a non-breaking or other
   multi-byte space and a letter (`270°` + U+00A0 + `Nord`, `1-0-1` +
   U+00A0 + `mg`) panicked. A chemical count beyond `u32`
-  (`H5000000000O`) panicked in debug builds; it now stays as written.
+  (`H5000000000O`, `H₅₀₀₀₀₀₀₀₀₀O`) panicked in debug builds.
   `de`/`en`/`ro`.
 - Text after a reading is kept intact: `Es hat 20° in Berlin` was
   "zwanzig Gradin Berlin", `1,5 × 10³ Zellen` was "… hoch dreiZellen";
