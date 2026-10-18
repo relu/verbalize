@@ -46,10 +46,10 @@ impl Normalizer {
     }
 
     /// Spoken form of `text`. Never fails; unrecognised input is returned
-    /// verbatim. Idempotent — `normalize(normalize(t)) == normalize(t)` —
-    /// except when a URL's last path word and the sentence period after it
-    /// form an abbreviation: `qq www.example.com/Nr.` reads
-    /// `… Schrägstrich Nr.`, which a second pass reads as `… Nummer`.
+    /// verbatim. Idempotent on every fixture input, but not on every
+    /// string: a reading can expose a token that the first pass saw only
+    /// glued into a larger one (`½.com` → `ein halb.com` → `ein halb Punkt
+    /// com`; `www.example.com/Nr.` → `… Schrägstrich Nr.` → `… Nummer`).
     pub fn normalize(&self, text: &str) -> String {
         pipeline::render(text, &self.annotate(text))
     }

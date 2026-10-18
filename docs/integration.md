@@ -108,15 +108,19 @@ regression fails the build the same way a broken test would.
 
 ## Idempotence
 
-`normalize(normalize(t)) == normalize(t)` holds, enforced by a property
-test over every fixture input and over random digit-rich and arbitrary
-Unicode strings (`cargo test -p verbalize --test fixtures`). The output
-never contains an ASCII digit or a classified symbol, so normalising
-twice — for example locally and again before a remote fallback — is a
-no-op, with one exception: a URL whose last path word and the sentence
-period after it form an abbreviation. `qq www.example.com/Nr.` becomes
-`qq www Punkt example Punkt com Schrägstrich Nr.`, and a second pass reads
-the now-plain `Nr.` as `Nummer`.
+`normalize(normalize(t)) == normalize(t)` holds for every fixture input
+and for the random digit-rich strings of the property tests
+(`cargo test -p verbalize --test fixtures`): the output contains no ASCII
+digit, so a second pass — for example locally and again before a remote
+fallback — finds no number left to read.
+
+It does not hold for every string. A reading can expose a token that the
+first pass saw only glued into a larger one, and the second pass reads it:
+`www.example.com/Nr.` becomes `… Schrägstrich Nr.`, which a second pass
+reads as `… Nummer`; `½.com` becomes `ein halb.com`, then `ein halb Punkt
+com`. Over 900,000 random strings built from digits, symbols, URL parts
+and abbreviations glued together, about 1.4% changed on a second pass, so
+normalise once when the input can contain such text.
 
 ## Performance
 

@@ -6,6 +6,83 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Minimum supported Rust version declared: `rust-version = "1.88"` (set
+  by the `icu_*` 2.3 dependencies), checked by an `msrv` CI job.
+- Tests: every fixture is also read inside a sentence (a word, a line
+  break, parentheses, a comma or a period around it) and must leave the
+  surrounding text byte-for-byte intact; spans may not start or end with
+  whitespace or cross a line break; the random-input tests include
+  non-breaking and other Unicode spaces.
+
+### Changed
+
+- **Breaking:** `Language` is `#[non_exhaustive]`; a downstream `match`
+  needs a wildcard arm, so adding a language is no longer breaking.
+- **Breaking:** the generated CLDR tables (`verbalize::data`) are no
+  longer public, and the doc-hidden `check_rbnf` is removed.
+- `Options` and `Agreement` are documented as struct literals built with
+  `..Default::default()`, since a 0.x minor release may add fields.
+- Idempotence is no longer promised for every string: a reading can
+  expose a token the first pass saw only glued into a larger one
+  (`www.example.com/Nr.` → `… Nr.` → `… Nummer`). It holds for every
+  fixture input and the random digit-rich strings of the property tests.
+- Release workflow: the GitHub release is created only after `cargo
+  publish` succeeds, so a failed publish no longer leaves a release for a
+  version that is not on crates.io; re-running the job skips crates
+  already published. Every action in `release.yml` is pinned to a commit
+  SHA.
+- `cargo xtask cldr-update` swaps the new data in only after every file
+  downloaded, so a failed download no longer deletes `xtask/cldr`;
+  `gen`/`check-data` fail when the vendored CLDR version differs from
+  `xtask/cldr.lock`. `xtask` no longer depends on `verbalize`.
+- `tools/icu-diff` compares negative values too, fails when ICU's public
+  rulesets differ from the shipped ones or a ruleset gets no comparisons,
+  reports comparisons made, and pins `PyICU==2.16.2`.
+
+### Fixed
+
+- A degree value or dose scheme followed by a non-breaking or other
+  multi-byte space and a letter (`270°` + U+00A0 + `Nord`, `1-0-1` +
+  U+00A0 + `mg`) panicked. A chemical count beyond `u32`
+  (`H5000000000O`) panicked in debug builds; it now stays as written.
+  `de`/`en`/`ro`.
+- Text after a reading is kept intact: `Es hat 20° in Berlin` was
+  "zwanzig Gradin Berlin", `1,5 × 10³ Zellen` was "… hoch dreiZellen";
+  numbers, units and signs are never joined across a line break, so
+  `Pagina 21` at the end of a line no longer takes "de" from the next
+  line, and a phone number keeps the parentheses around it.
+  `de`/`en`/`ro`.
+- A unit after a comparison sign or scale word is read when more text
+  follows (`≤10 mg pro Tag` → "kleiner oder gleich zehn Milligramm pro
+  Tag"), and `2x.`, `3-mal,`, `∞.`, `30 €/Monat.` are read before
+  punctuation. `(§)` is "(Paragraf)" with no stray space. `de`/`en`/`ro`.
+- Negative amounts with a scale word or three or more decimals said
+  "minus" twice (`-2,5 Mrd. €`, `USD -5.125`); `-1 Mio.` / `-1 mil.`
+  take the singular scale word. `de`/`en`/`ro`.
+- German: `um 1 Uhr` is "um ein Uhr" (was "eins Uhr"); `N.` before a
+  lower-case word is an ordinal (`der 3. große Sieg` → "der dritte große
+  Sieg"). An angle of one minute or degree is singular (`30°1'` →
+  "dreißig Grad eine Minute", "one minute"). `de`/`en`.
+- Romanian: `1 ¼` is "unu și un sfert" (was "unu și sfert"); `al II-lea5`
+  reads the ordinal and the number as separate words. `ro`.
+- Plural forms and ordinal suffixes of numbers above 2⁶⁴ follow the full
+  value instead of one clamped to `u64::MAX`. `en`/`ro`.
+- CLI: piping into a command that exits early (`… | head -1`) no longer
+  panics; a failing `--threshold` still exits 1. `sqlite:` paths open
+  read-only, so a mistyped path is an error instead of an empty, passing
+  database; columns are chosen by SQLite's TEXT affinity (`VARCHAR`),
+  BLOB/NULL values are skipped, and tables like `sqlitex` are scanned.
+  Symlinked directories are not followed (no loops). `annotate` escapes
+  tab, newline, carriage return and backslash in its TSV output.
+  `--region` must belong to `--lang`.
+- `tools/corpus/check.sh --strict` fails when no corpus (or only an empty
+  directory) is present instead of passing having checked nothing.
+- Docs: `Normalizer::with_options` no longer says English and Romanian
+  return the input verbatim; the README `normalize` example passes
+  `--lang de`.
+
 ## [0.1.5] - 2026-09-20
 
 ### Added

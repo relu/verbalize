@@ -22,9 +22,9 @@ assert_eq!(
 
 | Language | Status | Example |
 |---|---|---|
-| German (`de`) | Complete: every class below, case/gender agreement, 545 fixture lines, `docs/rules/de.md` | `Am 1. November kostet es 8,80 €.` → `Am ersten November kostet es acht Euro achtzig.` |
-| English (`en`) | Complete: every class, `Options::region` `EnUs` (default) / `EnGb` for date order, 383 fixture lines, `docs/rules/en.md` | `On November 1, 2026 I paid $8.80 at 2:30 pm.` → `On November first, twenty twenty-six I paid eight dollars and eighty cents at two thirty p m.` |
-| Romanian (`ro`) | Complete: every class, gender agreement and the "de" construction, 344 fixture lines, `docs/rules/ro.md` | `Pe 1 noiembrie 2026 am plătit 20 de lei la ora 14:30.` → `Pe întâi noiembrie două mii douăzeci și șase am plătit douăzeci de lei la paisprezece și treizeci.` |
+| German (`de`) | Complete: every class below, case/gender agreement, 635 fixture lines, `docs/rules/de.md` | `Am 1. November kostet es 8,80 €.` → `Am ersten November kostet es acht Euro achtzig.` |
+| English (`en`) | Complete: every class, `Options::region` `EnUs` (default) / `EnGb` for date order, 438 fixture lines, `docs/rules/en.md` | `On November 1, 2026 I paid $8.80 at 2:30 pm.` → `On November first, twenty twenty-six I paid eight dollars and eighty cents at two thirty p m.` |
+| Romanian (`ro`) | Complete: every class, gender agreement and the "de" construction, 400 fixture lines, `docs/rules/ro.md` | `Pe 1 noiembrie 2026 am plătit 20 de lei la ora 14:30.` → `Pe întâi noiembrie două mii douăzeci și șase am plătit douăzeci de lei la paisprezece și treizeci.` |
 
 The three modules share one core (`verbalize/src/lang/common.rs`): the
 language-neutral recognisers, the CLDR unit resolver and the number
@@ -157,19 +157,27 @@ cargo xtask check-data          # CI guard: fails if generated data is stale
 - **Golden fixtures** — `verbalize/tests/fixtures/de/<class>.tsv`
   (`input<TAB>expected`), one file per semiotic class plus `mixed.tsv` for
   interactions; run with `cargo test -p verbalize --test fixtures`.
-- **Property tests** — idempotence (`normalize(normalize(t)) == normalize(t)`)
-  and "output contains no ASCII digits", over every fixture input and over
-  random digit-rich strings.
+- **Context invariance** — every fixture is also read inside a sentence
+  (a word, a line break, parentheses, a comma or a period around it): the
+  surrounding text must survive byte-for-byte and the reading must not
+  change.
+- **Property tests** — idempotence (`normalize(normalize(t)) == normalize(t)`),
+  "output contains no ASCII digits", and span shape (no span starts or ends
+  with whitespace or crosses a line break), over every fixture input and
+  over random digit-rich strings that include non-ASCII spaces and other
+  characters of text pasted from Word or PDF.
 - **`tools/icu-diff`** — differential test of the RBNF interpreter against
-  ICU4C via PyICU: spells 0–1,000,000 (strided), powers of ten to 10¹⁸, and
-  10,000 random values for every vendored locale and public ruleset. Any
-  mismatch is a failure; see `tools/icu-diff/README.md`.
+  ICU4C via PyICU: spells 0–1,000,000 (strided), powers of ten to 10¹⁸,
+  negative values, and 10,000 random values for every vendored locale and
+  public ruleset, and fails if ICU's public rulesets differ from the shipped
+  ones. Any mismatch is a failure; see `tools/icu-diff/README.md`.
 
 ## Releasing
 
 Releases are cut by [cargo-dist](https://opensource.axo.dev/cargo-dist/)
-from `.github/workflows/release.yml` (generated; edit
-`dist-workspace.toml` and re-run `dist generate`, never the YAML). Both
+from `.github/workflows/release.yml` (generated: edit `dist-workspace.toml`,
+never the YAML, and regenerate with `dist generate` after temporarily
+removing its `allow-dirty` line — see the comment there). Both
 crates share one version and one tag.
 
 1. Bump `version` in `verbalize/Cargo.toml` and `verbalize-cli/Cargo.toml`
