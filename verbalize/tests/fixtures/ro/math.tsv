@@ -17,3 +17,7 @@ x ≠ 0	x diferit de zero
 a = b	a = b
 # negative: unspaced hyphen is a Range
 3-5	trei până la cinci
+# a unit after a comparison is the first token that resolves, not the rest of the text
+Doza ≤10 mg pe zi.	Doza mai mic sau egal cu zece miligrame pe zi.
+# the period rule is for single-letter variables, not for infinity
+∞.	infinit.

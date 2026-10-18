@@ -373,7 +373,7 @@ impl Units {
     /// are not (CLDR operands `v`/`f` count the visible fraction digits).
     pub(crate) fn category(&self, n: &Numeral) -> PluralCategory {
         if n.fraction.is_empty() {
-            let operands = PluralOperands::from(u64::try_from(n.integer).unwrap_or(u64::MAX));
+            let operands = PluralOperands::from(n.integer);
             return self.plural.category_for(operands);
         }
         let written = format!("{}.{}", n.integer, n.fraction);

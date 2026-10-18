@@ -33,3 +33,6 @@ Sunt 20 și 30.	Sunt douăzeci și treizeci.
 20 mii de locuitori	douăzeci de mii de locuitori
 3 milioane locuitori	trei milioane de locuitori
 3 milioane km	trei milioane de kilometri
+# negative scaled count: the sign is spoken once, singular/plural follow the magnitude
+-1 milion locuitori	minus un milion de locuitori
+-3 milioane locuitori	minus trei milioane de locuitori

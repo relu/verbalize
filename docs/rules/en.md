@@ -13,7 +13,7 @@ sources: CLDR en RBNF (`%spellout-numbering`, `%spellout-numbering-year`,
 `%spellout-ordinal`), CLDR en `units.json` and `currencies.json`.
 
 Regional variants (`Options::region`): `EnUs` is the default; `EnGb`
-changes numeric and ISO date order (§Date). Nothing else differs in v1.
+changes numeric and ISO date order (§Date). Nothing else differs between regions.
 
 ## Cardinal
 
@@ -99,7 +99,12 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
   amount and currency: `$2.5 billion` → "two point five billion dollars",
   `3 million euros` → "three million euros". No currency → a `Scaled`
   span ("five thousand" in `5 thousand people`).
-- **Source**: CLDR en `currencies.json`; ISO 4217 minor units.
+- **Negative amounts**: a leading `-` is spoken once, in front of the whole
+  reading, whichever shape it takes: `-12.50 USD` → "minus twelve dollars
+  and fifty cents", `-2.5 billion dollars` → "minus two point five
+  billion dollars", `-5.125 USD` → "minus five point one two five dollars".
+- **Source**: CLDR en `currencies.json` (display names by plural
+  category); a hand table for the minor-unit names (ISO 4217 conventions).
 
 ## Percent, permille
 
@@ -183,7 +188,9 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
 - **Written**: numeric `M/D/YYYY` (en-US) or `D/M/YYYY` (en-GB); ISO
   `YYYY-MM-DD`, `YYYY/M/D` (year first is unambiguous in either region)
   and year-month `YYYY-MM` (`2003-03`, zero-padded month 01–12); `Month D[st]`, `Month D, YYYY`, `Mon. D`; `D[st] [of]
-  Month [YYYY]`.
+  Month [YYYY]`. The period after a month belongs to the date only when
+  the month is abbreviated (`Nov. 5`); `1st of November.` keeps its
+  sentence period.
 - **Spoken**: month name plus ordinal day. Numeric and ISO forms follow
   the region: en-US "November first twenty twenty-six", en-GB "the first
   of November twenty twenty-six". Month-name forms keep their written
@@ -214,7 +221,9 @@ changes numeric and ISO date order (§Date). Nothing else differs in v1.
   followed by separated blocks (`+1 (555) 123-4567`, `(555) 123-4567`,
   `555.123.4567`), or a leading-zero block (`020 7946 0958`); at least
   seven digits in two or more blocks (`555-1234` is a local number,
-  `555-123` is a Range).
+  `555-123` is a Range). Parentheses belong to the number only as a
+  matched pair around a block; the brackets around a whole number
+  (`Call us (555-123-4567) today.`) stay outside.
 - **Spoken**: digit by digit, blocks separated by a pause comma, `+` →
   "plus". **Choice**: `0` reads "zero", not "oh" — unambiguous, and
   consistent with Long digit run.
@@ -343,6 +352,8 @@ readings the engine already produces).
 
 - `30°15′` "thirty degrees fifteen minutes", `52.52° N` "fifty-two point
   five two degrees north"; compass letters N/E/S/W.
+  A minute or second of value 1 is singular (`30°1′` "thirty degrees one
+  minute"), by the CLDR plural category.
 
 ## Rendering — as in German
 

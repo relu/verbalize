@@ -30,3 +30,11 @@
 350 ccm	trei sute cincizeci de centimetri cubi
 # negative: `din` is a preposition, not `d` + `in` (deci-inch)
 1 din 10	unu din zece
+# a scale word keeps its unit when more text follows
+Zboară cu 3 milioane km/h azi.	Zboară cu trei milioane de kilometri pe oră azi.
+# a line or paragraph separator between number and unit joins nothing
+5 mg	cinci mg
+5mg	cincimg
+5 %	cinci %
+# a count beyond u64 still picks its plural from the full value (35 is "other", so "de")
+18446744073709551635 kg	unu opt patru patru șase șapte patru patru zero șapte trei șapte zero nouă cinci cinci unu șase trei cinci de kilograme

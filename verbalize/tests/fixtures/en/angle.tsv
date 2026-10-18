@@ -10,3 +10,7 @@
 20 °C	twenty degrees Celsius
 # negative: a compass letter with no degree value
 N	N
+# a degree, minute or second of value 1 is singular
+30°1'	thirty degrees one minute
+30°1'1"	thirty degrees one minute one second
+1°30'	one degree thirty minutes

@@ -29,3 +29,7 @@ Lehrer/Lehrerin	Lehrer/Lehrerin
 # fraction_slash.tsv for the full gate
 # extrapolated
 1/2/2026	eins/zwei/zweitausendsechsundzwanzig
+# a unit after a comparison is the first token that resolves, not the rest of the text
+Dosis ≤10 mg pro Tag.	Dosis kleiner oder gleich zehn Milligramm pro Tag.
+# the period rule is for single-letter variables, not for infinity
+∞.	unendlich.

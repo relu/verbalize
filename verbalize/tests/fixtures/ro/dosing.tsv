@@ -15,3 +15,7 @@
 # into "ori" even when a range-shaped number sits in front of it; the
 # leading number falls back to a bare Cardinal with the hyphen unread
 2-3x pe zi	doi-de trei ori pe zi
+# a repetition ends at any non-alphanumeric character
+Doza 2x.	Doza de două ori.
+2x, apoi pauză	de două ori, apoi pauză
+(3x)	(de trei ori)

@@ -17,3 +17,7 @@ Metformin 1000 mg 2x/day	Metformin one thousand milligrams twice per day
 2-3x daily	two-three times daily
 # negative: hex literal
 0x1F	zerox one F
+# a repetition ends at any non-alphanumeric character
+Take it 2x.	Take it twice.
+2x, then rest	twice, then rest
+(3x)	(three times)

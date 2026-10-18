@@ -9,7 +9,9 @@ use super::German;
 use crate::lang::common::{
     self, group, is_trigger_bounded, iso_bounded, recognizer, text_of, Patterns,
 };
-use crate::lang::{char_before, digit_bounded, next_word, previous_word, Context};
+use crate::lang::{
+    char_after, char_before, digit_bounded, next_word, previous_word, Context, HSPACE,
+};
 use crate::pipeline::{Caps, Match, Recognizer};
 use crate::token::*;
 
@@ -21,16 +23,20 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         // `@`, `://`, `www.` and a known TLD are unambiguous: above everything.
         recognizer(&p.electronic, common::electronic),
         recognizer(
-            r"([0-9]{1,2})(?:([:.])([0-9]{2}))?(\s*[–-]\s*|\s+bis\s+)([0-9]{1,2})(?:([:.])([0-9]{2}))?(\s*Uhr)?",
+            &format!(
+                r"([0-9]{{1,2}})(?:([:.])([0-9]{{2}}))?({HSPACE}*[–-]{HSPACE}*|{HSPACE}+bis{HSPACE}+)([0-9]{{1,2}})(?:([:.])([0-9]{{2}}))?({HSPACE}*Uhr)?"
+            ),
             time_range,
         ),
         recognizer(
-            r"([0-9]{1,2})([:.])([0-9]{2})(?::([0-9]{2}))?(\s*Uhr)?",
+            &format!(r"([0-9]{{1,2}})([:.])([0-9]{{2}})(?::([0-9]{{2}}))?({HSPACE}*Uhr)?"),
             time,
         ),
+        // `um 1 Uhr`: an hour alone, read like `1:00 Uhr`.
+        recognizer(&format!(r"([0-9]{{1,2}}){HSPACE}*Uhr"), hour),
         recognizer(
             &format!(
-                r"(?:((?i:{TRIGGERS}))\s+)?(?:([0-9]{{1,2}})\.([0-9]{{1,2}})(?:(\.)([0-9]{{4}})?)?|([0-9]{{4}})-([0-9]{{2}})(?:-([0-9]{{2}}))?|([0-9]{{1,2}})\.\s+({months})(?:\s+([0-9]{{4}}))?)"
+                r"(?:((?i:{TRIGGERS}))\s+)?(?:([0-9]{{1,2}})\.([0-9]{{1,2}})(?:(\.)([0-9]{{4}})?)?|([0-9]{{4}})-([0-9]{{2}})(?:-([0-9]{{2}}))?|([0-9]{{1,2}})\.{HSPACE}+({months})(?:{HSPACE}+([0-9]{{4}}))?)"
             ),
             date,
         ),
@@ -52,14 +58,14 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         recognizer(&p.dose, common::dose),
         recognizer(
             &format!(
-                r"(?:(€|\$|£|EUR|USD|GBP|CHF)\s*)?(-?{num})(?:\s*(Mio\.|Mio|(?i:Millionen|Million|Milliarden|Milliarde|Billionen|Billion|Tausend)|Mrd\.|Bio\.|Tsd\.))?(?:\s*(€|EUR|Euro|\$|USD|Dollar|£|GBP|Pfund|CHF|Franken))?(?:/(\p{{L}}[\p{{L}}.]*))?"
+                r"(?:(€|\$|£|EUR|USD|GBP|CHF){HSPACE}*)?(-?{num})(?:{HSPACE}*(Mio\.|Mio|(?i:Millionen|Million|Milliarden|Milliarde|Billionen|Billion|Tausend)|Mrd\.|Bio\.|Tsd\.))?(?:{HSPACE}*(€|EUR|Euro|\$|USD|Dollar|£|GBP|Pfund|CHF|Franken))?(?:/(\p{{L}}[\p{{L}}.]*))?"
             ),
             common::money,
         ),
         recognizer(&p.percent, common::percent),
         recognizer(&p.degrees, common::degrees),
         recognizer(
-            &format!(r"(-?{plain})\s*(?:[x×]|-mal)(/\p{{L}}+)?"),
+            &format!(r"(-?{plain}){HSPACE}*(?:[x×]|-mal)(/\p{{L}}+)?"),
             common::repetition,
         ),
         recognizer(r"([0-9]+)\.[–-]([0-9]+)\.", ordinal_range),
@@ -67,7 +73,7 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         recognizer(&p.measure, common::measure),
         recognizer(&p.hyphenated_measure, common::hyphenated_measure),
         recognizer(
-            &format!(r"(?:((?i:{TRIGGERS}))\s+)?([0-9]+)\.(?:\s+(\p{{L}}+))?"),
+            &format!(r"(?:((?i:{TRIGGERS}))\s+)?([0-9]+)\.(?:{HSPACE}+(\p{{L}}+))?"),
             ordinal,
         ),
         // Below Range and Ordinal, above Year and Decimal: `2.3` and `3.10`
@@ -186,6 +192,25 @@ fn time(_: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
     if caps.get(4).is_some() {
         clock.second = Some(u8_at(text_of(caps, 4)).filter(|s| *s <= 59)?);
     }
+    Some(Match::new(whole, Token::Time(clock)))
+}
+
+/// An hour before "Uhr": `um 1 Uhr`. Not the tail of a longer number or
+/// range (`1.5 Uhr`, `50-2 Uhr`) and not the start of a word (`Uhrzeit`).
+fn hour(_: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
+    let whole = group(caps, 0)?;
+    let joined_to_number = {
+        let mut before = text[..whole.start].chars().rev();
+        matches!(before.next(), Some('.' | ',' | ':' | '-' | '–' | '/'))
+            && before.next().is_some_and(|c| c.is_ascii_digit())
+    };
+    if !digit_bounded(text, &whole)
+        || joined_to_number
+        || char_after(text, whole.end).is_some_and(char::is_alphanumeric)
+    {
+        return None;
+    }
+    let clock = clock(text_of(caps, 1), "")?;
     Some(Match::new(whole, Token::Time(clock)))
 }
 

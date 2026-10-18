@@ -23,3 +23,12 @@
 14:30 Uhr MEZ	vierzehn Uhr dreißig MEZ
 09:00 UTC	neun Uhr UTC
 12:00 UTC+2	zwölf Uhr UTC plus zwei
+# a bare hour before "Uhr" is a clock hour: "ein Uhr", not "eins Uhr" (Duden)
+1 Uhr	ein Uhr
+um 1 Uhr	um ein Uhr
+Wir treffen uns um 1 Uhr nachts.	Wir treffen uns um ein Uhr nachts.
+12 Uhr	zwölf Uhr
+24 Uhr	vierundzwanzig Uhr
+# negative: not an hour (more than 24, or the tail of a decimal) stays a number
+100 Uhr	einhundert Uhr
+1,5 Uhr	eins Komma fünf Uhr

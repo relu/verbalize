@@ -38,3 +38,15 @@ $2	zwei Dollar
 1 Mio. €	eine Million Euro
 5 Tsd. €	fünf Tausend Euro
 2 Bio. €	zwei Billionen Euro
+# negative amounts: "minus" once in front of every reading (cents, whole, sub-unit only, scale word, decimal fallback, rate)
+-12 €	minus zwölf Euro
+-0,15 €	minus fünfzehn Cent
+-12,50 €	minus zwölf Euro fünfzig
+-1 €	minus ein Euro
+-5,125 €	minus fünf Komma eins zwei fünf Euro
+USD -5,125	minus fünf Komma eins zwei fünf Dollar
+-2,5 Mrd. €	minus zwei Komma fünf Milliarden Euro
+-1 Mio. €	minus eine Million Euro
+-3 Tsd. €	minus drei Tausend Euro
+-5 €/kg	minus fünf Euro pro Kilogramm
+-5,125 €/kg	minus fünf Komma eins zwei fünf Euro pro Kilogramm

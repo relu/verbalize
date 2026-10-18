@@ -10,3 +10,6 @@
 # negative: fewer than seven digits is a Range
 555-123	five hundred fifty-five to one hundred twenty-three
 Tel. 555-123-4567	Tel. five five five, one two three, four five six seven
+# surrounding parentheses are not part of the number
+Call us (555-123-4567) today.	Call us (five five five, one two three, four five six seven) today.
+(+1 (555) 123-4567)	(plus one, five five five, one two three, four five six seven)

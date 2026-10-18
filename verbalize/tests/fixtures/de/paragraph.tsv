@@ -12,3 +12,5 @@ vgl. § 630c BGB	vergleiche Paragraf sechshundertdreißigc BGB
 # the gate matches only the literal "§"/"§§" character; the number still
 # reads via Cardinal (§9: no digits in output)
 Paragraf 25	Paragraf fünfundzwanzig
+# the span is the sign alone, so nothing dangles after it
+(§)	(Paragraf)

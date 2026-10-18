@@ -15,7 +15,7 @@ Regional variants (`Options::region`): `DeDe` is the default. `DeAt`
 every region. `DeCh` (Switzerland) has no "ß" (Bundeskanzlei "Weisungen
 zur Rechtschreibung"): every generated spoken form uses "ss" instead
 ("dreißig" → "dreissig"), applied to the spoken text only — verbatim
-passthrough input keeps its own spelling. Nothing else differs in v1.
+passthrough input keeps its own spelling. Nothing else differs between regions.
 
 ## Cardinal
 
@@ -56,7 +56,7 @@ passthrough input keeps its own spelling. Nothing else differs in v1.
   Elsewhere "N." is left alone; a wrong case ending is judged worse than
   the engine's own guess. Strong triggers (`seit`, `ab`, `bis`, `nach`,
   `vor`) and `der` still need a noun of known gender.
-- **Ordinal noun lexicon (v1, fixed list, with gender)**: Klasse (f),
+- **Ordinal noun lexicon (fixed list, with gender)**: Klasse (f),
   Stock (m), Etage (f), Platz (m), Mal (n), Liga (f), Runde (f),
   Halbjahr (n), Quartal (n), Semester (n), Jahrhundert (n), Auflage (f),
   Weltkrieg (m), Preis (m), Sieg (m), Versuch (m), Kapitel (n), Teil (m),
@@ -144,11 +144,16 @@ passthrough input keeps its own spelling. Nothing else differs in v1.
   Komma zwei Millionen Einwohner"); a scale glued into a compound
   (`Millionenstadt`) is not one. (Duden: Million, Milliarde, Billion are
   nouns and take the plural; Tausend is invariant after a numeral.)
-- **Source**: DIN 5008:2020 currency notation; CLDR de `numbers.json`
-  (currency formatting patterns), `currencies.json` (display names), CLDR
-  `supplemental/currencyData.json` (minor-unit digits); a small per-language
-  minor-unit **name** table sourced from ISO 4217 conventions (Cent,
-  Rappen, Pence, …) since CLDR does not name minor units.
+- **Negative amounts**: a leading `-` is spoken once, in front of the whole
+  reading, whichever shape it takes: `-12,50 €` → "minus zwölf Euro
+  fünfzig", `-2,5 Mrd. €` → "minus zwei Komma fünf Milliarden Euro",
+  `-5,125 €` → "minus fünf Komma eins zwei fünf Euro".
+- **Source**: DIN 5008:2020 currency notation; CLDR de `currencies.json`
+  (display names by plural category); a per-language hand table for the
+  written forms, head-noun gender and minor-unit **names** (Cent, Rappen,
+  Pence, …; ISO 4217 conventions, since CLDR does not name minor units).
+  Minor-unit digits are not read from CLDR: one or two fraction digits are
+  cents.
 
 ## Percent, permille
 
@@ -212,7 +217,8 @@ passthrough input keeps its own spelling. Nothing else differs in v1.
 
 - **Written**: `HH:MM` (colon form, always a time); `HH.MM Uhr` (dotted
   form, only a time when followed by "Uhr" — otherwise `3.10.` is a Date);
-  `HH:MM:SS` with optional "Uhr".
+  `HH:MM:SS` with optional "Uhr"; a bare hour before "Uhr" (`um 1 Uhr`,
+  `0–24`) is a clock hour too.
 - **Spoken**: hour and minute via Cardinal, joined by "Uhr"; `:00` collapses
   to "Uhr" alone (`neun Uhr`, not `neun Uhr null`); one o'clock is
   `ein Uhr` (Duden). The seconds form reads minutes and seconds as counted
@@ -232,7 +238,8 @@ passthrough input keeps its own spelling. Nothing else differs in v1.
 
 - **Written**: two Time-shaped values joined by an unspaced en dash or the
   word "bis" (`14:00–16:00`, `19.30–21.00 Uhr`, `von 7:00 bis 9:00 Uhr`,
-  `10-14 Uhr`).
+  `10-14 Uhr`, `1-2 Uhr`). Bare hours before "Uhr" read like `1:00 Uhr`:
+  `1-2 Uhr` → "ein bis zwei Uhr".
 - **Spoken**: both ends read as Time, joined by "bis"; higher classifier
   priority than plain Time so both ends of a range are read alike (a lone
   Time recogniser could otherwise strip "Uhr" from only one end).
@@ -516,7 +523,9 @@ passthrough input keeps its own spelling. Nothing else differs in v1.
   sexagesimal-chain reading the ISO 6709/surveying convention uses, not
   CLDR's full `angle-arc-minute`/`-second` unit names (a deliberate
   deviation: the "Grad … Minuten … Sekunden" chain already disambiguates
-  without the fuller "Winkelminute" wording). A single
+  without the fuller "Winkelminute" wording). Minutes and seconds are
+  counted nouns, singular and feminine for 1 (`30°1′` → "dreißig Grad eine
+  Minute"). A single
   compass letter (`N`, `O`, `S`, `W`) directly after a degree/prime/second
   value expands to the cardinal-direction word (Nord, Ost, Süd, West).
 - **Priority**: above Degrees, which alone only recognises a bare

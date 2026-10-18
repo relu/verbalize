@@ -312,7 +312,12 @@ fn context_invariance(language: Language) {
                 }
                 total += 1;
                 let wrapped = format!("{prefix}{}{suffix}", case.input);
-                let expected = format!("{prefix}{}{suffix}", case.expected);
+                // The dot of Romanian `min.` belongs to the abbreviation, so a
+                // sentence period right after `min` is absorbed into it.
+                let absorbed =
+                    language == Language::Ro && wrapper == "period" && case.input.ends_with(" min");
+                let kept_suffix = if absorbed { &suffix[1..] } else { suffix };
+                let expected = format!("{prefix}{}{kept_suffix}", case.expected);
                 let outcome = catch_quietly(|| {
                     (
                         normalizer.normalize(&wrapped),
@@ -326,7 +331,7 @@ fn context_invariance(language: Language) {
                         String::new()
                     }
                     Ok((actual, spans)) => {
-                        if !actual.starts_with(prefix) || !actual.ends_with(suffix) {
+                        if !actual.starts_with(prefix) || !actual.ends_with(kept_suffix) {
                             broken.push("wrapper not preserved".to_string());
                         }
                         if actual != expected {

@@ -37,3 +37,14 @@ $5 M	five dollars M
 # text-processing-rs: an amount that starts at the point
 $.01	one cent
 $.506	zero point five zero six dollars
+# negative amounts: "minus" once in front of every reading (cents, whole, sub-unit only, scale word, decimal fallback, rate)
+-12 USD	minus twelve dollars
+-0.15 USD	minus fifteen cents
+-12.50 USD	minus twelve dollars and fifty cents
+-1 USD	minus one dollar
+-5.125 USD	minus five point one two five dollars
+USD -5.125	minus five point one two five dollars
+-2.5 billion dollars	minus two point five billion dollars
+-1 million euros	minus one million euros
+-5 USD/month	minus five dollars per month
+-5.125 USD/month	minus five point one two five dollars per month

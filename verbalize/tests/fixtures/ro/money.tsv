@@ -30,3 +30,14 @@ GBP 5	cinci lire
 3 mil. lei	trei milioane de lei
 3 mil. de lei	trei milioane de lei
 1 mil. euro	un milion de euro
+# negative amounts: "minus" once in front of every reading (cents, whole, sub-unit only, scale word, decimal fallback, rate)
+-12 lei	minus doisprezece lei
+-0,50 lei	minus cincizeci de bani
+-12,50 lei	minus doisprezece lei și cincizeci de bani
+-1 leu	minus un leu
+-5,125 lei	minus cinci virgulă unu doi cinci lei
+-2,5 mld. lei	minus două virgulă cinci miliarde de lei
+-1 mil. euro	minus un milion de euro
+-3 mii lei	minus trei mii de lei
+-5 lei/kg	minus cinci lei pe kilogram
+-5,125 lei/kg	minus cinci virgulă unu doi cinci lei pe kilogram

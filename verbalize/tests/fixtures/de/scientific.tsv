@@ -24,3 +24,6 @@
 # base is not scientific notation — it is Power/exponent (§7.6) instead
 # extrapolated
 2^3	zwei hoch drei
+# a word after the exponent is not part of the span; a unit is, with or without a period after it
+Es sind 1,5 × 10³ Zellen.	Es sind eins Komma fünf mal zehn hoch drei Zellen.
+6,022 · 10²³ mol⁻¹.	sechs Komma null zwei zwei mal zehn hoch dreiundzwanzig pro Mol.

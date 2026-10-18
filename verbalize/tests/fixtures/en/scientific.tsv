@@ -9,3 +9,6 @@
 3 × 10⁸ m/s	three times ten to the power of eight meters per second
 # negative: no decimal point and no signed exponent
 1e10	oneeten
+# a word after the exponent is not part of the span; a unit is, with or without a period after it
+The sample has 1.5e3 items.	The sample has one point five times ten to the power of three items.
+6.022 × 10²³ mol⁻¹.	six point zero two two times ten to the power of twenty-three per mole.

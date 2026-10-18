@@ -4,3 +4,6 @@
 1,5e-6	unu virgulă cinci ori zece la puterea minus șase
 6,022 · 10²³ mol⁻¹	șase virgulă zero doi doi ori zece la puterea douăzeci și trei pe mol
 3 × 10⁸ m/s	trei ori zece la puterea opt metri pe secundă
+# a word after the exponent is not part of the span; a unit is, with or without a period after it
+Sunt 1,5 × 10³ celule.	Sunt unu virgulă cinci ori zece la puterea trei celule.
+6,022 · 10²³ mol⁻¹.	șase virgulă zero doi doi ori zece la puterea douăzeci și trei pe mol.

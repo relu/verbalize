@@ -14,3 +14,8 @@
 -20 °C	minus zwanzig Grad Celsius
 # extrapolated: "ein" before Grad, a noun of known (neuter) gender — CLDR de units.json angle-degree = neuter
 1 °C	ein Grad Celsius
+# a degree sign with no scale letter ends the span; the text after it is left as written
+Es hat 20° in Berlin	Es hat zwanzig Grad in Berlin
+# the C of a word is no scale letter
+20° Celsius	zwanzig Grad Celsius
+Er hat 38° Fieber	Er hat achtunddreißig Grad Fieber

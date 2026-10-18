@@ -61,13 +61,17 @@ fn year_words(year: u64) -> String {
 }
 
 impl German {
-    fn clock_words(&self, clock: Clock) -> String {
-        // "ein Uhr", not "eins Uhr" (Duden).
-        let mut out = if clock.hour == 1 {
+    /// "ein Uhr", not "eins Uhr" (Duden); a bare hour before "Uhr" or "bis".
+    fn hour_words(&self, hour: u8) -> String {
+        if hour == 1 {
             "ein".to_string()
         } else {
-            words(&clock.hour.into(), None)
-        };
+            words(&hour.into(), None)
+        }
+    }
+
+    fn clock_words(&self, clock: Clock) -> String {
+        let mut out = self.hour_words(clock.hour);
         out.push_str(" Uhr");
         if let Some(second) = clock.second {
             // `hh:mm:ss`: minutes and seconds are counted nouns.
@@ -97,7 +101,13 @@ impl German {
     /// `2,5 Mrd.` → "zwei Komma fünf Milliarden", `1 Mio.` → "eine Million"
     /// (the scale nouns are feminine), `3 Tsd.` → "drei Tausend".
     fn scaled_words(&self, amount: &Numeral, scale: Scale) -> String {
-        let one = amount.is_integer() && amount.integer == 1 && !amount.negative;
+        // Singular/plural follow the magnitude; the sign is spoken in front.
+        let negative = amount.negative;
+        let amount = &Numeral {
+            negative: false,
+            ..amount.clone()
+        };
+        let one = amount.is_integer() && amount.integer == 1;
         let (noun, gender) = match scale {
             Scale::Thousand => ("Tausend", None),
             Scale::Million if one => ("Million", Some(Gender::Feminine)),
@@ -107,7 +117,12 @@ impl German {
             Scale::Trillion if one => ("Billion", Some(Gender::Feminine)),
             Scale::Trillion => ("Billionen", Some(Gender::Feminine)),
         };
-        format!("{} {noun}", words(amount, gender))
+        let out = format!("{} {noun}", words(amount, gender));
+        if negative {
+            format!("minus {out}")
+        } else {
+            out
+        }
     }
 
     fn money_words(
@@ -135,6 +150,12 @@ impl German {
                 .or(cldr.map(|c| c.name))
                 .unwrap_or(code);
             name.rsplit([' ', '-']).next().unwrap_or(name).to_string()
+        };
+        let negative = amount.negative;
+        // The sign is spoken once, in front of the whole amount.
+        let amount = &Numeral {
+            negative: false,
+            ..amount.clone()
         };
         let major = Numeral::int(amount.integer);
         let mut out = String::new();
@@ -173,7 +194,7 @@ impl German {
                 out.push_str(&head_noun(amount));
             }
         }
-        if amount.negative {
+        if negative {
             out.insert_str(0, "minus ");
         }
         if let Some(part) = per {
@@ -339,8 +360,8 @@ pub(super) fn verbalize(g: &German, token: &Token, agreement: Agreement) -> Verb
             if from.minute.is_none() && to.minute.is_none() {
                 format!(
                     "{} bis {} Uhr",
-                    words(&from.hour.into(), None),
-                    words(&to.hour.into(), None)
+                    g.hour_words(from.hour),
+                    g.hour_words(to.hour)
                 )
             } else {
                 format!("{} bis {}", g.clock_words(*from), g.clock_words(*to))
@@ -413,7 +434,7 @@ pub(super) fn verbalize(g: &German, token: &Token, agreement: Agreement) -> Verb
             denominator,
         } => g.fraction_words(whole.as_ref(), *numerator, *denominator),
         Token::Paragraph { plural } => {
-            format!("{} ", if *plural { "Paragrafen" } else { "Paragraf" })
+            (if *plural { "Paragrafen" } else { "Paragraf" }).to_string()
         }
         Token::Roman { from, to } => {
             let word = |n: u8| words(&n.into(), None);
@@ -500,12 +521,24 @@ pub(super) fn verbalize(g: &German, token: &Token, agreement: Agreement) -> Verb
             seconds,
             compass,
         } => {
-            let mut out = format!("{} Grad", words(degrees, None));
+            // CLDR names pick singular/plural by value; minutes and seconds are
+            // feminine ("eine Minute").
+            let part = |id: &'static str, n: &Numeral| {
+                let unit = UnitRef::Cldr { id, prefix: None };
+                format!(
+                    "{} {}",
+                    words(n, g.units.gender(&unit)),
+                    g.units.name(&unit, n, Case::Nominative)
+                )
+            };
+            let mut out = part("angle-degree", degrees);
             if let Some(minutes) = minutes {
-                out.push_str(&format!(" {} Minuten", words(minutes, None)));
+                out.push(' ');
+                out.push_str(&part("duration-minute", minutes));
             }
             if let Some(seconds) = seconds {
-                out.push_str(&format!(" {} Sekunden", words(seconds, None)));
+                out.push(' ');
+                out.push_str(&part("duration-second", seconds));
             }
             if let Some(c) = compass {
                 if let Some((_, name)) = TABLES.compass.iter().find(|(l, _)| l == c) {

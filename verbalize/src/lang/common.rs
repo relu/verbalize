@@ -9,7 +9,7 @@ use regex::Regex;
 
 use super::{
     char_after, char_before, digit_bounded, letter_free, next_word, units::Units, Context,
-    Numerals, Tables,
+    Numerals, Tables, HSPACE,
 };
 use crate::pipeline::{word_bounded, Caps, Match, Recognizer};
 use crate::token::*;
@@ -99,38 +99,39 @@ impl Patterns {
         let num = numerals.num();
         let plain = numerals.plain();
         let dec = regex::escape(&numerals.decimal.to_string());
-        let seg = format!(r"(?:{plain}\s?)?\p{{L}}[\p{{L}}²³.]*");
+        let h = HSPACE;
+        let seg = format!(r"(?:{plain}{h}?)?\p{{L}}[\p{{L}}²³.]*");
         let unit = format!("(?:{SYM}(?:/{seg})*|(?:/{seg})+)");
         let compass: String = tables.compass.iter().map(|(c, _)| *c).collect();
         Patterns {
             electronic: electronic_pattern(tables),
             scientific: format!(
-                r"(-?[0-9]+(?:[.,][0-9]+)?)\s*(?:[×·x*]\s*10(?:\^(-?[0-9]+)|([{SUPERSCRIPT}⁻⁺]+))|[eE]([+-]?[0-9]+))(?:\s*(\p{{L}}[\p{{L}}²³⁻¹.]*(?:/{seg})*))?"
+                r"(-?[0-9]+(?:[.,][0-9]+)?){h}*(?:[×·x*]{h}*10(?:\^(-?[0-9]+)|([{SUPERSCRIPT}⁻⁺]+))|[eE]([+-]?[0-9]+))"
             ),
             chemical: format!(r"(?:[A-Z][a-z]?[{SUBSCRIPT}]*)+(?:[{SUPERSCRIPT}]*[⁺⁻])?"),
             power: format!(r"(?:(-?{plain})|(\p{{L}}))(?:([{SUPERSCRIPT}⁻]+)|\^(-?[0-9]+))"),
             zone_offset: r"(UTC|GMT)([+\-−])([0-9]{1,2})".into(),
             math: format!(
-                r"(?:(?:-?{plain}|[\p{{L}}∞π])\s*)?(?:[+×·*÷=≠<>≤≥≈±√]|\s-\s|−)\s*(?:-?{plain}|[\p{{L}}∞π])(?:\s*(?:[+×·*÷=≠<>≤≥≈±]|\s-\s|−)\s*(?:-?{plain}|[\p{{L}}∞π]))*|∞"
+                r"(?:(?:-?{plain}|[\p{{L}}∞π]){h}*)?(?:[+×·*÷=≠<>≤≥≈±√]|{h}-{h}|−){h}*(?:-?{plain}|[\p{{L}}∞π])(?:{h}*(?:[+×·*÷=≠<>≤≥≈±]|{h}-{h}|−){h}*(?:-?{plain}|[\p{{L}}∞π]))*|∞"
             ),
             angle: format!(
-                r#"(-?{plain})\s*°(?:\s*([0-9]{{1,2}})\s*[′'])?(?:\s*([0-9]{{1,2}})\s*[″"])?(?:\s*([{compass}]))?"#
+                r#"(-?{plain}){h}*°(?:{h}*([0-9]{{1,2}}){h}*[′'])?(?:{h}*([0-9]{{1,2}}){h}*[″"])?(?:{h}*([{compass}]))?"#
             ),
             blood_pressure: format!(
-                r"(?:({})\s+)?([0-9]+)/([0-9]+)(?:\s*(mmHg))?",
+                r"(?:({}){h}+)?([0-9]+)/([0-9]+)(?:{h}*(mmHg))?",
                 tables.blood_pressure.join("|")
             ),
             range_rate: r"([0-9]+)-([0-9]+)/(\p{L}+)".into(),
             ratio: format!(
-                r"(?:({})\s+)?({int})(\s*):(\s*)({int})",
+                r"(?:({}){h}+)?({int})({h}*):({h}*)({int})",
                 tables.ratio_triggers.join("|")
             ),
-            dose: format!(r"(?:[0-9]{{1,3}}|½)(?:-(?:[0-9]{{1,3}}|½)){{2,3}}(?:\s*({unit}))?"),
-            percent: format!(r"(-?{num})\s*([%‰])"),
-            degrees: format!(r"(-?{num})\s*°\s?([CF])?"),
-            measure: format!(r"(-?{num})(\s?)({unit})"),
-            hyphenated_measure: r"([0-9]+)-(\p{L}{1,4})[-\s](\p{L})".into(),
-            range: format!(r"({int})[–-]({int})(?:(\s?)({unit}))?"),
+            dose: format!(r"(?:[0-9]{{1,3}}|½)(?:-(?:[0-9]{{1,3}}|½)){{2,3}}(?:{h}*({unit}))?"),
+            percent: format!(r"(-?{num}){h}*([%‰])"),
+            degrees: format!(r"(-?{num}){h}*°(?:{h}?([CF]))?"),
+            measure: format!(r"(-?{num})({h}?)({unit})"),
+            hyphenated_measure: format!(r"([0-9]+)-(\p{{L}}{{1,4}})(?:-|{h})(\p{{L}})"),
+            range: format!(r"({int})[–-]({int})(?:({h}?)({unit}))?"),
             year: format!(r"([0-9]{{4}})({})?", regex::escape(tables.decade_suffix)),
             decimal: format!(r"(-?{int}){dec}([0-9]+)"),
             dotted: r"[0-9]+(?:\.[0-9]+)+".into(),
@@ -143,7 +144,7 @@ impl Patterns {
             card: r"[0-9]{4}(?:[ \u{a0}-][0-9]{4}){3}".into(),
             unicode_fraction: format!(r"[{UNICODE_FRACTION_CHARS}]"),
             roman: r"(IV|I{1,3})(?:-(IV|I{1,3}))?".into(),
-            paragraph: r"§§?\s*".into(),
+            paragraph: "§§?".into(),
         }
     }
 }
@@ -257,29 +258,87 @@ pub(crate) fn unit(units: &Units, numerals: &Numerals, text: &str, bare: bool) -
     units.resolve_compound(numerals, text, bare)
 }
 
+/// Whitespace that stays on its line: `\t` and the Unicode space separators
+/// (the set [`HSPACE`] matches), never a line or vertical break.
+fn is_horizontal_space(ch: char) -> bool {
+    ch.is_whitespace()
+        && !matches!(
+            ch,
+            '\n' | '\r' | '\u{b}' | '\u{c}' | '\u{85}' | '\u{2028}' | '\u{2029}'
+        )
+}
+
+/// Byte length of the one space a unit may be separated from its number
+/// by; 0 if the unit is glued.
+fn unit_gap(text: &str, at: usize) -> usize {
+    char_after(text, at)
+        .filter(|ch| is_horizontal_space(*ch))
+        .map_or(0, char::len_utf8)
+}
+
 /// A unit right after `at`, with the byte offset it ends at, for classes
-/// that own a trailing unit.
+/// that own a trailing unit. It is the longest prefix of the text that
+/// resolves, so what follows (`mg pro Tag`, `km/h fliegt`) is left alone.
+/// The prefix has the shape of the unit pattern: a symbol (with a space
+/// allowed after an inner dot, `I. E.`) and `/segment`s, a segment
+/// possibly carrying a number (`/1,73 m²`).
 pub(crate) fn trailing_unit<C: Context>(c: &C, text: &str, at: usize) -> Option<(Unit, usize)> {
-    let rest = &text[at..];
-    let start = rest.len() - rest.trim_start().len();
-    if start > 1 {
-        return None;
-    }
-    let symbol_len = rest[start..]
-        .find(|ch: char| !(ch.is_alphabetic() || "²³⁻¹./,0123456789 ".contains(ch)))
-        .unwrap_or(rest.len() - start);
-    let mut symbol = rest[start..start + symbol_len].trim_end_matches([' ', ',']);
-    if let Some(stripped) = symbol.strip_suffix('.') {
-        if c.unit(symbol, true).is_none() {
-            symbol = stripped;
+    let start = at + unit_gap(text, at);
+    let run_end = |from: usize| {
+        let len = text[from..].find(|ch: char| !(ch.is_alphabetic() || "²³⁻¹.".contains(ch)));
+        from + len.unwrap_or(text.len() - from)
+    };
+    let mut ends = Vec::new();
+    let mut pos = run_end(start);
+    loop {
+        ends.push(pos);
+        let rest = &text[pos..];
+        if text[..pos].ends_with('.')
+            && rest.starts_with(' ')
+            && rest[1..].starts_with(char::is_alphabetic)
+        {
+            pos = run_end(pos + 1);
+        } else {
+            break;
         }
     }
-    let unit = c.unit(symbol, true)?;
-    let end = at + start + symbol.len();
-    if char_after(text, end).is_some_and(|ch| ch.is_alphanumeric() || is_script(ch)) {
-        return None;
+    let decimal = c.numerals().decimal;
+    while text[pos..].starts_with('/') {
+        let number = pos + 1;
+        let symbol = number
+            + text[number..]
+                .find(|ch: char| !(ch.is_ascii_digit() || ch == decimal))
+                .unwrap_or(text.len() - number);
+        let symbol = if symbol > number && text[symbol..].starts_with(' ') {
+            symbol + 1
+        } else {
+            symbol
+        };
+        let segment_end = run_end(symbol);
+        if segment_end == symbol {
+            break;
+        }
+        pos = segment_end;
     }
-    Some((unit, end))
+    if ends.last() != Some(&pos) {
+        ends.push(pos);
+    }
+    for &end in ends.iter().rev() {
+        if text[end..].starts_with('/') {
+            continue;
+        }
+        let written = &text[start..end];
+        let found = c.unit(written, true).map(|unit| (unit, end)).or_else(|| {
+            let stripped = written.strip_suffix('.')?;
+            c.unit(stripped, true).map(|unit| (unit, end - 1))
+        });
+        if let Some((unit, end)) = found {
+            if !char_after(text, end).is_some_and(|ch| ch.is_alphanumeric() || is_script(ch)) {
+                return Some((unit, end));
+            }
+        }
+    }
+    None
 }
 
 // ----------------------------------------------------------- recognisers
@@ -397,17 +456,11 @@ pub(crate) fn scientific<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Opti
         }
         e.parse::<i32>().ok()?
     };
-    let mut end = group(caps, 0)?.end;
-    let mut unit = None;
-    if let Some(u) = caps.get(5) {
-        end = u.start;
-        if let Some(resolved) = c.unit(&text[u.clone()], true) {
-            if !char_after(text, u.end).is_some_and(|ch| ch.is_alphanumeric() || is_script(ch)) {
-                unit = Some(resolved);
-                end = u.end;
-            }
-        }
-    }
+    let exponent_end = group(caps, 0)?.end;
+    let (unit, end) = match trailing_unit(c, text, exponent_end) {
+        Some((unit, end)) => (Some(unit), end),
+        None => (None, exponent_end),
+    };
     if !digit_bounded(text, &(mantissa_range.start..end)) {
         return None;
     }
@@ -443,7 +496,7 @@ pub(crate) fn chemical<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option
     }
     let mut parts = Vec::new();
     let mut symbol = String::new();
-    let mut charge_magnitude = None;
+    let mut charge_magnitude: Option<u32> = None;
     for ch in formula.chars() {
         if ch.is_ascii_alphabetic() {
             if ch.is_ascii_uppercase() && !symbol.is_empty() {
@@ -457,11 +510,12 @@ pub(crate) fn chemical<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option
         }
         if let Some(d) = subscript_digit(ch) {
             match parts.last_mut() {
-                Some(ChemicalPart::Count(n)) => *n = *n * 10 + d,
+                Some(ChemicalPart::Count(n)) => *n = n.checked_mul(10)?.checked_add(d)?,
                 _ => parts.push(ChemicalPart::Count(d)),
             }
         } else if let Some(d) = superscript_digit(ch) {
-            charge_magnitude = Some(charge_magnitude.unwrap_or(0) * 10 + d);
+            let magnitude = charge_magnitude.unwrap_or(0);
+            charge_magnitude = Some(magnitude.checked_mul(10)?.checked_add(d)?);
         } else {
             parts.push(ChemicalPart::Charge {
                 magnitude: charge_magnitude.take(),
@@ -627,7 +681,9 @@ pub(crate) fn math<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Mat
             _ => return None,
         };
         let range = at..at + ch.len_utf8();
-        if !word_bounded(text, &range) || char_after(text, range.end) == Some('.') {
+        let before_period =
+            matches!(item, MathItem::Variable(_)) && char_after(text, range.end) == Some('.');
+        if !word_bounded(text, &range) || before_period {
             // A letter glued to a word (`Alter ≥65`) or before a period
             // (`z. B.`) is not an operand; drop it at either end.
             if items.is_empty() {
@@ -651,16 +707,13 @@ pub(crate) fn math<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Mat
     }
     let (start, mut end) = (spans.first()?.start, spans.last()?.end);
     if matches!(items.last(), Some(MathItem::Number(_))) {
-        let rest = &text[end..];
-        let after = rest.trim_start();
-        let skipped = rest.len() - after.len();
-        if skipped <= 1 && after.starts_with(['%', '‰']) {
-            let sign = after.chars().next()?;
+        let after = end + unit_gap(text, end);
+        if let Some(sign) = char_after(text, after).filter(|ch| matches!(ch, '%' | '‰')) {
             let unit = c
                 .units()
                 .resolve_compound(c.numerals(), &sign.to_string(), true)?;
             items.push(MathItem::Unit(unit));
-            end += skipped + sign.len_utf8();
+            end = after + sign.len_utf8();
         } else if let Some((unit, unit_end)) = trailing_unit(c, text, end) {
             items.push(MathItem::Unit(unit));
             end = unit_end;
@@ -681,10 +734,7 @@ pub(crate) fn angle<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
     let mut compass = None;
     if let Some(letter) = caps.get(4) {
         if char_after(text, letter.end).is_some_and(char::is_alphabetic) {
-            end = letter.start;
-            while text[..end].ends_with(char::is_whitespace) {
-                end -= 1;
-            }
+            end = text[..letter.start].trim_end().len();
         } else {
             compass = text[letter].chars().next();
         }
@@ -780,13 +830,9 @@ pub(crate) fn ratio<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
 
 pub(crate) fn dose<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Match> {
     let whole = group(caps, 0)?;
-    let scheme_end = caps.get(1).map_or(whole.end, |u| {
-        let mut end = u.start;
-        while text[..end].ends_with(char::is_whitespace) {
-            end -= 1;
-        }
-        end
-    });
+    let scheme_end = caps
+        .get(1)
+        .map_or(whole.end, |u| text[..u.start].trim_end().len());
     let scheme = whole.start..scheme_end;
     if !digit_bounded(text, &scheme)
         || char_before(text, scheme.start).is_some_and(|ch| ch == '-' || ch.is_alphanumeric())
@@ -814,11 +860,9 @@ pub(crate) fn dose<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Mat
     let mut end = scheme.end;
     let mut unit = None;
     if let Some(u) = caps.get(1) {
-        if let Some(resolved) = c.unit(&text[u.clone()], true) {
-            if !char_after(text, u.end).is_some_and(char::is_alphanumeric) {
-                unit = Some(resolved);
-                end = u.end;
-            }
+        if let Some((resolved, unit_end)) = captured_unit(c, text, u, false) {
+            unit = Some(resolved);
+            end = unit_end;
         }
     }
     Some(Match::new(scheme.start..end, Token::Dose { groups, unit }))
@@ -908,25 +952,33 @@ pub(crate) fn money<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Ma
     };
     let mut per = None;
     if let Some(p) = caps.get(5) {
+        let resolve = |word: &str| {
+            c.units()
+                .resolve_compound(c.numerals(), &format!("/{word}"), false)
+                .and_then(|u| u.denominators.into_iter().next())
+        };
+        // `€/Monat.` ends a sentence; `€/Std.` keeps the dot of its abbreviation.
         let word = &text[p.clone()];
-        let part = c
-            .units()
-            .resolve_compound(c.numerals(), &format!("/{word}"), false)
-            .and_then(|u| u.denominators.into_iter().next());
+        let (part, part_end) = match (resolve(word), word.strip_suffix('.')) {
+            (None, Some(stripped)) => (resolve(stripped), p.end - 1),
+            (part, _) => (part, p.end),
+        };
         match part {
-            Some(part) if !char_after(text, p.end).is_some_and(char::is_alphanumeric) => {
+            Some(part) if !char_after(text, part_end).is_some_and(char::is_alphanumeric) => {
                 per = Some(part);
-                end = p.end;
+                end = part_end;
             }
             _ => {}
         }
     }
     if per.is_none() && char_after(text, end) == Some('/') {
-        // `€/Monat` with an unknown word after the slash: keep it as written.
+        // `€/Monat` with an unknown word after the slash: keep it as written;
+        // a dot after it is the sentence's unless the word is a known abbreviation.
         if let Some((word, range)) = next_word(text, end + 1) {
-            let plain_word = word.chars().count() >= 2
-                && !word.chars().all(char::is_uppercase)
-                && char_after(text, range.end) != Some('.');
+            let abbreviated = char_after(text, range.end) == Some('.')
+                && c.abbreviation_key(&format!("{word}.")).is_some();
+            let plain_word =
+                word.chars().count() >= 2 && !word.chars().all(char::is_uppercase) && !abbreviated;
             if range.start == end + 1 && plain_word {
                 per = Some(UnitPart {
                     factor: None,
@@ -959,14 +1011,19 @@ pub(crate) fn percent<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<
 pub(crate) fn degrees<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<Match> {
     let (value, range) = numeral_at(c.numerals(), text, &group(caps, 1)?)?;
     let whole = group(caps, 0)?;
+    let mut end = whole.end;
     let scale = match caps.get(2) {
-        Some(s) if char_after(text, s.end).is_some_and(char::is_alphanumeric) => return None,
+        // `20° Celsius`: the letter starts a word, so the span ends at the sign.
+        Some(s) if char_after(text, s.end).is_some_and(char::is_alphanumeric) => {
+            end = text[..s.start].trim_end().len();
+            None
+        }
         Some(s) if &text[s.clone()] == "C" => Some("temperature-celsius"),
         Some(_) => Some("temperature-fahrenheit"),
         None => None,
     };
     Some(Match::new(
-        range.start..whole.end,
+        range.start..end,
         Token::Degrees { value, scale },
     ))
 }
@@ -975,8 +1032,7 @@ pub(crate) fn degrees<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Option<
 /// after a number (`5 kg`, `5kg`, `10 Min.`), validated against the unit
 /// table; the trailing `.` of a short name is tried both kept and
 /// stripped. Unlike [`trailing_unit`], which scans forward from a bare
-/// offset and tolerates spaces and digits for compound multi-word units
-/// (`12,5 €`), this only ever looks at the single token the regex's
+/// offset, this only ever looks at the single token the regex's
 /// `SYM`-bounded group matched, so prose after the unit can't be mistaken
 /// for part of it. `glued` is true when nothing separated the number from
 /// the symbol, which only a bare CLDR/extra symbol may do (`500mg`, not
@@ -1076,8 +1132,6 @@ pub(crate) fn repetition<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Opti
     }
     if per.is_none() {
         match char_after(text, end) {
-            None | Some('/') => {}
-            Some(ch) if ch.is_whitespace() => {}
             Some(ch) if ch.is_ascii_digit() => {
                 // `2x500` is a bare number; `0x1F` is not.
                 let run = text[end..].trim_start_matches(|d: char| d.is_ascii_digit());
@@ -1085,7 +1139,8 @@ pub(crate) fn repetition<C: Context>(c: &C, text: &str, caps: &Caps<'_>) -> Opti
                     return None;
                 }
             }
-            Some(_) => return None,
+            Some(ch) if ch.is_alphanumeric() => return None,
+            _ => {}
         }
     }
     if count.is_integer() && count.integer == 0 {

@@ -7,7 +7,7 @@ use regex::Regex;
 use super::lexicon::TABLES;
 use super::Romanian;
 use crate::lang::common::{self, group, iso_bounded, recognizer, text_of, Patterns};
-use crate::lang::{char_after, char_before, digit_bounded, Context};
+use crate::lang::{char_after, char_before, digit_bounded, Context, HSPACE};
 use crate::pipeline::{Caps, Match, Recognizer};
 use crate::token::*;
 
@@ -19,13 +19,18 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         // `@`, `://`, `www.` and a known TLD are unambiguous: above everything.
         recognizer(&p.electronic, common::electronic),
         recognizer(
-            r"([0-9]{1,2}):([0-9]{2})(\s*[–-]\s*|\s+(?:până\s+)?la\s+)([0-9]{1,2}):([0-9]{2})",
+            &format!(
+                r"([0-9]{{1,2}}):([0-9]{{2}})({HSPACE}*[–-]{HSPACE}*|{HSPACE}+(?:până{HSPACE}+)?la{HSPACE}+)([0-9]{{1,2}}):([0-9]{{2}})"
+            ),
             time_range,
         ),
-        recognizer(r"(?:(ora|orele)\s+)?([0-9]{1,2})(?::([0-9]{2}))?", time),
+        recognizer(
+            &format!(r"(?:(ora|orele){HSPACE}+)?([0-9]{{1,2}})(?::([0-9]{{2}}))?"),
+            time,
+        ),
         recognizer(
             &format!(
-                r"(?:([0-9]{{1,2}})\.([0-9]{{1,2}})\.([0-9]{{4}})?|([0-9]{{4}})-([0-9]{{2}})(?:-([0-9]{{2}}))?|([0-9]{{1,2}})\s+({months})(?:\s+([0-9]{{4}}))?)"
+                r"(?:([0-9]{{1,2}})\.([0-9]{{1,2}})\.([0-9]{{4}})?|([0-9]{{4}})-([0-9]{{2}})(?:-([0-9]{{2}}))?|([0-9]{{1,2}}){HSPACE}+({months})(?:{HSPACE}+([0-9]{{4}}))?)"
             ),
             date,
         ),
@@ -38,7 +43,10 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         // `al 3-lea`, `a 5-a`, `al II-lea`: the suffix is the marker, so the
         // ordinal outranks the classes that would take its letters (chemical,
         // math variables) and its digits.
-        recognizer(r"(?:(al|a|Al|A)\s+)?([0-9]+|[IVXLCDM]+)-(lea|a)", ordinal),
+        recognizer(
+            &format!(r"(?:(al|a|Al|A){HSPACE}+)?([0-9]+|[IVXLCDM]+)-(lea|a)"),
+            ordinal,
+        ),
         recognizer(&p.scientific, common::scientific),
         recognizer(&p.chemical, common::chemical),
         recognizer(&p.power, common::power),
@@ -51,14 +59,14 @@ pub(super) fn recognizers(months: &str, abbreviations: Option<Regex>) -> Vec<Rec
         recognizer(&p.dose, common::dose),
         recognizer(
             &format!(
-                r"(?:(€|\$|£|EUR|USD|GBP|RON)\s?)?(-?{num})(?:\s*(?:de\s+)?(mii|milioane|milion|mil\.|miliarde|miliard|mld\.))?(?:\s*(?:de\s+)?(lei|leu|Lei|LEI|RON|ron|€|EUR|euro|\$|USD|dolari|dolar|£|GBP|lire|liră))?(?:/(\p{{L}}[\p{{L}}.]*))?"
+                r"(?:(€|\$|£|EUR|USD|GBP|RON){HSPACE}?)?(-?{num})(?:{HSPACE}*(?:de{HSPACE}+)?(mii|milioane|milion|mil\.|miliarde|miliard|mld\.))?(?:{HSPACE}*(?:de{HSPACE}+)?(lei|leu|Lei|LEI|RON|ron|€|EUR|euro|\$|USD|dolari|dolar|£|GBP|lire|liră))?(?:/(\p{{L}}[\p{{L}}.]*))?"
             ),
             common::money,
         ),
         recognizer(&p.percent, common::percent),
         recognizer(&p.degrees, common::degrees),
         recognizer(
-            &format!(r"(-?{plain})\s*[x×](/\p{{L}}+)?"),
+            &format!(r"(-?{plain}){HSPACE}*[x×](/\p{{L}}+)?"),
             common::repetition,
         ),
         recognizer(&p.range, common::range),

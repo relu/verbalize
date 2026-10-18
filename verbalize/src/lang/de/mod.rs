@@ -184,7 +184,6 @@ impl Context for German {
         None
     }
 
-    /// Bare 1100–1999 is a year; 2000–2999 read the same either way.
     /// The full words also lower-case (`2 millionen km/h` in loose prose).
     fn scale(&self, word: &str) -> Option<Scale> {
         Some(match word {
@@ -196,6 +195,7 @@ impl Context for German {
         })
     }
 
+    /// Bare 1100–1999 is a year; 2000–2999 read the same either way.
     fn is_year(&self, year: u64) -> bool {
         (1100..=2999).contains(&year)
     }

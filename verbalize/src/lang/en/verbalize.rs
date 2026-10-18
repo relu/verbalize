@@ -131,6 +131,12 @@ impl English {
             .iter()
             .find(|c| c.code == code)
             .expect("code from the table");
+        let negative = amount.negative;
+        // The sign is spoken once, in front of the whole amount.
+        let amount = &Numeral {
+            negative: false,
+            ..amount.clone()
+        };
         let major = Numeral::int(amount.integer);
         let mut out = String::new();
         match (scale, amount.fraction.len()) {
@@ -173,7 +179,7 @@ impl English {
                 out.push_str(&self.head_noun(code, amount));
             }
         }
-        if amount.negative {
+        if negative {
             out.insert_str(0, "minus ");
         }
         if let Some(part) = per {
@@ -426,7 +432,7 @@ pub(super) fn verbalize(e: &English, token: &Token, agreement: Agreement) -> Ver
             numerator,
             denominator,
         } => e.fraction_words(whole.as_ref(), *numerator, *denominator),
-        Token::Paragraph { plural } => format!("{} ", if *plural { "sections" } else { "section" }),
+        Token::Paragraph { plural } => (if *plural { "sections" } else { "section" }).to_string(),
         Token::Roman { from, to } => {
             let word = |n: u8| words(&n.into());
             match to {
@@ -512,12 +518,19 @@ pub(super) fn verbalize(e: &English, token: &Token, agreement: Agreement) -> Ver
             seconds,
             compass,
         } => {
-            let mut out = format!("{} degrees", words(degrees));
+            // CLDR names pick singular/plural by value ("one minute").
+            let part = |id: &'static str, n: &Numeral| {
+                let unit = UnitRef::Cldr { id, prefix: None };
+                format!("{} {}", words(n), e.units.name(&unit, n, Case::Nominative))
+            };
+            let mut out = part("angle-degree", degrees);
             if let Some(minutes) = minutes {
-                out.push_str(&format!(" {} minutes", words(minutes)));
+                out.push(' ');
+                out.push_str(&part("duration-minute", minutes));
             }
             if let Some(seconds) = seconds {
-                out.push_str(&format!(" {} seconds", words(seconds)));
+                out.push(' ');
+                out.push_str(&part("duration-second", seconds));
             }
             if let Some(c) = compass {
                 if let Some((_, name)) = TABLES.compass.iter().find(|(l, _)| l == c) {

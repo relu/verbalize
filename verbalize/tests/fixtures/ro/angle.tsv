@@ -6,3 +6,7 @@
 26,1° E	douăzeci și șase virgulă unu grade est
 # negative: plain Degrees
 20 °C	douăzeci de grade Celsius
+# a degree, minute or second of value 1 is singular ("un minut", "o secundă")
+30°1'	treizeci de grade un minut
+30°1'1"	treizeci de grade un minut o secundă
+1°30'	un grad treizeci de minute

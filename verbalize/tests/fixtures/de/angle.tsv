@@ -24,3 +24,7 @@ N	N
 # negative: a letter after an unrelated number is not a coordinate — no
 # degree sign present, ordinary Cardinal reading
 5 N	fünf N
+# a minute or second of value 1 is singular and feminine ("eine Minute")
+30°1'	dreißig Grad eine Minute
+30°1'1"	dreißig Grad eine Minute eine Sekunde
+1°30'	ein Grad dreißig Minuten

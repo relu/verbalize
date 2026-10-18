@@ -23,3 +23,5 @@ NaCl	NaCl
 # negative: bare superscript with no element symbol in front is left
 # untouched — the gate needs a preceding letter
 ²⁺	²⁺
+# a count too large for the reading is not a formula: the subscripts stay as written
+H₅₀₀₀₀₀₀₀₀₀O	H₅₀₀₀₀₀₀₀₀₀O

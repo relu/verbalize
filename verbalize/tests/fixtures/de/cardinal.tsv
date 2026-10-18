@@ -38,3 +38,6 @@ Millionenstadt	Millionenstadt
 30	dreissig
 130	einhundertdreissig
 # region: default
+# negative scaled count: the sign is spoken once, singular/plural follow the magnitude
+-1 Mio. Einwohner	minus eine Million Einwohner
+-2,5 Mio. Einwohner	minus zwei Komma fünf Millionen Einwohner

@@ -267,7 +267,13 @@ impl Romanian {
     /// `3 mil.` → "trei milioane", `1 mld.` → "un miliard", `20 mii` →
     /// "douăzeci de mii"; with `de` when a noun follows ("… de locuitori").
     fn scaled_words(&self, amount: &Numeral, scale: Scale, noun_follows: bool) -> String {
-        let one = amount.is_integer() && amount.integer == 1 && !amount.negative;
+        // Singular/plural follow the magnitude; the sign is spoken in front.
+        let negative = amount.negative;
+        let amount = &Numeral {
+            negative: false,
+            ..amount.clone()
+        };
+        let one = amount.is_integer() && amount.integer == 1;
         let (noun, gender) = match scale {
             Scale::Thousand if one => ("mie", Gender::Feminine),
             Scale::Thousand => ("mii", Gender::Feminine),
@@ -279,6 +285,9 @@ impl Romanian {
             Scale::Trillion => ("trilioane", Gender::Neuter),
         };
         let mut out = format!("{} {noun}", self.count_words(amount, Some(gender)));
+        if negative {
+            out.insert_str(0, "minus ");
+        }
         if noun_follows {
             out.push_str(" de");
         }
@@ -299,6 +308,12 @@ impl Romanian {
             .iter()
             .find(|c| c.code == code)
             .expect("code from the table");
+        let negative = amount.negative;
+        // The sign is spoken once, in front of the whole amount.
+        let amount = &Numeral {
+            negative: false,
+            ..amount.clone()
+        };
         let major = Numeral::int(amount.integer);
         let minor_words = |cents: u128| -> String {
             let n = Numeral::int(cents);
@@ -341,7 +356,7 @@ impl Romanian {
                 out.push_str(&self.head_noun(code, amount));
             }
         }
-        if amount.negative {
+        if negative {
             out.insert_str(0, "minus ");
         }
         if let Some(part) = per {
@@ -375,7 +390,8 @@ impl Romanian {
         if let Some(whole) = whole {
             out.push_str(&words(whole, None));
             out.push_str(" și ");
-            if numerator == 1 {
+            // "jumătate" takes no article after "și"; other nouns count: "un sfert".
+            if numerator == 1 && denominator == 2 {
                 out.push_str(singular);
                 return out;
             }
@@ -615,7 +631,7 @@ pub(super) fn verbalize(r: &Romanian, token: &Token, agreement: Agreement) -> Ve
             denominator,
         } => r.fraction_words(whole.as_ref(), *numerator, *denominator),
         Token::Paragraph { plural } => {
-            format!("{} ", if *plural { "paragrafele" } else { "paragraful" })
+            (if *plural { "paragrafele" } else { "paragraful" }).to_string()
         }
         Token::Roman { from, to } => {
             let word = |n: u8| words(&n.into(), None);

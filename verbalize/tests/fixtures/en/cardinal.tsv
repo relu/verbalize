@@ -15,3 +15,6 @@ B1	B one
 # a scale word with no currency
 5 thousand people	five thousand people
 5 million km	five million kilometers
+# negative scaled count
+-1 million people	minus one million people
+-3 million people	minus three million people

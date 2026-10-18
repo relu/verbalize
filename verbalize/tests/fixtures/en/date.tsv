@@ -25,3 +25,6 @@ November 1, 2026	November first, twenty twenty-six
 # Inputs below marked "# text-processing-rs" are NeMo-derived TN test inputs from FluidInference/text-processing-rs (tests/fixtures/en, Apache-2.0); the expected outputs are ours.
 # text-processing-rs: year first with slashes is unambiguous in either region
 2016/07/03	July third twenty sixteen
+# the period after a month belongs to it only when abbreviated
+He left on 1 November. Then he came back.	He left on the first of November. Then he came back.
+on Nov. 5 we met	on November fifth we met

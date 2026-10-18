@@ -6,3 +6,7 @@
 37 °C	treizeci și șapte de grade Celsius
 0 °C	zero grade Celsius
 2 °C	două grade Celsius
+# a degree sign with no scale letter ends the span; the text after it is left as written
+Sunt 20° în Cluj	Sunt douăzeci de grade în Cluj
+# the C of a word is no scale letter
+20° Celsius	douăzeci de grade Celsius

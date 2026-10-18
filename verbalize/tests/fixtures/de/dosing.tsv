@@ -38,3 +38,7 @@ Metformin 1000 mg 2×/Tag	Metformin eintausend Milligramm zweimal pro Tag
 # negative: fused "-mal" already spelled needs no digit at all — no rule
 # needed, listed as a shape reminder
 zweimal	zweimal
+# a repetition ends at any non-alphanumeric character
+Einnahme 2x.	Einnahme zweimal.
+2x, dann Pause	zweimal, dann Pause
+(3-mal)	(dreimal)

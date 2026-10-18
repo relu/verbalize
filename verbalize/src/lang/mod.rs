@@ -211,6 +211,11 @@ impl Numerals {
 /// Whitespace group separators DIN 5008 and the Chicago style share.
 pub(crate) const SPACE_GROUPS: [char; 4] = [' ', '\u{a0}', '\u{202f}', '\u{2009}'];
 
+/// Regex fragment for whitespace within a line: tab and the space
+/// separators (`\p{Zs}`, which includes NBSP, U+202F and U+2009), never a
+/// line break, so a recogniser does not join its parts across one.
+pub(crate) const HSPACE: &str = r"[\t\p{Zs}]";
+
 // ------------------------------------------------------------- helpers
 
 /// The digits of `range` are a whole digit run: no ASCII digit touches it
@@ -236,11 +241,19 @@ pub(crate) fn letter_free(text: &str, range: &Range<usize>) -> bool {
         && !char_after(text, range.end).is_some_and(char::is_alphabetic)
 }
 
-/// The word (letters only) starting at `at` after optional whitespace, with
-/// its byte range.
+/// The word (letters only) starting at `at` after optional horizontal
+/// whitespace, with its byte range. A line break ends the search: what is on
+/// the next line is not part of this one.
 pub(crate) fn next_word(text: &str, at: usize) -> Option<(&str, Range<usize>)> {
     let rest = &text[at..];
-    let start = at + rest.len() - rest.trim_start().len();
+    let horizontal = rest.trim_start_matches(|c: char| {
+        c.is_whitespace()
+            && !matches!(
+                c,
+                '\n' | '\r' | '\u{b}' | '\u{c}' | '\u{85}' | '\u{2028}' | '\u{2029}'
+            )
+    });
+    let start = at + rest.len() - horizontal.len();
     let word: &str = text[start..].split(|c: char| !c.is_alphabetic()).next()?;
     (!word.is_empty()).then(|| (word, start..start + word.len()))
 }

@@ -35,3 +35,9 @@ and/or	and/or
 350cc	three hundred fifty cubic centimeters
 # negative: `my` is a word, not `m` + `y` (milli-year)
 3 my	three my
+# a scale word keeps its unit when more text follows
+It flies 2 million km/h today.	It flies two million kilometers per hour today.
+# a line or paragraph separator between number and unit joins nothing
+5 mg	five mg
+5mg	fivemg
+5 %	five %

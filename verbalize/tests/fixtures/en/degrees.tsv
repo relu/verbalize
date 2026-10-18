@@ -7,3 +7,8 @@
 1°	one degree
 98.6 °F	ninety-eight point six degrees Fahrenheit
 0 °C	zero degrees Celsius
+# a degree sign with no scale letter ends the span; the text after it is left as written
+It is 20° in Berlin	It is twenty degrees in Berlin
+# the C or F of a word is no scale letter
+20° Celsius	twenty degrees Celsius
+20° Fahrenheit	twenty degrees Fahrenheit

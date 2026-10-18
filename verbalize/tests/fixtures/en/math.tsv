@@ -17,3 +17,7 @@ x ≠ 0	x is not equal to zero
 a = b	a = b
 # negative: unspaced hyphen is a Range
 3-5	three to five
+# a unit after a comparison is the first token that resolves, not the rest of the text
+Dose ≤10 mg per day.	Dose less than or equal to ten milligrams per day.
+# the period rule is for single-letter variables, not for infinity
+∞.	infinity.

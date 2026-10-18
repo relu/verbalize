@@ -28,7 +28,9 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
   but "o sută douăzeci de lei"). The verbalizer appends "de" to a Cardinal
   whose following word is a noun (`NounPosition::After`, set by the
   classifier unless the word is in the function-word stoplist or "de" is
-  already written); CLDR's own `other` unit patterns carry it ("{0} de
+  already written; only a word on the same line counts, so `Pagina 21` at
+  a line end takes no "de");
+  CLDR's own `other` unit patterns carry it ("{0} de
   kilometri"); currencies, fractions and repetition add it in code.
 - **Thousands**: from 1000 up the groups are composed in the verbalizer —
   count (feminine for "mii", neuter for "milioane"), "de" by the count's
@@ -101,6 +103,10 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
   hand table ban/bani, cent/cenți, penny/pence ("un leu și cincizeci de
   bani", "doi lei și cinci bani", "cincizeci de bani"); `,00` dropped;
   three or more fraction digits read as a decimal plus the currency.
+- **Negative amounts**: a leading `-` is spoken once, in front of the whole
+  reading, whichever shape it takes: `-12,50 lei` → "minus doisprezece lei
+  și cincizeci de bani", `-2,5 mld. lei` → "minus două virgulă cinci
+  miliarde de lei", `-5,125 lei` → "minus cinci virgulă unu doi cinci lei".
 - **Scale words**: `mii`, `mil.`/`milion`/`milioane`, `mld.`/`miliard`/
   `miliarde` between amount and currency; the scale noun takes the
   count's "de" from 20 on and the currency always follows with "de"
@@ -195,8 +201,10 @@ Standards Institute conventions for numeric dates; CLDR ro (`rbnf.json`,
 - Feminine fraction nouns (jumătate/jumătăți, treime/treimi, cincime …,
   sutime/sutimi, miime/miimi) with "un sfert"/"sferturi" neuter: "o
   jumătate", "două treimi", "trei sferturi", "o optime", "douăzeci de
-  sutimi"; mixed numbers with "și" ("unu și jumătate", "doi și trei
-  sferturi"). Denominators 13–99 derive the noun from the cardinal minus
+  sutimi"; mixed numbers with "și": the fraction is counted as on its own
+  ("unu și un sfert", "unu și o treime", "doi și trei sferturi"), except
+  "jumătate", which takes no article after "și" ("unu și jumătate").
+  Denominators 13–99 derive the noun from the cardinal minus
   its final vowel plus "-ime"/"-imi" ("o treisprezecime", "trei
   douăzecimi").
 

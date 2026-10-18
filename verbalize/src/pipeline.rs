@@ -205,7 +205,8 @@ pub(crate) fn word_bounded(text: &str, range: &Range<usize>) -> bool {
 /// after an uppercase letter (`B1`, `SpO2`) gets a separating space so the
 /// letter is spelled on its own, and one sandwiched between letters of any
 /// case (`H2O`, `HbA1c`) on both sides; a suffix on a word that starts
-/// with the digits stays attached (`630c`, `1990er`, `1F`).
+/// with the digits stays attached (`630c`, `1990er`, `1F`). The paragraph
+/// sign is spoken as a word, so a number glued to it (`§25`) is separated.
 pub(crate) fn render(text: &str, spans: &[Span]) -> String {
     let mut out = String::with_capacity(text.len() + text.len() / 2);
     let mut at = 0;
@@ -221,6 +222,10 @@ pub(crate) fn render(text: &str, spans: &[Span]) -> String {
         }
         out.push_str(&span.spoken);
         if glue && sandwiched {
+            out.push(' ');
+        }
+        if matches!(span.token, Token::Paragraph { .. }) && after.is_some_and(char::is_alphanumeric)
+        {
             out.push(' ');
         }
         at = span.range.end;
