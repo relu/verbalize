@@ -298,10 +298,27 @@ fn ordinal(g: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
     {
         return None;
     }
-    let gender = caps.get(3).and_then(|_| g.ordinal_noun(text_of(caps, 3)));
-    // Without a lexicon noun only a trigger whose ending does not depend on
-    // the noun's gender resolves the ordinal (`am 5.`, `am 100. Geburtstag`).
+    let next = caps.get(3).map(|_| text_of(caps, 3));
+    let mut gender = next.and_then(|w| g.ordinal_noun(w));
+    // A sentence period is followed by a capital, so `N.` before a lower-case
+    // word is an ordinal even without a resolvable noun, unless `N` is the
+    // tail of a larger number (`3,5.`, `22 000.`, `-12.`, `1.11.`).
+    let before_lowercase = next.is_some_and(|w| w.starts_with(char::is_lowercase))
+        && !continues_number(text, number.start);
+    // `der` alone is masculine nominative or feminine/plural dative or
+    // genitive; an adjective ending in `-en` after it marks the latter.
     if gender.is_none()
+        && before_lowercase
+        && trigger.is_some_and(|t| t.eq_ignore_ascii_case("der"))
+        && next.is_some_and(|w| !w.ends_with("en"))
+    {
+        gender = Some(Gender::Masculine);
+    }
+    // Otherwise only a trigger whose ending does not depend on the noun's
+    // gender resolves the ordinal without a lexicon noun (`am 5.`,
+    // `am 100. Geburtstag`).
+    if gender.is_none()
+        && !before_lowercase
         && (!trigger.is_some_and(gender_free_trigger)
             || crate::lang::char_after(text, number.end + 1).is_some_and(char::is_alphanumeric))
     {
@@ -311,6 +328,17 @@ fn ordinal(g: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
     let mut m = Match::new(number.start..number.end + 1, Token::Ordinal(n));
     m.agreement = ordinal_agreement(trigger, gender);
     Some(m)
+}
+
+/// The number at `start` follows a sign, a decimal comma, a dot or a digit
+/// group separator, so it is the end of a larger number.
+fn continues_number(text: &str, start: usize) -> bool {
+    let mut before = text[..start].chars().rev();
+    match before.next() {
+        Some('-' | '−' | '–' | '+' | ',' | '.' | '/') => true,
+        Some(c) if c.is_whitespace() => before.next().is_some_and(|d| d.is_ascii_digit()),
+        _ => false,
+    }
 }
 
 /// Triggers that fix the ordinal's ending for every gender (weak

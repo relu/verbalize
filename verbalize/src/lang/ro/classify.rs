@@ -228,8 +228,10 @@ fn ordinal(_: &Romanian, text: &str, caps: &Caps<'_>) -> Option<Match> {
     let article =
         group(caps, 1).filter(|r| !char_before(text, r.start).is_some_and(char::is_alphanumeric));
     let number = group(caps, 2)?;
-    let glued =
-        char_after(text, whole.end).is_some_and(|c| c.is_alphanumeric() && !common::is_script(c));
+    // A digit after the suffix starts its own reading, which the render
+    // separates from the ordinal; letters would make the suffix part of a word.
+    let glued = char_after(text, whole.end)
+        .is_some_and(|c| c.is_alphanumeric() && !c.is_ascii_digit() && !common::is_script(c));
     let before = char_before(text, number.start);
     if glued || (article.is_none() && before.is_some_and(|c| c.is_alphabetic() || c == '-')) {
         return None;

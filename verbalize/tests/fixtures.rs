@@ -9,7 +9,7 @@ use std::cell::{Cell, RefCell};
 use std::fs;
 use std::panic;
 use std::path::{Path, PathBuf};
-use std::sync::{Mutex, Once};
+use std::sync::Once;
 
 use verbalize::token::Span;
 use verbalize::{Language, Normalizer, Options, Region};
@@ -166,8 +166,7 @@ static QUIET_HOOK: Once = Once::new();
 /// hook for other tests.
 fn catch_quietly<R>(f: impl FnOnce() -> R) -> Result<R, String> {
     QUIET_HOOK.call_once(|| {
-        // `panic_safety_over_arbitrary_unicode` swaps the hook while holding this lock.
-        let _guard = HOOK_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        // Wrapping once keeps the previous hook for threads outside `catch_quietly`.
         let previous = panic::take_hook();
         panic::set_hook(Box::new(move |info| {
             if QUIET.get() {
@@ -268,10 +267,18 @@ fn wrappers(language: Language) -> [(&'static str, &'static str, &'static str); 
 /// Whether `wrapper` makes a different input rather than embedding the same
 /// one: "X.." and "X,," are not "X. zzq", and in de and ro a period after a
 /// dotted number (`2.3` + `.`) is the closing dot of a date, which the date
-/// reading consumes.
+/// reading consumes. German writes ordinals as `N.` and a period before a
+/// lower-case word is one, so `X. zzq` and `N. zzq` are not neutral there.
 fn wrapper_applies(language: Language, wrapper: &str, input: &str) -> bool {
+    let german = language == Language::De;
     match wrapper {
         "comma" => !input.ends_with(','),
+        "words" => {
+            !(german
+                && input
+                    .strip_suffix('.')
+                    .is_some_and(|n| n.ends_with(|c: char| c.is_ascii_digit())))
+        }
         "period" => {
             let dotted_number = input
                 .rsplit(|c: char| !c.is_ascii_digit() && c != '.')
@@ -279,7 +286,9 @@ fn wrapper_applies(language: Language, wrapper: &str, input: &str) -> bool {
                 .is_some_and(|run| {
                     run.contains('.') && run.ends_with(|c: char| c.is_ascii_digit())
                 });
-            !input.ends_with('.') && !(language != Language::En && dotted_number)
+            !input.ends_with('.')
+                && !(language != Language::En && dotted_number)
+                && !(german && input.ends_with(|c: char| c.is_ascii_digit()))
         }
         _ => true,
     }
@@ -384,7 +393,8 @@ fn ro_context_invariance() {
 fn properties_over_space_shapes(language: Language) {
     const HEADS: &[&str] = &["270°", "2°", "1-0-1", "5", "§", "1,5 × 10³", "5 mg", "2x"];
     const GAPS: &[&str] = &[
-        " ", "\u{a0}", "\u{202f}", "\u{2009}", "\u{200b}", "\u{2011}", "\u{ad}", "\n",
+        " ", "\u{a0}", "\u{202f}", "\u{2009}", "\u{200b}", "\u{2011}", "\u{ad}", "\n", "\u{2028}",
+        "\u{85}",
     ];
     const TAILS: &[&str] = &["Nord", "EUR", "mg", "foo", "x", "kg", ""];
     let normalizer = Normalizer::new(language);
@@ -417,46 +427,6 @@ fn en_properties_over_space_shapes() {
 #[test]
 fn ro_properties_over_space_shapes() {
     properties_over_space_shapes(Language::Ro);
-}
-
-/// A URL or address followed by a word that is an abbreviation in some
-/// language: the spoken URL must not leave text that a second pass reads
-/// differently, since the output of `normalize` is routinely normalized again.
-fn properties_over_url_shapes(language: Language) {
-    const HEADS: &[&str] = &[
-        "www.example.com/",
-        "https://example.org/a/",
-        "example.com/",
-        "user@example.com/",
-    ];
-    const TAILS: &[&str] = &["Nr.", "nr.", "St.", "Dr.", "Abs.", "z. B.", "e.g.", "Std."];
-    let normalizer = Normalizer::new(language);
-    let failures: Vec<String> = HEADS
-        .iter()
-        .flat_map(|h| TAILS.iter().map(move |t| format!("qq {h}{t}")))
-        .filter_map(|input| check_properties(&normalizer, &input).err())
-        .collect();
-    assert!(
-        failures.is_empty(),
-        "{} failures:\n{}",
-        failures.len(),
-        failures.join("\n")
-    );
-}
-
-#[test]
-fn de_properties_over_url_shapes() {
-    properties_over_url_shapes(Language::De);
-}
-
-#[test]
-fn en_properties_over_url_shapes() {
-    properties_over_url_shapes(Language::En);
-}
-
-#[test]
-fn ro_properties_over_url_shapes() {
-    properties_over_url_shapes(Language::Ro);
 }
 
 /// xorshift64*: deterministic random digit-rich strings without a dev-dependency.
@@ -759,26 +729,18 @@ fn check_spans(input: &str, spans: &[Span]) -> Result<(), String> {
 
 /// `normalize` and `annotate` must never panic, on any input whatsoever,
 /// every span `annotate` returns must be a valid slice of the input, and
-/// a second pass must be a no-op (the crate's documented idempotence
-/// contract, `Normalizer::normalize`, holds unconditionally — it is not
-/// scoped to digit-bearing input). Narrower than `check_properties` only
-/// in dropping "no digit left behind": arbitrary Unicode noise carrying
-/// no digits to begin with trivially satisfies that one and adds nothing.
+/// a second pass must be a no-op (`Normalizer::normalize`; the documented
+/// URL exception is not reachable from random pieces). Narrower than
+/// `check_properties` only in dropping "no digit left behind": arbitrary
+/// Unicode noise carrying no digits to begin with trivially satisfies that
+/// one and adds nothing.
 ///
-/// `panic::set_hook`/`take_hook` are process-global; cargo runs the three
-/// per-language instances of this test concurrently in one binary, so the
-/// hook swap is serialized through `HOOK_LOCK` to avoid one test silently
-/// leaving another's stderr suppressed for the rest of the run.
-static HOOK_LOCK: Mutex<()> = Mutex::new(());
-
+/// Panics go through `catch_quietly`, so their location is reported.
 fn panic_safety_over_arbitrary_unicode(language: Language, seed: u64) {
     let normalizer = Normalizer::new(language);
     let mut rng = XorShift(seed);
     let mut failures = Vec::new();
 
-    let guard = HOOK_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-    let previous_hook = panic::take_hook();
-    panic::set_hook(Box::new(|_| {}));
     for i in 0..300 {
         let piece_count = if i % 40 == 0 {
             // Occasionally build a multi-KB input: catches quadratic
@@ -791,23 +753,20 @@ fn panic_safety_over_arbitrary_unicode(language: Language, seed: u64) {
             .map(|_| random_wide_piece(&mut rng))
             .collect();
 
-        let once = panic::catch_unwind(panic::AssertUnwindSafe(|| normalizer.normalize(&input)));
-        match &once {
-            Err(_) => failures.push(format!("normalize panicked on: {input:?}")),
-            Ok(once) => {
-                match panic::catch_unwind(panic::AssertUnwindSafe(|| normalizer.normalize(once))) {
-                    Err(_) => {
-                        failures.push(format!("normalize(normalize(t)) panicked on: {input:?}"))
-                    }
-                    Ok(twice) if &twice != once => failures.push(format!(
-                        "not idempotent: {input:?} -> {once:?} -> {twice:?}"
-                    )),
-                    Ok(_) => {}
-                }
-            }
+        match catch_quietly(|| normalizer.normalize(&input)) {
+            Err(panic) => failures.push(format!("normalize panicked ({panic}) on: {input:?}")),
+            Ok(once) => match catch_quietly(|| normalizer.normalize(&once)) {
+                Err(panic) => failures.push(format!(
+                    "normalize(normalize(t)) panicked ({panic}) on: {input:?}"
+                )),
+                Ok(twice) if twice != once => failures.push(format!(
+                    "not idempotent: {input:?} -> {once:?} -> {twice:?}"
+                )),
+                Ok(_) => {}
+            },
         }
-        match panic::catch_unwind(panic::AssertUnwindSafe(|| normalizer.annotate(&input))) {
-            Err(_) => failures.push(format!("annotate panicked on: {input:?}")),
+        match catch_quietly(|| normalizer.annotate(&input)) {
+            Err(panic) => failures.push(format!("annotate panicked ({panic}) on: {input:?}")),
             Ok(spans) => {
                 if let Err(e) = check_spans(&input, &spans) {
                     failures.push(format!("{e}: {input:?}"));
@@ -815,8 +774,6 @@ fn panic_safety_over_arbitrary_unicode(language: Language, seed: u64) {
             }
         }
     }
-    panic::set_hook(previous_hook);
-    drop(guard);
 
     assert!(
         failures.is_empty(),

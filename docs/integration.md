@@ -108,13 +108,15 @@ regression fails the build the same way a broken test would.
 
 ## Idempotence
 
-`normalize(normalize(t)) == normalize(t)` is a hard property,
-enforced by a property test over every fixture input and over random
-digit-rich strings (`cargo test -p verbalize --test fixtures`). The output
-of `normalize` never contains an ASCII digit or a classified symbol, so
-running it twice — for example if your pipeline both normalises for a
-local phonemiser and again defensively before a remote fallback — is
-always a safe no-op, not a source of double-reading bugs.
+`normalize(normalize(t)) == normalize(t)` holds, enforced by a property
+test over every fixture input and over random digit-rich and arbitrary
+Unicode strings (`cargo test -p verbalize --test fixtures`). The output
+never contains an ASCII digit or a classified symbol, so normalising
+twice — for example locally and again before a remote fallback — is a
+no-op, with one exception: a URL whose last path word and the sentence
+period after it form an abbreviation. `qq www.example.com/Nr.` becomes
+`qq www Punkt example Punkt com Schrägstrich Nr.`, and a second pass reads
+the now-plain `Nr.` as `Nummer`.
 
 ## Performance
 

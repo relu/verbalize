@@ -217,7 +217,10 @@ pub(crate) fn render(text: &str, spans: &[Span]) -> String {
         let after = text[span.range.end..].chars().next();
         let sandwiched =
             before.is_some_and(char::is_alphabetic) && after.is_some_and(char::is_alphabetic);
-        if glue && (sandwiched || before.is_some_and(char::is_uppercase)) {
+        // A reading that starts where the previous span ends (`al II-lea5`)
+        // would otherwise fuse with it into one word.
+        let abuts_span = at > 0 && at == span.range.start && !out.ends_with(' ');
+        if glue && (sandwiched || before.is_some_and(char::is_uppercase) || abuts_span) {
             out.push(' ');
         }
         out.push_str(&span.spoken);

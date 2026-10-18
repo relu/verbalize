@@ -53,9 +53,22 @@ passthrough input keeps its own spelling. Nothing else differs between regions.
   dative/accusative/genitive `am`/`vom`/`zum`/`beim`/`im`/`dem`/`den`/`des`
   → `-en`, weak nominative `die`/`das` → `-e`): `am 100. Geburtstag` →
   `am einhundertsten Geburtstag`, `Wir treffen uns am 5.` → `am fünften`.
-  Elsewhere "N." is left alone; a wrong case ending is judged worse than
-  the engine's own guess. Strong triggers (`seit`, `ab`, `bis`, `nach`,
-  `vor`) and `der` still need a noun of known gender.
+  Elsewhere "N." is left alone before a capital or the end of the text; a
+  wrong case ending is judged worse than the engine's own guess. Strong
+  triggers (`seit`, `ab`, `bis`, `nach`, `vor`) and `der` still need a noun
+  of known gender, except before a lower-case word (next item).
+- **Before a lower-case word**: `N.` followed by whitespace and a
+  lower-case word is an ordinal even without a lexicon noun, because a
+  German sentence period is followed by a capital and an ordinal is a
+  numeral with a period (Duden). The ending comes from the preceding
+  trigger (`nach 2. langem Warten` → `nach zweitem langem Warten`); with
+  none, the bare strong form (`Er wurde 3. und war froh.` → `Er wurde
+  dritter und war froh.`). `der` is masculine nominative unless the next
+  word ends in `-en` (`der 3. große Sieg` → `der dritte große Sieg`, `der
+  3. großen Klasse` → `der dritten großen Klasse`). Before a capital the
+  period ends the sentence and `N` stays a cardinal (`Das sind 3. Danach`
+  → `Das sind drei. Danach`), as does the tail of a larger number
+  (`3,5.`, `22 000.`, `-12.`, `1.11.`).
 - **Ordinal noun lexicon (fixed list, with gender)**: Klasse (f),
   Stock (m), Etage (f), Platz (m), Mal (n), Liga (f), Runde (f),
   Halbjahr (n), Quartal (n), Semester (n), Jahrhundert (n), Auflage (f),

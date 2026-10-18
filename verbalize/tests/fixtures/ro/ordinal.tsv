@@ -25,3 +25,6 @@ al 3-lea etaj	al treilea etaj
 a 3-a clasă	a treia clasă
 # negative: a bare number with a period is a Cardinal
 Capitolul 3.	Capitolul trei.
+# a digit right after the suffix is a word boundary; its reading follows the ordinal.
+al II-lea5	al doilea cinci
+a 3-a5	a treia cinci

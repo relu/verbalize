@@ -58,3 +58,13 @@ der 30. Geburtstag	der dreißigste Geburtstag
 # region: DeCh
 der 30. Geburtstag	der dreissigste Geburtstag
 # region: default
+# A period followed by a lower-case word is an ordinal dot, not a sentence end (Duden: ordinals are a numeral with a period). Agreement from the preceding determiner; none -> bare strong form.
+# "der" with an unknown noun: an adjective ending in -en marks the feminine/plural dative or genitive, otherwise masculine nominative
+der 3. große Sieg	der dritte große Sieg
+der 3. großen Klasse	der dritten großen Klasse
+Er wurde 3. und war froh.	Er wurde dritter und war froh.
+nach 2. langem Warten	nach zweitem langem Warten
+# a capitalised word after the period starts a new sentence: still a cardinal
+Das sind 3. Danach	Das sind drei. Danach
+# the tail of a larger number is no ordinal, even before a lower-case word
+Wert 3,5. dann	Wert drei Komma fünf. dann

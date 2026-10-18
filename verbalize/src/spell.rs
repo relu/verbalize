@@ -100,8 +100,8 @@ pub(crate) fn rbnf(language: Language) -> &'static Rbnf {
 }
 
 fn compile(language: Language) -> Rbnf {
-    // `cargo xtask gen` parses the vendored rules with the same parser
-    // before they are checked in, so this cannot fail on shipped data.
+    // The `every_vendored_language_compiles` test compiles every shipped
+    // ruleset, so this cannot fail on shipped data.
     Rbnf::new(language.data())
         .unwrap_or_else(|e| panic!("vendored RBNF data for {}: {e}", language.code()))
 }
