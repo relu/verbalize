@@ -60,7 +60,10 @@ passthrough input keeps its own spelling. Nothing else differs between regions.
 - **Before an attributive adjective**: a trigger word (the triggers above,
   or an indefinite article `ein`/`eine`/`einen`/`einem`/`einer`/`eines`),
   `N.`, then a lower-case word that looks like an attributive adjective: it
-  ends in `-e`, `-en`, `-em`, `-er` or `-es` and is at least four letters.
+  ends in `-e`, `-en`, `-em`, `-er` or `-es`, is at least four letters, and
+  is followed (possibly after more such adjectives) by a capitalised word,
+  since an attributive adjective precedes its noun and German capitalises
+  nouns (`der 3. große rote Ball` → `der dritte große rote Ball`).
   The ordinal takes that adjective's ending, because successive attributive
   adjectives inflect alike (Duden — Die Grammatik, Adjektiv: Deklination
   aufeinanderfolgender Adjektive; the ordinal is an adjective): `der 3.
@@ -73,8 +76,10 @@ passthrough input keeps its own spelling. Nothing else differs between regions.
   adverbs (`wieder`, `immer`), pronouns and determiners (`jeder`,
   `dieser`, `keine`, `seinen`), auxiliary and modal verbs (`werden`,
   `können`); the full lists are `NOT_ADJECTIVES` and `DETERMINER_STEMS` in
-  `lang/de/lexicon.rs`. Before such a word the reading is the one of the
-  previous items (`am 5. oder später` → `am fünften oder später`).
+  `lang/de/lexicon.rs`. Before such a word, or a lower-case word with no
+  noun after it (`bis 3. kommen`, `nach 2. kontrolle in 3 Tagen`), the
+  reading is the one of the previous items (`am 5. oder später` → `am
+  fünften oder später`, `bis 3. kommen` → `bis drei. kommen`).
 - **No trigger, no ordinal**: without a determiner or preposition before
   `N.`, a lower-case word after the period does not make `N.` an ordinal. A
   list number (`Diagnosen: 1. koronare Herzkrankheit, 2. arterielle

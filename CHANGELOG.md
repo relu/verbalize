@@ -64,11 +64,11 @@ All notable changes to this project are documented here. The format follows
   "minus" twice (`-2,5 Mrd. €`, `USD -5.125`); `-1 Mio.` / `-1 mil.`
   take the singular scale word. `de`/`en`/`ro`.
 - German: `um 1 Uhr` is "um ein Uhr" (was "eins Uhr"). After an article
-  or preposition, `N.` before a lower-case adjective is an ordinal with
-  the adjective's ending (`der 3. große Sieg` → "der dritte große Sieg",
-  `nach 2. langer Pause` → "nach zweiter langer Pause"). An angle of one
-  minute or degree is singular (`30°1'` → "dreißig Grad eine Minute",
-  "one minute"). `de`/`en`.
+  or preposition, `N.` before a lower-case adjective and its noun is an
+  ordinal with the adjective's ending (`der 3. große Sieg` → "der dritte
+  große Sieg", `nach 2. langer Pause` → "nach zweiter langer Pause"). An
+  angle of one minute or degree is singular (`30°1'` → "dreißig Grad
+  eine Minute", "one minute"). `de`/`en`.
 - Romanian: `1 ¼` is "unu și un sfert" (was "unu și sfert"); `al II-lea5`
   reads the ordinal and the number as separate words. `ro`.
 - Plural forms and ordinal suffixes of numbers above 2⁶⁴ follow the full

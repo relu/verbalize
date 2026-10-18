@@ -58,7 +58,7 @@ der 30. Geburtstag	der dreißigste Geburtstag
 # region: DeCh
 der 30. Geburtstag	der dreissigste Geburtstag
 # region: default
-# A determiner or preposition before N. and a lower-case adjective after it: the ordinal takes the adjective's ending (Duden Grammatik: successive attributive adjectives inflect alike).
+# A determiner or preposition before N. and a lower-case adjective after it, up to a capitalised noun: the ordinal takes the adjective's ending (Duden Grammatik: successive attributive adjectives inflect alike).
 der 3. große Sieg	der dritte große Sieg
 der 3. großen Klasse	der dritten großen Klasse
 nach 2. langer Pause	nach zweiter langer Pause
@@ -68,6 +68,7 @@ die 3. erfolglosen Versuche	die dritten erfolglosen Versuche
 das 2. beste Ergebnis	das zweite beste Ergebnis
 dem 2. kleinen Kind	dem zweiten kleinen Kind
 von der 2. großen Hürde	von der zweiten großen Hürde
+der 3. große rote Ball	der dritte große rote Ball
 # indefinite article: the adjective's ending, not a default
 eine 2. große Chance	eine zweite große Chance
 Ein 2. großes Haus	Ein zweites großes Haus
@@ -77,6 +78,11 @@ einer 3. großen Chance	einer dritten großen Chance
 Wir treffen uns am 5. oder später	Wir treffen uns am fünften oder später
 Wir treffen uns am 5. sowie am 6.	Wir treffen uns am fünften sowie am sechsten
 am 3. dieses Monats	am dritten dieses Monats
+# no capitalised noun after the lower-case word: it is no attribute, so a strong trigger still needs a lexicon noun
+nach 2. kontrolle in 3 Tagen	nach zwei. kontrolle in drei Tagen
+bis 3. kommen	bis drei. kommen
+nach 3. gerne	nach drei. gerne
+nach 3. über Nacht	nach drei. über Nacht
 # no determiner or preposition before N.: list numbers and bare numbers stay cardinals
 Diagnosen: 1. koronare Herzkrankheit, 2. arterielle Hypertonie, 3. Diabetes mellitus.	Diagnosen: eins. koronare Herzkrankheit, zwei. arterielle Hypertonie, drei. Diabetes mellitus.
 Therapie: 1. absetzen von ASS 2. kontrolle in 3 Tagen	Therapie: eins. absetzen von ASS zwei. kontrolle in drei Tagen

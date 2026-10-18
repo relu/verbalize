@@ -302,11 +302,15 @@ fn ordinal(g: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
     }
     let next = caps.get(3).map(|_| text_of(caps, 3));
     let gender = next.and_then(|w| g.ordinal_noun(w));
-    // Determiner, `N.`, lower-case adjective: the ordinal inflects like the
-    // adjective (Duden: successive attributive adjectives take one ending).
-    // Without a determiner `N.` is a list number or a sentence end.
-    let adjective = match (trigger, next) {
-        (Some(_), Some(word)) if gender.is_none() => adjective_ending(word),
+    // Determiner, `N.`, lower-case adjective, noun: the ordinal inflects like
+    // the adjective (Duden: successive attributive adjectives take one
+    // ending). Without a determiner `N.` is a list number or a sentence end;
+    // without a capitalised noun after it the word is no attribute
+    // (`bis 3. kommen`, `nach 2. kontrolle in`).
+    let adjective = match (trigger, group(caps, 3)) {
+        (Some(_), Some(word)) if gender.is_none() && before_noun(text, word.end) => {
+            adjective_ending(&text[word])
+        }
         _ => None,
     };
     // Otherwise only a trigger whose ending does not depend on the noun's
@@ -326,6 +330,21 @@ fn ordinal(g: &German, text: &str, caps: &Caps<'_>) -> Option<Match> {
         None => ordinal_agreement(trigger, gender),
     };
     Some(m)
+}
+
+/// The words after `at` are adjectives up to a capitalised noun
+/// (`große Sieg`, `große rote Ball`).
+fn before_noun(text: &str, mut at: usize) -> bool {
+    while let Some((word, range)) = next_word(text, at) {
+        if word.starts_with(char::is_uppercase) {
+            return true;
+        }
+        if adjective_ending(word).is_none() {
+            return false;
+        }
+        at = range.end;
+    }
+    false
 }
 
 /// The inflection ending (`e`, `en`, `em`, `er`, `es`) of a lower-case word
