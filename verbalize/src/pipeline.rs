@@ -206,7 +206,9 @@ pub(crate) fn word_bounded(text: &str, range: &Range<usize>) -> bool {
 /// letter is spelled on its own, and one sandwiched between letters of any
 /// case (`H2O`, `HbA1c`) on both sides; a suffix on a word that starts
 /// with the digits stays attached (`630c`, `1990er`, `1F`). The paragraph
-/// sign is spoken as a word, so a number glued to it (`§25`) is separated.
+/// sign is spoken as a word, so a number glued to it (`§25`) is separated. A
+/// reading of any class that starts where the previous span ends is
+/// separated too.
 pub(crate) fn render(text: &str, spans: &[Span]) -> String {
     let mut out = String::with_capacity(text.len() + text.len() / 2);
     let mut at = 0;
@@ -217,10 +219,10 @@ pub(crate) fn render(text: &str, spans: &[Span]) -> String {
         let after = text[span.range.end..].chars().next();
         let sandwiched =
             before.is_some_and(char::is_alphabetic) && after.is_some_and(char::is_alphabetic);
-        // A reading that starts where the previous span ends (`al II-lea5`)
-        // would otherwise fuse with it into one word.
+        // A reading that starts where the previous span ends (`al II-lea5`,
+        // `Nr.2023`) would otherwise fuse with it into one word.
         let abuts_span = at > 0 && at == span.range.start && !out.ends_with(' ');
-        if glue && (sandwiched || before.is_some_and(char::is_uppercase) || abuts_span) {
+        if abuts_span || (glue && (sandwiched || before.is_some_and(char::is_uppercase))) {
             out.push(' ');
         }
         out.push_str(&span.spoken);

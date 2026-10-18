@@ -118,3 +118,6 @@ GmbH	GmbH
 d. h.	das heisst
 Str.	Strasse
 # region: default
+# an abbreviation glued to a number reads as it does with a space
+Nr.2023	Nummer zweitausenddreiundzwanzig
+ca.5 kg	zirka fünf Kilogramm

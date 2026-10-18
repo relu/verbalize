@@ -28,3 +28,7 @@ Capitolul 3.	Capitolul trei.
 # a digit right after the suffix is a word boundary; its reading follows the ordinal.
 al II-lea5	al doilea cinci
 a 3-a5	a treia cinci
+# a following reading that starts exactly where the ordinal ends is a separate word, whatever its class
+al XX-lea2023	al douăzecilea două mii douăzeci și trei
+al 3-lea5 kg	al treilea cinci kilograme
+al 3-lea5%	al treilea cinci la sută

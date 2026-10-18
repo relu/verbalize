@@ -58,13 +58,33 @@ der 30. Geburtstag	der dreißigste Geburtstag
 # region: DeCh
 der 30. Geburtstag	der dreissigste Geburtstag
 # region: default
-# A period followed by a lower-case word is an ordinal dot, not a sentence end (Duden: ordinals are a numeral with a period). Agreement from the preceding determiner; none -> bare strong form.
-# "der" with an unknown noun: an adjective ending in -en marks the feminine/plural dative or genitive, otherwise masculine nominative
+# A determiner or preposition before N. and a lower-case adjective after it: the ordinal takes the adjective's ending (Duden Grammatik: successive attributive adjectives inflect alike).
 der 3. große Sieg	der dritte große Sieg
 der 3. großen Klasse	der dritten großen Klasse
-Er wurde 3. und war froh.	Er wurde dritter und war froh.
+nach 2. langer Pause	nach zweiter langer Pause
 nach 2. langem Warten	nach zweitem langem Warten
+nach 3. erfolglosen Versuchen	nach dritten erfolglosen Versuchen
+die 3. erfolglosen Versuche	die dritten erfolglosen Versuche
+das 2. beste Ergebnis	das zweite beste Ergebnis
+dem 2. kleinen Kind	dem zweiten kleinen Kind
+von der 2. großen Hürde	von der zweiten großen Hürde
+# indefinite article: the adjective's ending, not a default
+eine 2. große Chance	eine zweite große Chance
+Ein 2. großes Haus	Ein zweites großes Haus
+einen 2. großen Preis	einen zweiten großen Preis
+einer 3. großen Chance	einer dritten großen Chance
+# closed-class words end like adjectives but do not carry the ordinal's ending: a gender-free trigger keeps its own
+Wir treffen uns am 5. oder später	Wir treffen uns am fünften oder später
+Wir treffen uns am 5. sowie am 6.	Wir treffen uns am fünften sowie am sechsten
+am 3. dieses Monats	am dritten dieses Monats
+# no determiner or preposition before N.: list numbers and bare numbers stay cardinals
+Diagnosen: 1. koronare Herzkrankheit, 2. arterielle Hypertonie, 3. Diabetes mellitus.	Diagnosen: eins. koronare Herzkrankheit, zwei. arterielle Hypertonie, drei. Diabetes mellitus.
+Therapie: 1. absetzen von ASS 2. kontrolle in 3 Tagen	Therapie: eins. absetzen von ASS zwei. kontrolle in drei Tagen
+Kapitel 4. behandelt	Kapitel vier. behandelt
+Seite 12. siehe	Seite zwölf. siehe
+Platz 1. war	Platz eins. war
 # a capitalised word after the period starts a new sentence: still a cardinal
 Das sind 3. Danach	Das sind drei. Danach
-# the tail of a larger number is no ordinal, even before a lower-case word
+# the tail of a larger number is no ordinal
 Wert 3,5. dann	Wert drei Komma fünf. dann
+Ergebnis 3:2. danach	Ergebnis drei zu zwei. danach

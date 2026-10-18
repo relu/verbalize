@@ -242,7 +242,8 @@ fn ro_properties_over_fixture_inputs() {
 /// month, numeral, roman numeral or counted noun in de, en or ro, so any
 /// difference they cause comes from how the recogniser treats its
 /// surroundings. A comma or period is followed by a word, not by the end of the
-/// text, so the number is not "at the end of the input".
+/// text, so the number is not "at the end of the input". The word after a
+/// period is capitalised: it starts a sentence, as the period says.
 ///
 /// Romanian reads any non-function word after a cardinal of 20 or more as the
 /// counted noun ("21 de zzq"), so an unknown word on the same line legitimately
@@ -260,25 +261,17 @@ fn wrappers(language: Language) -> [(&'static str, &'static str, &'static str); 
         ("lines", "qq\n", "\nzzq"),
         ("parens", "(", ")"),
         ("comma", "", ", zzq"),
-        ("period", "", ". zzq"),
+        ("period", "", ". Zzq"),
     ]
 }
 
 /// Whether `wrapper` makes a different input rather than embedding the same
-/// one: "X.." and "X,," are not "X. zzq", and in de and ro a period after a
+/// one: "X.." and "X,," are not "X. Zzq", and in de and ro a period after a
 /// dotted number (`2.3` + `.`) is the closing dot of a date, which the date
-/// reading consumes. German writes ordinals as `N.` and a period before a
-/// lower-case word is one, so `X. zzq` and `N. zzq` are not neutral there.
+/// reading consumes.
 fn wrapper_applies(language: Language, wrapper: &str, input: &str) -> bool {
-    let german = language == Language::De;
     match wrapper {
         "comma" => !input.ends_with(','),
-        "words" => {
-            !(german
-                && input
-                    .strip_suffix('.')
-                    .is_some_and(|n| n.ends_with(|c: char| c.is_ascii_digit())))
-        }
         "period" => {
             let dotted_number = input
                 .rsplit(|c: char| !c.is_ascii_digit() && c != '.')
@@ -286,9 +279,7 @@ fn wrapper_applies(language: Language, wrapper: &str, input: &str) -> bool {
                 .is_some_and(|run| {
                     run.contains('.') && run.ends_with(|c: char| c.is_ascii_digit())
                 });
-            !input.ends_with('.')
-                && !(language != Language::En && dotted_number)
-                && !(german && input.ends_with(|c: char| c.is_ascii_digit()))
+            !input.ends_with('.') && !(language != Language::En && dotted_number)
         }
         _ => true,
     }
@@ -853,4 +844,49 @@ fn abbreviations_can_be_left_alone() {
     assert_eq!(de.normalize("z. B. 5 km"), "z. B. fünf Kilometer");
     let en = Normalizer::with_options(Language::En, options);
     assert_eq!(en.normalize("e.g. 5 km"), "e.g. five kilometers");
+}
+
+/// A line break ends an abbreviation: `z.⏎B.` is two lines, and no span may
+/// cross it. Every abbreviation fixture with a space is re-read with line
+/// breaks in place of its spaces (the spaced lexicon keys are among them).
+fn abbreviations_stop_at_line_breaks(language: Language) {
+    let mut normalizers = Normalizers::new(language);
+    let mut report = String::new();
+    let mut tested = 0;
+    for case in cases(&fixture_dir(language).join("abbreviation.tsv")) {
+        if !case.input.contains(' ') {
+            continue;
+        }
+        tested += 1;
+        let broken = case.input.replace(' ', "\n");
+        let spans = normalizers.get(case.region).annotate(&broken);
+        if let Err(e) = check_spans(&broken, &spans) {
+            report.push_str(&format!("{broken:?}: {e}\n"));
+        }
+    }
+    assert!(
+        tested > 0,
+        "no spaced abbreviation fixture in {}",
+        language.code()
+    );
+    assert!(
+        report.is_empty(),
+        "{} spans cross a line break:\n{report}",
+        language.code()
+    );
+}
+
+#[test]
+fn de_abbreviations_stop_at_line_breaks() {
+    abbreviations_stop_at_line_breaks(Language::De);
+}
+
+#[test]
+fn en_abbreviations_stop_at_line_breaks() {
+    abbreviations_stop_at_line_breaks(Language::En);
+}
+
+#[test]
+fn ro_abbreviations_stop_at_line_breaks() {
+    abbreviations_stop_at_line_breaks(Language::Ro);
 }

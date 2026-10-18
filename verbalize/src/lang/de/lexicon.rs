@@ -58,6 +58,84 @@ pub(super) const STRONG_DATIVE: &[&str] = &["seit", "ab", "bis", "nach", "vor"];
 /// All trigger words, for the regexes.
 pub(super) const TRIGGERS: &str = "am|vom|zum|beim|im|dem|den|des|der|die|das|seit|ab|bis|nach|vor";
 
+/// Indefinite articles. Before `N.` and a lower-case adjective they mark an
+/// ordinal like the definite triggers do, but fix no ending themselves.
+pub(super) const INDEFINITE_ARTICLES: &str = "einen|einem|einer|eines|eine|ein";
+
+/// Lower-case words of four or more letters that end in `-e`/`-en`/`-em`/`-er`/
+/// `-es` without being attributive adjectives, so an ordinal before them takes
+/// no ending from them: conjunctions, prepositions, adverbs and
+/// pronouns, plus the auxiliary and modal verbs whose plural ends in `-en`.
+/// A fixed closed class, not a dictionary: an open class (other verbs,
+/// lower-case nouns) cannot be listed.
+pub(super) const NOT_ADJECTIVES: &[&str] = &[
+    "oder",
+    "aber",
+    "sowie",
+    "weder",
+    "solange",
+    "indem",
+    "nachdem",
+    "seitdem",
+    "über",
+    "unter",
+    "hinter",
+    "neben",
+    "wegen",
+    "gegen",
+    "ohne",
+    "außer",
+    "ausser",
+    "zwischen",
+    "inmitten",
+    "binnen",
+    "wieder",
+    "immer",
+    "eben",
+    "hier",
+    "daher",
+    "woher",
+    "leider",
+    "außerdem",
+    "trotzdem",
+    "heute",
+    "morgen",
+    "oben",
+    "unten",
+    "gerade",
+    "bitte",
+    "dessen",
+    "deren",
+    "denen",
+    "ihnen",
+    "haben",
+    "hatten",
+    "werden",
+    "wurden",
+    "waren",
+    "wären",
+    "können",
+    "konnten",
+    "müssen",
+    "mussten",
+    "sollen",
+    "sollten",
+    "wollen",
+    "wollten",
+    "dürfen",
+    "durften",
+    "mögen",
+    "möchten",
+];
+
+/// Stems of determiners and quantifiers (`dieser`, `jedem`, `keine`,
+/// `seinen`): they take the case ending themselves and do not follow an
+/// ordinal, so a word made of a stem and an ending is not an adjective.
+pub(super) const DETERMINER_STEMS: &[&str] = &[
+    "dies", "jen", "jed", "welch", "manch", "solch", "all", "kein", "mein", "dein", "sein", "ihr",
+    "unser", "eur", "ein", "einig", "mehrer", "viel", "wenig", "beid",
+];
+
 pub(super) const TABLES: Tables = Tables {
     ratio_triggers: &[
         "Titer",

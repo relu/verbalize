@@ -10,7 +10,7 @@ use std::ops::Range;
 use regex::Regex;
 
 use super::units::Units;
-use super::{next_word, Context, Lang, Numerals, Tables, Verbalized, SPACE_GROUPS};
+use super::{next_word, Context, Lang, Numerals, Tables, Verbalized, HSPACE, SPACE_GROUPS};
 use crate::data::LangData;
 use crate::pipeline::{self, Match, Recognizers};
 use crate::token::{Agreement, Gender, NounPosition, Numeral, Scale, Token};
@@ -95,9 +95,10 @@ impl German {
         let abbreviation_regex = options.expand_abbreviations.then(|| {
             let mut keys: Vec<&String> = abbreviations.values().map(|(k, _)| k).collect();
             keys.sort_by_key(|k| std::cmp::Reverse(k.len()));
+            // Only horizontal space joins the parts: a line break ends the line.
             let alternation: Vec<String> = keys
                 .iter()
-                .map(|k| regex::escape(k).replace(' ', "\\s?"))
+                .map(|k| regex::escape(k).replace(' ', &format!("{HSPACE}?")))
                 .collect();
             Regex::new(&format!("(?:{})", alternation.join("|"))).expect("escaped keys")
         });

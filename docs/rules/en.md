@@ -362,4 +362,5 @@ readings the engine already produces).
   sides is spaced on both sides (`H2O` → "H two O", `HbA1c` → "HbA one
   c"); a suffix on a word that starts with the digits stays attached
   (`1stx` → "onestx", `1e10` → "oneeten"); `1.5liters` → "one point
-  fiveliters".
+  fiveliters". A reading of any class that starts where the previous one
+  ends is separated by a space (`No.2023` → "Number twenty twenty-three").

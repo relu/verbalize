@@ -22,9 +22,9 @@ assert_eq!(
 
 | Language | Status | Example |
 |---|---|---|
-| German (`de`) | Complete: every class below, case/gender agreement, 635 fixture lines, `docs/rules/de.md` | `Am 1. November kostet es 8,80 €.` → `Am ersten November kostet es acht Euro achtzig.` |
-| English (`en`) | Complete: every class, `Options::region` `EnUs` (default) / `EnGb` for date order, 438 fixture lines, `docs/rules/en.md` | `On November 1, 2026 I paid $8.80 at 2:30 pm.` → `On November first, twenty twenty-six I paid eight dollars and eighty cents at two thirty p m.` |
-| Romanian (`ro`) | Complete: every class, gender agreement and the "de" construction, 400 fixture lines, `docs/rules/ro.md` | `Pe 1 noiembrie 2026 am plătit 20 de lei la ora 14:30.` → `Pe întâi noiembrie două mii douăzeci și șase am plătit douăzeci de lei la paisprezece și treizeci.` |
+| German (`de`) | Complete: every class below, case/gender agreement, 655 fixture lines, `docs/rules/de.md` | `Am 1. November kostet es 8,80 €.` → `Am ersten November kostet es acht Euro achtzig.` |
+| English (`en`) | Complete: every class, `Options::region` `EnUs` (default) / `EnGb` for date order, 440 fixture lines, `docs/rules/en.md` | `On November 1, 2026 I paid $8.80 at 2:30 pm.` → `On November first, twenty twenty-six I paid eight dollars and eighty cents at two thirty p m.` |
+| Romanian (`ro`) | Complete: every class, gender agreement and the "de" construction, 403 fixture lines, `docs/rules/ro.md` | `Pe 1 noiembrie 2026 am plătit 20 de lei la ora 14:30.` → `Pe întâi noiembrie două mii douăzeci și șase am plătit douăzeci de lei la paisprezece și treizeci.` |
 
 The three modules share one core (`verbalize/src/lang/common.rs`): the
 language-neutral recognisers, the CLDR unit resolver and the number

@@ -50,9 +50,11 @@ All notable changes to this project are documented here. The format follows
   `de`/`en`/`ro`.
 - Text after a reading is kept intact: `Es hat 20° in Berlin` was
   "zwanzig Gradin Berlin", `1,5 × 10³ Zellen` was "… hoch dreiZellen";
-  numbers, units and signs are never joined across a line break, so
-  `Pagina 21` at the end of a line no longer takes "de" from the next
-  line, and a phone number keeps the parentheses around it.
+  numbers, units, signs and abbreviations are never joined across a line
+  break, so `Pagina 21` at the end of a line no longer takes "de" from
+  the next line, and a phone number keeps the parentheses around it. Two
+  readings that touch are separated: `Nr.2023` was
+  "Nummerzweitausenddreiundzwanzig", `ca.5 kg` "zirkafünf Kilogramm".
   `de`/`en`/`ro`.
 - A unit after a comparison sign or scale word is read when more text
   follows (`≤10 mg pro Tag` → "kleiner oder gleich zehn Milligramm pro
@@ -61,10 +63,12 @@ All notable changes to this project are documented here. The format follows
 - Negative amounts with a scale word or three or more decimals said
   "minus" twice (`-2,5 Mrd. €`, `USD -5.125`); `-1 Mio.` / `-1 mil.`
   take the singular scale word. `de`/`en`/`ro`.
-- German: `um 1 Uhr` is "um ein Uhr" (was "eins Uhr"); `N.` before a
-  lower-case word is an ordinal (`der 3. große Sieg` → "der dritte große
-  Sieg"). An angle of one minute or degree is singular (`30°1'` →
-  "dreißig Grad eine Minute", "one minute"). `de`/`en`.
+- German: `um 1 Uhr` is "um ein Uhr" (was "eins Uhr"). After an article
+  or preposition, `N.` before a lower-case adjective is an ordinal with
+  the adjective's ending (`der 3. große Sieg` → "der dritte große Sieg",
+  `nach 2. langer Pause` → "nach zweiter langer Pause"). An angle of one
+  minute or degree is singular (`30°1'` → "dreißig Grad eine Minute",
+  "one minute"). `de`/`en`.
 - Romanian: `1 ¼` is "unu și un sfert" (was "unu și sfert"); `al II-lea5`
   reads the ordinal and the number as separate words. `ro`.
 - Plural forms and ordinal suffixes of numbers above 2⁶⁴ follow the full

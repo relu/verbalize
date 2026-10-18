@@ -56,19 +56,33 @@ passthrough input keeps its own spelling. Nothing else differs between regions.
   Elsewhere "N." is left alone before a capital or the end of the text; a
   wrong case ending is judged worse than the engine's own guess. Strong
   triggers (`seit`, `ab`, `bis`, `nach`, `vor`) and `der` still need a noun
-  of known gender, except before a lower-case word (next item).
-- **Before a lower-case word**: `N.` followed by whitespace and a
-  lower-case word is an ordinal even without a lexicon noun, because a
-  German sentence period is followed by a capital and an ordinal is a
-  numeral with a period (Duden). The ending comes from the preceding
-  trigger (`nach 2. langem Warten` → `nach zweitem langem Warten`); with
-  none, the bare strong form (`Er wurde 3. und war froh.` → `Er wurde
-  dritter und war froh.`). `der` is masculine nominative unless the next
-  word ends in `-en` (`der 3. große Sieg` → `der dritte große Sieg`, `der
-  3. großen Klasse` → `der dritten großen Klasse`). Before a capital the
-  period ends the sentence and `N` stays a cardinal (`Das sind 3. Danach`
-  → `Das sind drei. Danach`), as does the tail of a larger number
-  (`3,5.`, `22 000.`, `-12.`, `1.11.`).
+  of known gender, except before an adjective (next item).
+- **Before an attributive adjective**: a trigger word (the triggers above,
+  or an indefinite article `ein`/`eine`/`einen`/`einem`/`einer`/`eines`),
+  `N.`, then a lower-case word that looks like an attributive adjective: it
+  ends in `-e`, `-en`, `-em`, `-er` or `-es` and is at least four letters.
+  The ordinal takes that adjective's ending, because successive attributive
+  adjectives inflect alike (Duden — Die Grammatik, Adjektiv: Deklination
+  aufeinanderfolgender Adjektive; the ordinal is an adjective): `der 3.
+  große Sieg` → `der dritte große Sieg`, `der 3. großen Klasse` → `der
+  dritten großen Klasse`, `nach 2. langer Pause` → `nach zweiter langer
+  Pause`, `nach 3. erfolglosen Versuchen` → `nach dritten erfolglosen
+  Versuchen`, `eine 2. große Chance` → `eine zweite große Chance`. Not an
+  adjective: a closed class that merely ends alike — conjunctions
+  (`oder`, `aber`, `sowie`), prepositions (`über`, `unter`, `hinter`),
+  adverbs (`wieder`, `immer`), pronouns and determiners (`jeder`,
+  `dieser`, `keine`, `seinen`), auxiliary and modal verbs (`werden`,
+  `können`); the full lists are `NOT_ADJECTIVES` and `DETERMINER_STEMS` in
+  `lang/de/lexicon.rs`. Before such a word the reading is the one of the
+  previous items (`am 5. oder später` → `am fünften oder später`).
+- **No trigger, no ordinal**: without a determiner or preposition before
+  `N.`, a lower-case word after the period does not make `N.` an ordinal. A
+  list number (`Diagnosen: 1. koronare Herzkrankheit, 2. arterielle
+  Hypertonie`) or a sentence end (`Kapitel 4. behandelt`) stays a
+  cardinal and the period stays, as does the tail of a larger number
+  (`3,5.`, `3:2.`, `22 000.`, `1.11.`), which a trigger can never directly
+  precede. Before a capital the period ends the sentence and `N` stays a
+  cardinal (`Das sind 3. Danach` → `Das sind drei. Danach`).
 - **Ordinal noun lexicon (fixed list, with gender)**: Klasse (f),
   Stock (m), Etage (f), Platz (m), Mal (n), Liga (f), Runde (f),
   Halbjahr (n), Quartal (n), Semester (n), Jahrhundert (n), Auflage (f),
@@ -321,7 +335,11 @@ passthrough input keeps its own spelling. Nothing else differs between regions.
 ## Abbreviation
 
 - **Written**: the fixed Duden abbreviation list (§ below), with or
-  without inter-word spaces (`z. B.`, `z.B.`).
+  without inter-word spaces (`z. B.`, `z.B.`). Only horizontal space
+  (blank, tab, no-break space) joins the parts: `z.⏎B.` is two lines, not
+  an abbreviation. A number glued to an abbreviation reads as with a
+  space (`Nr.2023` → "Nummer zweitausenddreiundzwanzig", `ca.5 kg` →
+  "zirka fünf Kilogramm").
 - **Spoken**: the expansion from the list, only when
   `Options::expand_abbreviations` is true (default). Weekdays `Mo.`–`So.`
   and months `Jan.`–`Dez.` expand via the CLDR de abbreviated names

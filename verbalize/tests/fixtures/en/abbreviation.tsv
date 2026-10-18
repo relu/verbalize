@@ -21,3 +21,7 @@ Dec.	December
 No.	No.
 # negative: not in the table
 GmbH	GmbH
+# an abbreviation glued to a number reads as it does with a space
+No.2023	Number twenty twenty-three
+# the two-word abbreviation joins across horizontal space only
+Smith et al. found it	Smith and others found it
