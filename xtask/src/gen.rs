@@ -32,10 +32,6 @@ pub fn generate(cldr: &Path, tag: &str) -> Result<Vec<(String, String)>> {
     for lang in LANGUAGES {
         files.push((format!("{lang}.rs"), lang_source(cldr, lang, &header)?));
     }
-    files.push((
-        "supplemental.rs".to_string(),
-        supplemental_source(cldr, &header)?,
-    ));
     Ok(files)
 }
 
@@ -96,8 +92,6 @@ fn lang_source(cldr: &Path, lang: &str, header: &str) -> Result<String> {
     write_symbols(&mut out, &symbols)?;
     write_rbnf(&mut out, &rulesets)?;
     write_currencies(&mut out, &currencies, lang)?;
-    out.push_str("    currency_digits: supplemental::CURRENCY_DIGITS,\n");
-    out.push_str("    currency_digits_default: supplemental::CURRENCY_DIGITS_DEFAULT,\n");
     write_units(&mut out, &units, lang)?;
     write_calendar(&mut out, &dates, lang)?;
     out.push_str("};\n");
@@ -105,7 +99,7 @@ fn lang_source(cldr: &Path, lang: &str, header: &str) -> Result<String> {
 }
 
 /// `NumberSymbols` field name and value, in struct order.
-type Symbols = [(&'static str, String); 5];
+type Symbols = [(&'static str, String); 3];
 
 fn symbols(json: &Json, lang: &str) -> Result<Symbols> {
     let numbers = format!("main/{lang}/numbers");
@@ -122,8 +116,6 @@ fn symbols(json: &Json, lang: &str) -> Result<Symbols> {
     Ok([
         ("decimal", get("decimal")?),
         ("group", get("group")?),
-        ("percent", get("percentSign")?),
-        ("permille", get("perMille")?),
         ("minus", get("minusSign")?),
     ])
 }
@@ -187,14 +179,12 @@ fn write_currencies(out: &mut String, json: &Json, lang: &str) -> Result<()> {
         let ctx = format!("{}: {code}", json.file);
         let mut name = None;
         let mut names = Vec::new();
-        let (mut symbol, mut narrow, mut variant) = (None, None, None);
         for (key, value) in expect_object(entry, &ctx)? {
             let value = expect_str(value, &format!("{ctx}/{key}"))?;
             match key.as_str() {
                 "displayName" => name = Some(value),
-                "symbol" => symbol = Some(value),
-                "symbol-alt-narrow" => narrow = Some(value),
-                "symbol-alt-variant" => variant = Some(value),
+                // Symbols are not emitted: the languages keep their own currency tables.
+                "symbol" | "symbol-alt-narrow" | "symbol-alt-variant" => {}
                 _ => match key.strip_prefix("displayName-count-") {
                     Some(plural) => names.push((plural_variant(plural, &ctx)?, value)),
                     None => return Err(format!("{ctx}: unknown key {key}").into()),
@@ -208,13 +198,10 @@ fn write_currencies(out: &mut String, json: &Json, lang: &str) -> Result<()> {
             .collect();
         writeln!(
             out,
-            "        Currency {{ code: {}, name: {}, names: &[{}], symbol: {}, symbol_narrow: {}, symbol_variant: {} }},",
+            "        Currency {{ code: {}, name: {}, names: &[{}] }},",
             lit(code),
             lit(name),
-            names.join(", "),
-            opt_lit(symbol),
-            opt_lit(narrow),
-            opt_lit(variant)
+            names.join(", ")
         )?;
     }
     out.push_str("    ],\n");
@@ -293,7 +280,7 @@ fn write_units(out: &mut String, json: &Json, lang: &str) -> Result<()> {
             opt_lit(l.per)
         )?;
         write_patterns(out, &l.patterns)?;
-        writeln!(out, "        ], short_name: {}, short: &[", opt_lit(s.name))?;
+        writeln!(out, "        ], short: &[")?;
         write_patterns(out, &s.patterns)?;
         out.push_str("        ] },\n");
     }
@@ -365,43 +352,6 @@ fn write_calendar(out: &mut String, json: &Json, lang: &str) -> Result<()> {
         writeln!(out, "    {field}: [{}],", names.join(", "))?;
     }
     Ok(())
-}
-
-// ------------------------------------------------------------ supplemental
-
-fn supplemental_source(cldr: &Path, header: &str) -> Result<String> {
-    let json = Json::load(cldr, SUPPLEMENTAL)?;
-    let mut rows = Vec::new();
-    let mut default = None;
-    for (code, entry) in json.object("supplemental/currencyData/fractions")? {
-        let ctx = format!("{}: fractions/{code}", json.file);
-        let digits = entry
-            .get("_digits")
-            .ok_or_else(|| format!("{ctx}: no _digits"))?;
-        let digits: u8 = expect_str(digits, &ctx)?
-            .parse()
-            .map_err(|e| format!("{ctx}: _digits: {e}"))?;
-        if code == "DEFAULT" {
-            default = Some(digits);
-        } else {
-            rows.push((code.as_str(), digits));
-        }
-    }
-    let default = default.ok_or_else(|| format!("{}: no DEFAULT fraction", json.file))?;
-    rows.sort();
-
-    let mut out = String::from(header);
-    out.push_str(
-        "/// Minor-unit digits by ISO 4217 code, ascending (supplemental `currencyData`).\n",
-    );
-    out.push_str("#[rustfmt::skip]\npub const CURRENCY_DIGITS: &[(&str, u8)] = &[\n");
-    for (code, digits) in rows {
-        writeln!(out, "    ({}, {digits}),", lit(code))?;
-    }
-    out.push_str("];\n\n");
-    out.push_str("/// Digits for codes not listed in `CURRENCY_DIGITS`.\n");
-    writeln!(out, "pub const CURRENCY_DIGITS_DEFAULT: u8 = {default};")?;
-    Ok(out)
 }
 
 // ----------------------------------------------------------------- helpers

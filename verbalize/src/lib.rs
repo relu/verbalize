@@ -17,7 +17,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-pub mod data;
+mod data;
 mod lang;
 mod pipeline;
 mod rbnf;
@@ -39,8 +39,7 @@ impl Normalizer {
         Normalizer::with_options(language, Options::default())
     }
 
-    /// English and Romanian have no language module yet: their normalizer
-    /// returns the input verbatim.
+    /// Like [`Normalizer::new`], with explicit reading [`Options`].
     pub fn with_options(language: Language, options: Options) -> Self {
         let lang = lang::new(language, &options);
         Normalizer { lang, options }
@@ -63,7 +62,8 @@ impl Normalizer {
     }
 }
 
-/// Reading options.
+/// Reading options. New fields may appear in a minor release before 1.0:
+/// build with a struct literal ending in `..Options::default()`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Options {
     /// Expand "z. B." → "zum Beispiel" etc. Default true.
@@ -106,6 +106,7 @@ pub enum Region {
 /// region and other subtags are accepted and ignored here (`Options::region`
 /// selects regional readings).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Language {
     De,
     En,

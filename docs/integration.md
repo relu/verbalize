@@ -100,8 +100,10 @@ The exit code is non-zero when any shape in the "unhandled" section
 at least `--threshold` times. This is the mechanism that finds the next
 "8,80 €" — a shape the classifier doesn't yet know — before a user hears it
 misread, rather than after. Point it at a directory of exported text files
-or a `sqlite:<path>` database (every `TEXT` column of every table is
-scanned); wire it into the same CI that runs your test suite so a coverage
+or a `sqlite:<path>` database (every column with TEXT affinity of every
+table is scanned — by SQLite's rule, any declared type containing `CHAR`,
+`CLOB` or `TEXT` and not `INT`, so `VARCHAR(50)` counts); wire it into the
+same CI that runs your test suite so a coverage
 regression fails the build the same way a broken test would.
 
 ## Idempotence

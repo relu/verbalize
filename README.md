@@ -16,7 +16,7 @@ assert_eq!(
 );
 ```
 
-(Verified: `echo "Am 1. November kostet es 8,80 €." | cargo run -q -p verbalize-cli -- normalize` prints exactly that.)
+(Verified: `echo "Am 1. November kostet es 8,80 €." | cargo run -q -p verbalize-cli -- normalize --lang de` prints exactly that.)
 
 ## Languages
 
@@ -102,7 +102,7 @@ verbalize annotate --json input.txt      # same spans as a JSON array
 # frequency, plus the shapes that are still unhandled (fallback or verbatim)
 verbalize survey corpus/ --threshold 5   # non-zero exit if an unhandled
                                           # shape occurs 5+ times (for CI)
-verbalize survey sqlite:app.db           # every TEXT column, every table
+verbalize survey sqlite:app.db           # every TEXT-affinity column, every table
 ```
 
 Flags shared by `normalize`/`annotate`: `--lang de|en|ro` (default `en`),
@@ -118,6 +118,9 @@ pub struct Options {
     pub lexicon: Vec<(String, String)>, // caller domain shorthand, applied last
 }
 ```
+
+Build it as a struct literal with `..Options::default()` so new fields do
+not break your code.
 
 `lexicon` is a literal, case-sensitive, word-bounded substitution applied
 after every digit-bearing class, so it can add domain vocabulary (clinical

@@ -129,6 +129,24 @@ fn ruleset_by_name() {
 }
 
 #[test]
+fn ordinal_suffix_beyond_u64() {
+    // The `1000000000000000000` rule's plural operand is n / 10^18, which
+    // here exceeds u64; CLDR en ordinal rules only read its last digits.
+    let suffix = |k: i128| {
+        let n = 10i128.pow(38) + k * 10i128.pow(18);
+        let text = spell::ruleset(En, "%spellout-ordinal", n).unwrap();
+        text.trim_start_matches(|c: char| c.is_ascii_digit() || c == ',')
+            .to_string()
+    };
+    assert_eq!(suffix(1), "st");
+    assert_eq!(suffix(2), "nd");
+    assert_eq!(suffix(3), "rd");
+    assert_eq!(suffix(4), "th");
+    assert_eq!(suffix(11), "th");
+    assert_eq!(suffix(21), "st");
+}
+
+#[test]
 fn language_from_bcp47() {
     assert_eq!("de".parse(), Ok(De));
     assert_eq!("de-AT".parse(), Ok(De));

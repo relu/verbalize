@@ -1,7 +1,7 @@
 //! CLDR tables, compiled from the JSON vendored under `xtask/cldr/` by
-//! `cargo xtask gen`. This file is hand-written; the per-language files and
-//! `supplemental.rs` are generated and must not be edited. `cargo xtask
-//! check-data` fails when they are stale.
+//! `cargo xtask gen`. This file is hand-written; the per-language files are
+//! generated and must not be edited. `cargo xtask check-data` fails when
+//! they are stale.
 //!
 //! Everything is `static` data with `&'static str` leaves: no parsing, no
 //! allocation, no I/O at runtime.
@@ -12,7 +12,6 @@ use icu_plurals::PluralCategory;
 pub mod de;
 pub mod en;
 pub mod ro;
-pub mod supplemental;
 
 /// Generated CLDR tables for one language.
 pub struct LangData {
@@ -25,10 +24,6 @@ pub struct LangData {
     pub rbnf: &'static [Ruleset],
     /// Currencies in CLDR order, i.e. by ISO 4217 code (`currencies.json`).
     pub currencies: &'static [Currency],
-    /// Minor-unit digits by ISO 4217 code, ascending (supplemental
-    /// `currencyData`); codes not listed use `currency_digits_default`.
-    pub currency_digits: &'static [(&'static str, u8)],
-    pub currency_digits_default: u8,
     /// Measurement units in CLDR order (`units.json`), excluding prefixes and
     /// compound patterns.
     pub units: &'static [Unit],
@@ -45,8 +40,6 @@ pub struct LangData {
 pub struct NumberSymbols {
     pub decimal: &'static str,
     pub group: &'static str,
-    pub percent: &'static str,
-    pub permille: &'static str,
     pub minus: &'static str,
 }
 
@@ -66,12 +59,6 @@ pub struct Currency {
     pub name: &'static str,
     /// `displayName-count-*`, e.g. `[(One, "Britisches Pfund"), (Other, "Britische Pfund")]`.
     pub names: &'static [(PluralCategory, &'static str)],
-    /// `symbol`, e.g. `€`; absent when CLDR uses the code.
-    pub symbol: Option<&'static str>,
-    /// `symbol-alt-narrow`, often ambiguous (`$` for every dollar).
-    pub symbol_narrow: Option<&'static str>,
-    /// `symbol-alt-variant`.
-    pub symbol_variant: Option<&'static str>,
 }
 
 pub struct Unit {
@@ -85,8 +72,6 @@ pub struct Unit {
     pub long_per: Option<&'static str>,
     /// Long patterns by plural category and case, e.g. `{0} Kilometern`.
     pub long: &'static [UnitPattern],
-    /// Short `displayName`, e.g. `km`.
-    pub short_name: Option<&'static str>,
     /// Short patterns by plural category, e.g. `{0} km`; the source of the
     /// symbol → unit reverse index.
     pub short: &'static [UnitPattern],

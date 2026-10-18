@@ -56,7 +56,7 @@ impl Rbnf {
                     let category = rules
                         .as_ref()
                         .expect("plural rules are built when a rule needs them")
-                        .category_for(u64::try_from(operand).unwrap_or(u64::MAX));
+                        .category_for(operand);
                     let form = plural
                         .forms
                         .iter()

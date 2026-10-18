@@ -54,7 +54,9 @@ pub enum NounPosition {
 
 /// What the spoken form of a number must agree with. Decided by the
 /// classifier from local context and consumed by the verbalizer;
-/// `Agreement::default()` is the bare, context-free reading.
+/// `Agreement::default()` is the bare, context-free reading. New fields may
+/// appear in a minor release before 1.0: build with a struct literal ending
+/// in `..Agreement::default()`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Agreement {
     pub case: Case,
