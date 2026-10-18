@@ -1,5 +1,7 @@
 # Invoked by release.yml (dist `publish-jobs = ["./publish-crates"]`) after
-# every platform artifact has built, before the GitHub release is announced.
+# every platform artifact has built and `host` has finished, before the
+# `announce` job creates the GitHub release; a failed publish here means no
+# release is created.
 #
 # Authenticates via crates.io Trusted Publishing (OIDC): no long-lived token.
 # crates.io validates the *calling* workflow's `workflow_ref`, so each crate's

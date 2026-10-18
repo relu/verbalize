@@ -184,9 +184,9 @@ The tag triggers the workflow: it builds the CLI for every target, runs
 `.github/workflows/publish-crates.yml` (`cargo publish` for `verbalize`
 then `verbalize-cli`, authenticated by crates.io Trusted Publishing — each
 crate lists `relu/verbalize` / `release.yml` as a trusted publisher, no
-token secret), then creates the GitHub release with the archives,
-installers, checksums and the changelog section for that version as
-release notes.
+token secret), and only if that succeeds creates the GitHub release with
+the archives, installers, checksums and the changelog section for that
+version as release notes. A failed publish therefore leaves no release.
 
 ## Licence
 

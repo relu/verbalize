@@ -17,13 +17,25 @@ install-path = "CARGO_HOME"
 hosting = "github"
 # Custom workflow_call jobs run after all artifacts build, before announce
 publish-jobs = ["./publish-crates"]
+# Create the GitHub Release in `announce`, which waits for crates.io, so a
+# failed `cargo publish` leaves no public release. Safe because no publisher
+# references hosted artifact URLs (no Homebrew/npm); the shell/PowerShell
+# installers are themselves release assets.
+github-release = "announce"
 # The generated job otherwise only grants id-token/packages, leaving
 # publish-crates.yml's own `contents: read` (needed for actions/checkout)
 # capped at "none" per GitHub's reusable-workflow permission ceiling.
 github-custom-job-permissions = { "publish-crates" = { id-token = "write", packages = "write", contents = "read" } }
 # Whether to install an updater program
 install-updater = false
-# Dependabot bumps the action pins inside the generated release.yml, which the
-# pinned cargo-dist version regenerates from its own template; without this, a
-# bumped pin makes `dist plan` fail on every PR until the template catches up.
+# Dependabot bumps the action pins inside the generated release.yml; without
+# this, the bumped file makes `dist plan` fail on every PR. The pins come from
+# [dist.github-action-commits] below, so mirror each bump there: with this
+# line removed, `dist generate` rewrites release.yml from that table.
 allow-dirty = ["ci"]
+
+# Full commit SHAs for every action dist emits into release.yml.
+[dist.github-action-commits]
+"actions/checkout" = "3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+"actions/upload-artifact" = "cf430e030ddbb5b0abf93d22962f4752f3646cd9" # v7.0.2
+"actions/download-artifact" = "9000827ccba6bdab643e8b6fd33ac0654aef8333" # v8.0.2
